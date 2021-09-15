@@ -1,0 +1,6 @@
+.DS_Store
+*~
+out
+*.wav
+*.egg-info
+events.txt
