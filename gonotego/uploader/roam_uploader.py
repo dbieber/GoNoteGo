@@ -135,7 +135,7 @@ def upload(note_events, headless=True):
   for note_event in note_events:
     text = note_event.text.strip()
     if note_event.audio_filepath:
-      text = f'{text} #[[Unverified transcription]]'
+      text = f'{text} #[[unverified transcription]]'
     block_uid = browser.insert_note(text)
     print(f'Inserted: {text} at {block_uid}')
     if note_event.audio_filepath:
