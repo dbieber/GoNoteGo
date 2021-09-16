@@ -3,13 +3,19 @@ import setuptools
 DEPENDENCIES = [
     'fire>=0.4.0',
     'keyboard',
+    'google-cloud-speech',
+    'redis',
     'sounddevice',
     'soundfile',
+    'supervisor',
 ]
 
 packages = [
     'gonotego',
     'gonotego.audio',
+    'gonotego.common',
+    'gonotego.text',
+    'gonotego.transcription',
 ]
 setuptools.setup(
     name="GoNoteGo",
