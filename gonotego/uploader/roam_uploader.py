@@ -1,6 +1,8 @@
 import getpass
 import time
 
+import dropbox
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -59,11 +61,14 @@ class RoamBrowser:
     password_el = driver.find_element_by_name('password')
     password_el.clear()
     password_el.send_keys(password)
+    self.screenshot('screenshot-signing-in.png')
     password_el.send_keys(Keys.RETURN)
     time.sleep(1.0)
+    self.sleep_until_astrolabe_gone()
 
   def screenshot(self, name=None):
     filename = name or 'screenshot.png'
+    print(f'Saving screenshot to {filename}')
     self.driver.save_screenshot(filename)
 
   def sleep(self):
@@ -77,8 +82,32 @@ class RoamBrowser:
 
   def insert_note(self, text):
     text = text.replace('`', r'\`').replace('${', r'\${')
-    js = f'insertGoNoteGoNote(`{text}`)'
+    js = f'window.insertion_result = insertGoNoteGoNote(`{text}`);'
     self.utils.execute_script_tag(js)
+    time.sleep(0.25)
+    retries = 5
+    while retries:
+      try:
+        return self.driver.execute_script('return window.insertion_result;');
+      except:
+        print('Retrying script: window.insertion_result.')
+        time.sleep(1)
+        retries -= 1
+
+  def create_child_block(self, parent_uid, block, order=-1):
+    parent_uid = parent_uid.replace('`', r'\`').replace('${', r'\${')
+    block = block.replace('`', r'\`').replace('${', r'\${')
+    js = f'window.insertion_result = createChildBlock(`{parent_uid}`, `{block}`, {order});'
+    self.utils.execute_script_tag(js)
+
+  def sleep_until_astrolabe_gone(self, timeout=30):
+    while self.driver.find_elements_by_class_name('loading-astrolabe'):
+      print('Astrolabe still there.')
+      time.sleep(1)
+      timeout -= 1
+      if timeout <= 0:
+        raise RuntimeError('Astrolabe still there after timeout.')
+    print('Astrolabe gone.')
 
 
 def upload(note_events, headless=True):
@@ -94,40 +123,31 @@ def upload(note_events, headless=True):
   browser.screenshot('screenshot-post-sign-in.png')
   browser.go_graph(secure_settings.ROAM_GRAPH)
 
-  # Wait for graph to load.
-  def wait_for_graph_to_load():
-    # Wait for loading-astrolabe to disappear.
-    retries = 20
-    loaded = False
-    while retries > 0:
-      if driver.find_elements_by_class_name('loading-astrolabe'):
-        print('Astrolabe still there.')
-        browser.screenshot('screenshot-astrolabe.png')
-      else:
-        print('Astrolabe gone.')
-        loaded = True
-        break  # Once gone, exit the loop.
-      time.sleep(1)
-      retries -= 1
-
-    if not loaded:
-      browser.screenshot('screenshot-raising.png')
-      raise ValueError('Could not write notes.')
-
-  wait_for_graph_to_load()
+  browser.sleep_until_astrolabe_gone()
   time.sleep(1)
-  wait_for_graph_to_load()
-  print('Graph loaded')
+  browser.sleep_until_astrolabe_gone()
+  print('Graph loaded: ' + driver.current_url)
   browser.screenshot('screenshot-graph.png')
 
   browser.execute_helper_js()
   time.sleep(0.5)
+  dbx = dropbox.Dropbox(secure_settings.DROPBOX_ACCESS_TOKEN)
   for note_event in note_events:
     text = note_event.text.strip()
     if note_event.audio_filepath:
       text = f'{text} #[[Unverified transcription]]'
-    browser.insert_note(text)
-    print(f'Inserted: {text}')
+    block_uid = browser.insert_note(text)
+    print(f'Inserted: {text} at {block_uid}')
+    if note_event.audio_filepath:
+      # div = driver.find_element_by_css_selector(f'[id$="{block_uid}"]')
+      # browser.utils.drag_and_drop_file(div, note_event.audio_filepath)
+      dropbox_path = f'/{note_event.audio_filepath}'
+      with open(note_event.audio_filepath, 'rb') as f:
+        file_metadata = dbx.files_upload(f.read(), dropbox_path)
+        link_metadata = dbx.sharing_create_shared_link(dropbox_path)
+        embed_url = link_metadata.url.replace('www.', 'dl.').replace('?dl=0', '')
+        if block_uid:
+          browser.create_child_block(block_uid, '{{audio: ' + embed_url + '}}')
 
   time.sleep(1)
   print('Screenshot')

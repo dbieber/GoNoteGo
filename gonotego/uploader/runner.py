@@ -24,7 +24,7 @@ def main():
       upload(note_events)
       print('Uploaded.')
 
-    time.sleep(5)
+    time.sleep(1)
 
 
 if __name__ == '__main__':

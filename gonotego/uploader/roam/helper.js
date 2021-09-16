@@ -103,20 +103,12 @@ async function createChildBlock(parent_uid, block, order) {
   if (!order) {
     order = 0;
   }
-  console.log('Creating child block.');
-  console.log(parent_uid);
-  console.log(typeof parent_uid);
-  console.log(order);
-  console.log(typeof order);
-  console.log(block);
-  console.log(typeof block);
   window.roamAlphaAPI.createBlock(
     {
       "location": {"parent-uid": parent_uid, "order": order},
       "block": {"string": block}
     }
   );
-  console.log('Here now');
   let block_uid;
   while (!block_uid) {
     await sleep(25);
@@ -171,5 +163,6 @@ async function insertGoNoteGoNote(note) {
   // Add the note to the daily notes page.
   let block_uid = await getOrCreateBlockOnPage($roam_date, '[[Go Note Go]] Notes:', -1);
   let note_block = await createChildBlock(block_uid, note, -1);
+  return note_block
 }
 window.insertGoNoteGoNote = insertGoNoteGoNote;

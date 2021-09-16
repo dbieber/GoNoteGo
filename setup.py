@@ -1,6 +1,7 @@
 import setuptools
 
 DEPENDENCIES = [
+    'dropbox',
     'fire>=0.4.0',
     'keyboard',
     'google-cloud-speech',

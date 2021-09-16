@@ -6,3 +6,5 @@ out
 *.egg-info
 events.txt
 secure_settings.py
+screenshot-*.png
+geckodriver.log
