@@ -28,6 +28,7 @@ def main():
   listener = audiolistener.AudioListener()
   audio_events_queue = interprocess.get_audio_events_queue()
 
+  filepath = None
   last_filepath = None
   last_pressed = False
   last_press_time = None

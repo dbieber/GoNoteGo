@@ -39,14 +39,14 @@ class AudioListener:
     def record_callback(indata, frames, time, status):
       frame_max_volume = get_max_volume(indata)
       if frame_max_volume / self.max_volume > SILENCE_THRESHOLD:
-        # print(f'Loud frame ({frame_max_volume} / {self.max_volume}, {frame_max_volume / self.max_volume})')
+        # Loud frame.
         self.consecutive_loud += 1
         self.consecutive_loud_frames += frames
         if self.consecutive_loud > 20:
           self.consecutive_quiet = 0
           self.consecutive_quiet_frames = 0
       else:
-        # print(f'Quiet frame ({frame_max_volume}  / {self.max_volume}) {frame_max_volume / self.max_volume}')
+        # Quiet frame.
         self.consecutive_quiet += 1
         self.consecutive_quiet_frames += frames
         if self.consecutive_quiet > 20:
@@ -70,10 +70,3 @@ class AudioListener:
     self.file.flush()
     self.file.close()
     self.stream = None
-
-
-def main():
-  listener = AudioListener()
-  listener.record('tmp.wav')
-  time.sleep(3)
-  listener.stop()

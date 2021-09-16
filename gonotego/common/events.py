@@ -1,6 +1,7 @@
 from typing import Text
 
 import dataclasses
+import json
 
 AUDIO_DONE = 'done'
 
@@ -29,3 +30,16 @@ class TextEvent:
   def from_bytes(b):
     text = b.decode('utf-8')
     return TextEvent(text)
+
+
+@dataclasses.dataclass
+class NoteEvent:
+  text: Text
+  audio_filepath: Text
+
+  def __bytes__(self):
+    return json.dumps(dataclasses.asdict(self)).encode('utf-8')
+
+  def from_bytes(b):
+    d = json.loads(b.decode('utf-8'))
+    return NoteEvent(**d)

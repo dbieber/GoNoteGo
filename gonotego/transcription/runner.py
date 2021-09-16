@@ -8,7 +8,7 @@ from gonotego.transcription import transcriber
 def main():
   print('Starting transcription.')
   audio_events_queue = interprocess.get_audio_events_queue()
-  notes_queue = interprocess.get_notes_queue()
+  note_events_queue = interprocess.get_note_events_queue()
 
   t = transcriber.Transcriber()
   while True:
@@ -22,6 +22,8 @@ def main():
         text_filepath = event.filepath.replace('.wav', '.txt')
         with open(text_filepath, 'w') as f:
           f.write(transcript)
+        note_event = events.NoteEvent(transcript, event.filepath)
+        note_events_queue.put(bytes(note_event))
 
     time.sleep(3)
 
