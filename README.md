@@ -46,6 +46,7 @@ Want to contribute a new note-taking system?
 ## Installation
 
 * brew install portaudio
+* brew install geckodriver
 * python setup.py install
 
 ## History
