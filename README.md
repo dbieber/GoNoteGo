@@ -43,6 +43,11 @@ Velcro
 3 ft USB - USB C cable
 6 in USB - USB C cable
 
+## Installation
+
+brew install portaudio
+python setup.py install
+
 ## History
 
 Learn about "Shh Shell" here.
