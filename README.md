@@ -45,9 +45,9 @@ Want to contribute a new note-taking system?
 
 ## Installation
 
-brew install portaudio
-python setup.py install
+* brew install portaudio
+* python setup.py install
 
 ## History
 
-Learn about "Shh Shell" here.
+[Learn about "Shh Shell" here](https://davidbieber.com/projects/shh-shell/).
