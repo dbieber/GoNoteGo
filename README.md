@@ -1,6 +1,6 @@
 # Go Note Go
 
-_Go Note Go_ is a note-taking system for when you're on the go, with a focus on driving and camping._
+_Go Note Go is a note-taking system for when you're on the go, with a focus on driving and camping._
 
 ## Features
 
@@ -35,13 +35,13 @@ Want to contribute a new note-taking system?
 
 ## Hardware Parts
 
-Raspberry Pi 400
-Voice bonnet from Adafruit
-2x20 connector
-Velcro
-10000 mAh battery
-3 ft USB - USB C cable
-6 in USB - USB C cable
+* Raspberry Pi 400
+* Voice bonnet from Adafruit
+* 2x20 connector
+* Velcro
+* 10000 mAh battery
+* 3 ft USB - USB C cable
+* 6 in USB - USB C cable
 
 ## Installation
 
