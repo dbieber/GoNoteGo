@@ -96,32 +96,15 @@ def upload(note_events, headless=True):
 
   # Wait for graph to load.
   def wait_for_graph_to_load():
-    retries = 20
-    loaded = False
-
-    # First wait for rm-sync to appear.
-    while retries > 0:
-      try:
-        driver.find_elements_by_class_name('rm-sync')
-        print('sync found')
-        loaded = True
-        break  # Once found, exit the loop.
-      except:
-        print('sync not found')
-        pass
-      time.sleep(1)
-      retries -= 1
-
-    # Also wait for loading-astrolabe to disappear.
+    # Wait for loading-astrolabe to disappear.
     retries = 20
     loaded = False
     while retries > 0:
       if driver.find_elements_by_class_name('loading-astrolabe'):
         print('Astrolabe still there.')
-        print(driver.find_elements_by_class_name('loading-astrolabe'))
         browser.screenshot('screenshot-astrolabe.png')
       else:
-        print('Astrolabe gone')
+        print('Astrolabe gone.')
         loaded = True
         break  # Once gone, exit the loop.
       time.sleep(1)
