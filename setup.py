@@ -17,8 +17,11 @@ packages = [
     'gonotego',
     'gonotego.audio',
     'gonotego.common',
+    'gonotego.settings',
     'gonotego.text',
     'gonotego.transcription',
+    'gonotego.uploader',
+    'gonotego.uploader.roam',
 ]
 setuptools.setup(
     name="GoNoteGo",

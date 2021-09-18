@@ -45,8 +45,16 @@ Want to contribute a new note-taking system?
 
 ## Installation
 
+### On Mac
+
 * brew install portaudio
 * brew install geckodriver
+* python setup.py install
+
+### On Raspberry Pi
+
+* sudo apt install portaudio19-dev
+* sudo apt install libatlas-base-dev
 * python setup.py install
 
 ## History
