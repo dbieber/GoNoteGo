@@ -8,6 +8,7 @@ DEPENDENCIES = [
     'google-cloud-speech',
     'numpy',
     'redis',
+    'selenium',
     'sounddevice',
     'soundfile',
     'supervisor',
