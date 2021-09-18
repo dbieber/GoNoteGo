@@ -1,2 +1,4 @@
 class Shell:
-  pass
+  
+  def start(self):
+    pass

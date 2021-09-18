@@ -22,6 +22,7 @@ def main():
         text_filepath = event.filepath.replace('.wav', '.txt')
         with open(text_filepath, 'w') as f:
           f.write(transcript)
+        print(transcript)
         note_event = events.NoteEvent(transcript, event.filepath)
         note_events_queue.put(bytes(note_event))
 

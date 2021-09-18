@@ -54,7 +54,6 @@ class RoamBrowser:
     """Sign in to Roam Research."""
     driver = self.driver
     driver.get('https://roamresearch.com/#/signin')
-    time.sleep(0.25)
     email_el = driver.find_element_by_name('email')
     email_el.clear()
     email_el.send_keys(username)
@@ -63,7 +62,7 @@ class RoamBrowser:
     password_el.send_keys(password)
     self.screenshot('screenshot-signing-in.png')
     password_el.send_keys(Keys.RETURN)
-    time.sleep(1.0)
+    time.sleep(5.0)
     self.sleep_until_astrolabe_gone()
 
   def screenshot(self, name=None):
@@ -130,24 +129,23 @@ def upload(note_events, headless=True):
   browser.screenshot('screenshot-graph.png')
 
   browser.execute_helper_js()
-  time.sleep(0.5)
   dbx = dropbox.Dropbox(secure_settings.DROPBOX_ACCESS_TOKEN)
   for note_event in note_events:
     text = note_event.text.strip()
     if note_event.audio_filepath:
       text = f'{text} #[[unverified transcription]]'
     block_uid = browser.insert_note(text)
-    print(f'Inserted: {text} at {block_uid}')
+    print(f'Inserted: "{text}" at block (({block_uid}))')
     if note_event.audio_filepath:
-      # div = driver.find_element_by_css_selector(f'[id$="{block_uid}"]')
-      # browser.utils.drag_and_drop_file(div, note_event.audio_filepath)
       dropbox_path = f'/{note_event.audio_filepath}'
       with open(note_event.audio_filepath, 'rb') as f:
         file_metadata = dbx.files_upload(f.read(), dropbox_path)
         link_metadata = dbx.sharing_create_shared_link(dropbox_path)
         embed_url = link_metadata.url.replace('www.', 'dl.').replace('?dl=0', '')
+        embed_text = '{{audio: ' + embed_url + '}}'
+        print(f'Audio embed: {embed_text}')
         if block_uid:
-          browser.create_child_block(block_uid, '{{audio: ' + embed_url + '}}')
+          browser.create_child_block(block_uid, embed_text)
 
   time.sleep(1)
   print('Screenshot')
