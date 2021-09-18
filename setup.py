@@ -6,6 +6,7 @@ DEPENDENCIES = [
     'fire>=0.4.0',
     'keyboard',
     'google-cloud-speech',
+    'numpy',
     'redis',
     'sounddevice',
     'soundfile',
