@@ -53,8 +53,10 @@ Want to contribute a new note-taking system?
 
 ### On Raspberry Pi
 
+* sudo apt update
 * sudo apt install portaudio19-dev
 * sudo apt install libatlas-base-dev
+* sudo apt install redis-server
 * python setup.py install
 
 ## History

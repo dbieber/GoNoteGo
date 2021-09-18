@@ -10,6 +10,7 @@ def upload(note_events):
 
 
 def main():
+  print('Starting uploader.')
   note_events_queue = interprocess.get_note_events_queue()
 
   while True:
