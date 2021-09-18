@@ -9,3 +9,4 @@ secure_settings.py
 screenshot-*.png
 geckodriver.log
 scratch
+env
