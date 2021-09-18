@@ -1,6 +1,7 @@
 import setuptools
 
 DEPENDENCIES = [
+    'absl-py',
     'dropbox',
     'fire>=0.4.0',
     'keyboard',
