@@ -41,6 +41,8 @@ class Shell:
   def on_press(self, event):
     if event.name == 'delete':
       self.text = self.text[:-1]
+      if keyboard.is_pressed('shift') or keyboard.is_pressed('right shift'):
+        self.text = ''
     elif event.name == 'enter':
       print(self.text)
       text_event = events.TextEvent(self.text)
