@@ -3,13 +3,14 @@ import fire
 from gonotego.common import events
 from gonotego.common import interprocess
 
-def insert():
+def insert(text='test transcript', filepath=None):
+  filepath = filepath or 'out/20210920-1632188898638.wav'
   note_events_queue = interprocess.get_note_events_queue()
-  note_event = events.NoteEvent('Test transcript', 'out/20210920-1632188898638.wav')
+  note_event = events.NoteEvent(text, filepath)
   note_events_queue.put(bytes(note_event))
   print(note_events_queue.size())
   return 'Success'
 
 
 if __name__ == '__main__':
-  fire.Fire()
+  fire.Fire(insert)
