@@ -8,6 +8,7 @@ import time
 from gonotego.audio import audiolistener
 from gonotego.common import events
 from gonotego.common import interprocess
+from gonotego.common import leds
 
 
 def make_filepath():
@@ -52,6 +53,7 @@ def main():
       logging.info(f'Three seconds of silence. Stopping. {filepath}')
       print(f'Three seconds of silence. Stopping. {filepath}')
       listener.stop()
+      leds.off()
       enqueue_recording(audio_events_queue, filepath)
       last_filepath = filepath
       filepath = None
@@ -61,6 +63,7 @@ def main():
       if listener.recording:
         # We just started recording with the first push. Now we're going to stop.
         listener.stop()
+        leds.off()
         subprocess.call(['rm', filepath])
         filepath = None
       else:
@@ -75,12 +78,14 @@ def main():
       filepath = make_filepath()
       logging.info(f'Start recording. {filepath}')
       print(f'Start recording. {filepath}')
+      leds.red()
       listener.record(filepath)
     elif newly_pressed and listener.recording:
       # Stop a recording by press.
       logging.info(f'Stop recording. {filepath}')
       print(f'Stop recording. {filepath}')
       listener.stop()
+      leds.off()
       # TODO(dbieber): Should wait to make sure it's not a double press.
       enqueue_recording(audio_events_queue, filepath)
       last_filepath = filepath
@@ -91,6 +96,7 @@ def main():
       print('Held down for 1 second. Cancel and read back.')
       if listener.recording:
         listener.stop()
+        leds.off()
         subprocess.call(['rm', filepath])
         filepath = None
       subprocess.call(['afplay', last_filepath])

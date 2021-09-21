@@ -2,6 +2,9 @@ import setuptools
 
 DEPENDENCIES = [
     'absl-py',
+    'adafruit-circuitpython-dotstar',
+    'adafruit-circuitpython-motor',
+    'adafruit-circuitpython-bmp280',
     'dropbox',
     'fire>=0.4.0',
     'keyboard',
