@@ -31,11 +31,11 @@ def red(ids=None):
   set((0, 0, 255, 1.0))
 
 
-def green(ids=None):
+def blue(ids=None):
   set((0, 255, 0, 1.0))
 
 
-def blue(ids=None):
+def green(ids=None):
   set((255, 0, 0, 1.0))
 
 
