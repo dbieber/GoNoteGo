@@ -32,3 +32,7 @@ def main():
       dots.show()
       time.sleep(0.005)
     time.sleep(0.05)
+
+
+if __name__ == '__main__':
+  main()
