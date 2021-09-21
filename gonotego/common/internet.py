@@ -11,3 +11,14 @@ def is_internet_available(url='www.google.com'):
   except:
     connection.close()
     return False
+
+
+def wait_for_internet(url='www.google.com'):
+  first = True
+  while not is_internet_available(url):
+    if first:
+      print('No internet connection available. Sleeping.')
+      first = False
+    time.sleep(60)
+  if not first:
+    print('Internet connection restored.')

@@ -1,6 +1,7 @@
 import time
 
 from gonotego.common import events
+from gonotego.common import internet
 from gonotego.common import interprocess
 from gonotego.common import leds
 from gonotego.transcription import transcriber
@@ -11,9 +12,13 @@ def main():
   audio_events_queue = interprocess.get_audio_events_queue()
   note_events_queue = interprocess.get_note_events_queue()
 
+  internet_available = True
   t = transcriber.Transcriber()
   while True:
     audio_event_bytes = audio_events_queue.get()
+
+    # Don't even try transcribing if we don't have a connection.
+    internet.wait_for_internet()
 
     if audio_event_bytes is not None:
       print(f'Event received: {audio_event_bytes}')

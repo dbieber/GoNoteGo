@@ -1,9 +1,9 @@
 import time
 
 from gonotego.common import events
+from gonotego.common import internet
 from gonotego.common import interprocess
 from gonotego.common import leds
-from gonotego.uploader import internet
 from gonotego.uploader import roam_uploader
 
 
@@ -20,15 +20,7 @@ def main():
   while True:
 
     # Don't even try uploading notes if we don't have a connection.
-    if not internet.is_internet_available():
-      if internet_available:
-        print('No internet connection available. Sleeping')
-      time.sleep(60)
-      internet_available = False
-      continue
-    if not internet_available:
-      print('Internet connection restored.')
-    internet_available = True
+    internet.wait_for_internet()
 
     note_events = []
     while text_events_queue.size() > 0:
