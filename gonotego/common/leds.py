@@ -23,24 +23,28 @@ def wheel(pos):
   return (pos * 3, 0, 255 - pos * 3)
 
 
-def off():
-  set_all((0, 0, 0, 0.0))
+def off(ids=None):
+  set((0, 0, 0, 0.0))
 
 
-def red():
-  set_all((0, 0, 255, 1.0))
+def red(ids=None):
+  set((0, 0, 255, 1.0))
 
 
-def green():
-  set_all((0, 255, 0, 1.0))
+def green(ids=None):
+  set((0, 255, 0, 1.0))
 
 
-def blue():
-  set_all((255, 0, 0, 1.0))
+def blue(ids=None):
+  set((255, 0, 0, 1.0))
 
 
-def set_all(color):
-  for i in range(3):
+def set(color, ids=None):
+  if ids is None:
+    ids = range(3)
+  elif isinstance(ids, int):
+    ids = [ids]
+  for i in ids:
     dots[i] = color
   dots.show()
 

@@ -2,6 +2,7 @@ import time
 
 from gonotego.common import events
 from gonotego.common import interprocess
+from gonotego.common import leds
 from gonotego.uploader import roam_uploader
 
 
@@ -22,8 +23,10 @@ def main():
       note_event = events.NoteEvent.from_bytes(note_event_bytes)
       note_events.append(note_event)
     if note_events:
+      leds.blue(2)
       upload(note_events)
       print('Uploaded.')
+      leds.off(2)
 
     time.sleep(1)
 

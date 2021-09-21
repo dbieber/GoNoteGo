@@ -2,6 +2,7 @@ import time
 
 from gonotego.common import events
 from gonotego.common import interprocess
+from gonotego.common import leds
 from gonotego.transcription import transcriber
 
 
@@ -18,6 +19,7 @@ def main():
       print(f'Event received: {audio_event_bytes}')
       event = events.AudioEvent.from_bytes(audio_event_bytes)
       if event.action == events.AUDIO_DONE:
+        leds.green(1)
         transcript = t.transcribe(event.filepath)
         text_filepath = event.filepath.replace('.wav', '.txt')
         with open(text_filepath, 'w') as f:
@@ -25,6 +27,7 @@ def main():
         print(transcript)
         note_event = events.NoteEvent(transcript, event.filepath)
         note_events_queue.put(bytes(note_event))
+        leds.off(1)
 
     time.sleep(3)
 
