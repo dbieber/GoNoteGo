@@ -50,7 +50,7 @@ class RoamBrowser:
   def go_graph(self, graph_name):
     self.driver.get(f'https://roamresearch.com/#/app/{graph_name}')
 
-  def sign_in(self, username, password):
+  def sign_in_attempt(self, username, password):
     """Sign in to Roam Research."""
     driver = self.driver
     driver.get('https://roamresearch.com/#/signin')
@@ -64,6 +64,23 @@ class RoamBrowser:
     password_el.send_keys(Keys.RETURN)
     time.sleep(5.0)
     self.sleep_until_astrolabe_gone()
+
+  def sign_in(self, username, password, retries=5):
+    """Sign in to Roam Research with retries."""
+    while retries > 0:
+      self.sign_in_attempt(username, password)
+      retries -= 1
+
+      print(driver.current_url)
+      if is_element_with_class_name_stable('rm-plan'):
+        return True
+
+  def is_element_with_class_name_stable(class_name):
+    if driver.find_elements_by_class_name(class_name):
+      time.sleep(1)
+      if driver.find_elements_by_class_name(class_name):
+        return True
+    return False
 
   def screenshot(self, name=None):
     filename = name or 'screenshot.png'
