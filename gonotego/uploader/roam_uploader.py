@@ -87,12 +87,15 @@ class RoamBrowser:
     """Sign in to Roam Research with retries."""
     while retries > 0:
       print('Attempting sign in.')
-      self.sign_in_attempt(username, password)
       retries -= 1
+      try:
+        self.sign_in_attempt(username, password)
 
-      print(self.driver.current_url)
-      if self.is_element_with_class_name_stable('rm-plan'):
-        return True
+        print(self.driver.current_url)
+        if self.is_element_with_class_name_stable('rm-plan'):
+          return True
+      except:
+        print('Attempt failed with exception.')
     print('Failed to sign in. No retries left.')
     return False
 
