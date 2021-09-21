@@ -1,17 +1,4 @@
 import time
-import board
-import adafruit_dotstar
-
-DOTSTAR_DATA = board.D5
-DOTSTAR_CLOCK = board.D6
-
-dots = adafruit_dotstar.DotStar(DOTSTAR_CLOCK, DOTSTAR_DATA, 3, brightness=0.2)
-
-colors = [
-    (0, 0, 0),
-    (0, 0, 0),
-    (0, 0, 0),
-]
 
 # Colors are (G, B, R, A)
 
@@ -46,15 +33,17 @@ def green(ids=None):
 
 
 def set(color, ids=None):
+  led_events_queue = interprocess.get_led_events_queue()  
+
   if ids is None:
     ids = range(3)
   elif isinstance(ids, int):
     ids = [ids]
-  for i in ids:
-    colors[i] = color
-  for i in range(3):
-    dots[i] = colors[i]
-  dots.show()
+  led_event = events.LEDEvent(
+      color=color,
+      ids=tuple(ids)
+  )
+  led_events_queue.put(bytes(led_event))
 
 
 def example():

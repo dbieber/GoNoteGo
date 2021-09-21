@@ -12,3 +12,7 @@ pip3 install virtualenv
 sudo apt install iceweasel
 sudo apt install xvfb
 # Install geckodriver to /usr/local/bin
+
+# Follow the guide at https://www.raspberrypi.org/documentation/computers/configuration.html to set your wpa_supplicant
+# to configure your Raspberry Pi to connect to the internet.
+# sudo nano /etc/wpa_supplicant/wpa_supplicant.conf

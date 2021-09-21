@@ -31,3 +31,7 @@ def get_text_events_queue():
 
 def get_note_events_queue():
   return InterprocessQueue('note_events_queue')
+
+
+def get_led_events_queue():
+  return InterprocessQueue('led_events_queue')
