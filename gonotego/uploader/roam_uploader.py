@@ -72,7 +72,7 @@ class RoamBrowser:
       retries -= 1
 
       print(driver.current_url)
-      if is_element_with_class_name_stable('rm-plan'):
+      if self.is_element_with_class_name_stable('rm-plan'):
         return True
 
   def is_element_with_class_name_stable(class_name):
