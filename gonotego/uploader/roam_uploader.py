@@ -47,8 +47,25 @@ class RoamBrowser:
   def go_home(self):
     self.driver.get('https://roamresearch.com/')
 
-  def go_graph(self, graph_name):
+  def go_graph_attempt(self, graph_name):
     self.driver.get(f'https://roamresearch.com/#/app/{graph_name}')
+    self.sleep_until_astrolabe_gone()
+    time.sleep(1)
+    self.sleep_until_astrolabe_gone()
+    print('Graph loaded: ' + driver.current_url)
+    self.screenshot('screenshot-graph.png')
+
+  def go_graph(self, graph_name, retries=5):
+    while retries > 0:
+      print('Attempting to go to graph.')
+      self.go_graph_attempt(graph_name)
+      retries -= 1
+
+      print(driver.current_url)
+      if self.is_element_with_class_name_stable('roam-app'):
+        return True
+    print('Failed to go to graph. No retries left.')
+    return False
 
   def sign_in_attempt(self, username, password):
     """Sign in to Roam Research."""
@@ -76,6 +93,7 @@ class RoamBrowser:
       if self.is_element_with_class_name_stable('rm-plan'):
         return True
     print('Failed to sign in. No retries left.')
+    return False
 
   def is_element_with_class_name_stable(self, class_name):
     if driver.find_elements_by_class_name(class_name):
