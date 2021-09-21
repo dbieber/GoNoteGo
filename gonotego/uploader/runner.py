@@ -12,16 +12,25 @@ def upload(note_events):
 
 def main():
   print('Starting uploader.')
+  text_events_queue = interprocess.get_text_events_queue()
   note_events_queue = interprocess.get_note_events_queue()
 
   while True:
 
     note_events = []
+    while text_events_queue.size() > 0:
+      print('Text event received. Converting to note event.')
+      text_event_bytes = text_events_queue.get()
+      text_event = events.TextEvent.from_bytes(text_event_bytes)
+      note_event = events.NoteEvent(text_event.text, audio_filepath=None)
+      note_events.append(note_event)
+
     while note_events_queue.size() > 0:
       print('Note event received')
       note_event_bytes = note_events_queue.get()
       note_event = events.NoteEvent.from_bytes(note_event_bytes)
       note_events.append(note_event)
+
     if note_events:
       leds.blue(2)
       upload(note_events)
