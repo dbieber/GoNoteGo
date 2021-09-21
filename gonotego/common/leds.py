@@ -1,19 +1,9 @@
 import time
 
-# Colors are (G, B, R, A)
+from gonotego.common import events
+from gonotego.common import interprocess
 
-def wheel(pos):
-  # Input a value 0 to 255 to get a color value.
-  # The colors are a transition r - g - b - back to r.
-  if pos < 0 or pos > 255:
-    return (0, 0, 0)
-  if pos < 85:
-    return (255 - pos * 3, pos * 3, 0)
-  if pos < 170:
-    pos -= 85
-    return (0, 255 - pos * 3, pos * 3)
-  pos -= 170
-  return (pos * 3, 0, 255 - pos * 3)
+# Colors are (G, B, R, A)
 
 
 def off(ids=None):
@@ -44,13 +34,3 @@ def set(color, ids=None):
       ids=tuple(ids)
   )
   led_events_queue.put(bytes(led_event))
-
-
-def example():
-  while True:
-    for j in range(255):
-      for i in range(3):
-        rc_index = (i * 256 // 3) + j * 5
-        dots[i] = wheel(rc_index & 255)
-      dots.show()
-      time.sleep(0.01)
