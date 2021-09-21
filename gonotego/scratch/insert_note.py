@@ -12,5 +12,11 @@ def insert(text='test transcript', filepath=None):
   return 'Success'
 
 
+def size():
+  note_events_queue = interprocess.get_note_events_queue()
+  print(note_events_queue.size())
+  return 'Success'
+
+
 if __name__ == '__main__':
-  fire.Fire(insert)
+  fire.Fire()
