@@ -1,11 +1,11 @@
 from absl import logging
 
 from datetime import datetime
-import keyboard
 import subprocess
 import time
 
 from gonotego.audio import audiolistener
+from gonotego.audio import trigger
 from gonotego.common import events
 from gonotego.common import interprocess
 from gonotego.common import leds
@@ -36,7 +36,7 @@ def main():
   hold_triggered = False
   press_time = None
   while True:
-    pressed = keyboard.is_pressed('shift+.+command')
+    pressed = trigger.is_pressed()
     newly_pressed = pressed and not last_pressed
     still_pressed = pressed and last_pressed
 
