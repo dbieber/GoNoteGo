@@ -7,6 +7,12 @@ DOTSTAR_CLOCK = board.D6
 
 dots = adafruit_dotstar.DotStar(DOTSTAR_CLOCK, DOTSTAR_DATA, 3, brightness=0.2)
 
+colors = [
+    (0, 0, 0),
+    (0, 0, 0),
+    (0, 0, 0),
+]
+
 # Colors are (G, B, R, A)
 
 def wheel(pos):
@@ -45,7 +51,9 @@ def set(color, ids=None):
   elif isinstance(ids, int):
     ids = [ids]
   for i in ids:
-    dots[i] = color
+    colors[i] = color
+  for i in range(3):
+    dots[i] = colors[i]
   dots.show()
 
 
