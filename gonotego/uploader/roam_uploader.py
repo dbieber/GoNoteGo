@@ -161,12 +161,9 @@ def upload(note_events, headless=True):
   browser.sign_in(username, password)
   browser.screenshot('screenshot-post-sign-in.png')
   browser.go_graph(secure_settings.ROAM_GRAPH)
-
-  browser.sleep_until_astrolabe_gone()
-  time.sleep(1)
-  browser.sleep_until_astrolabe_gone()
-  print('Graph loaded: ' + driver.current_url)
-  browser.screenshot('screenshot-graph.png')
+  self.screenshot('screenshot-graph-2.png')
+  time.sleep(0.5)
+  self.screenshot('screenshot-graph-3.png')
 
   browser.execute_helper_js()
   dbx = dropbox.Dropbox(secure_settings.DROPBOX_ACCESS_TOKEN)
@@ -192,30 +189,3 @@ def upload(note_events, headless=True):
   browser.screenshot('screenshot-closing.png')
   print('Closing browser')
   driver.close()
-
-
-def main():
-  import getpass
-  import time
-
-  from selenium import webdriver
-  from selenium.webdriver.common.by import By
-  from selenium.webdriver.common.keys import Keys
-  from selenium.webdriver.firefox.options import Options
-  from gonotego.uploader import roam_uploader
-  headless = False
-  options = roam_uploader.Options()
-
-  if headless:
-    options.add_argument('-headless')
-  driver = roam_uploader.webdriver.Firefox(options=options)
-  browser = roam_uploader.RoamBrowser(driver)
-
-  username = secure_settings.ROAM_USER
-  password = secure_settings.ROAM_PASSWORD or getpass.getpass()
-  browser.sign_in(username, password)
-  browser.go_graph(secure_settings.ROAM_GRAPH)
-
-  browser.execute_helper_js()
-  time.sleep(0.05)
-  browser.insert_note("It's working!!!")
