@@ -1,4 +1,5 @@
 import http
+import time
 
 
 def is_internet_available(url='www.google.com'):
