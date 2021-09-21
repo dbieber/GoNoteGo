@@ -1,4 +1,5 @@
 import getpass
+import random
 import time
 
 import dropbox
@@ -52,7 +53,7 @@ class RoamBrowser:
     self.sleep_until_astrolabe_gone()
     time.sleep(1)
     self.sleep_until_astrolabe_gone()
-    print('Graph loaded: ' + driver.current_url)
+    print('Graph loaded: ' + self.driver.current_url)
     self.screenshot('screenshot-graph.png')
 
   def go_graph(self, graph_name, retries=5):
@@ -61,7 +62,7 @@ class RoamBrowser:
       self.go_graph_attempt(graph_name)
       retries -= 1
 
-      print(driver.current_url)
+      print(self.driver.current_url)
       if self.is_element_with_class_name_stable('roam-app'):
         return True
     print('Failed to go to graph. No retries left.')
@@ -89,16 +90,16 @@ class RoamBrowser:
       self.sign_in_attempt(username, password)
       retries -= 1
 
-      print(driver.current_url)
+      print(self.driver.current_url)
       if self.is_element_with_class_name_stable('rm-plan'):
         return True
     print('Failed to sign in. No retries left.')
     return False
 
   def is_element_with_class_name_stable(self, class_name):
-    if driver.find_elements_by_class_name(class_name):
+    if self.driver.find_elements_by_class_name(class_name):
       time.sleep(1)
-      if driver.find_elements_by_class_name(class_name):
+      if self.driver.find_elements_by_class_name(class_name):
         return True
     return False
 
@@ -161,9 +162,9 @@ def upload(note_events, headless=True):
   browser.sign_in(username, password)
   browser.screenshot('screenshot-post-sign-in.png')
   browser.go_graph(secure_settings.ROAM_GRAPH)
-  self.screenshot('screenshot-graph-2.png')
+  browser.screenshot('screenshot-graph-2.png')
   time.sleep(0.5)
-  self.screenshot('screenshot-graph-3.png')
+  browser.screenshot('screenshot-graph-3.png')
 
   browser.execute_helper_js()
   dbx = dropbox.Dropbox(secure_settings.DROPBOX_ACCESS_TOKEN)
