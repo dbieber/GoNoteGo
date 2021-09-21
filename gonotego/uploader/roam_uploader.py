@@ -75,7 +75,7 @@ class RoamBrowser:
       if self.is_element_with_class_name_stable('rm-plan'):
         return True
 
-  def is_element_with_class_name_stable(class_name):
+  def is_element_with_class_name_stable(self, class_name):
     if driver.find_elements_by_class_name(class_name):
       time.sleep(1)
       if driver.find_elements_by_class_name(class_name):
