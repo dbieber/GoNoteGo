@@ -11,7 +11,7 @@ dots = adafruit_dotstar.DotStar(DOTSTAR_CLOCK, DOTSTAR_DATA, 3, brightness=0.2)
 
 def wheel(pos):
   # Input a value 0 to 255 to get a color value.
-  # The colours are a transition r - g - b - back to r.
+  # The colors are a transition r - g - b - back to r.
   if pos < 0 or pos > 255:
     return (0, 0, 0)
   if pos < 85:
@@ -24,19 +24,19 @@ def wheel(pos):
 
 
 def off(ids=None):
-  set((0, 0, 0, 0.0))
+  set((0, 0, 0, 0.0), ids=ids)
 
 
 def red(ids=None):
-  set((0, 0, 255, 1.0))
+  set((0, 0, 255, 1.0), ids=ids)
 
 
 def blue(ids=None):
-  set((0, 255, 0, 1.0))
+  set((0, 255, 0, 1.0), ids=ids)
 
 
 def green(ids=None):
-  set((255, 0, 0, 1.0))
+  set((255, 0, 0, 1.0), ids=ids)
 
 
 def set(color, ids=None):
