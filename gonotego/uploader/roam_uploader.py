@@ -68,7 +68,10 @@ class RoamBrowser:
   def screenshot(self, name=None):
     filename = name or 'screenshot.png'
     print(f'Saving screenshot to {filename}')
-    self.driver.save_screenshot(filename)
+    try:
+      self.driver.save_screenshot(filename)
+    except:
+      print('Failed to save screenshot. Continuing.')
 
   def sleep(self):
     seconds = random.randint(10, 160)
