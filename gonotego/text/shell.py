@@ -1,5 +1,6 @@
 import keyboard
 
+from gonotego.common import events
 from gonotego.common import interprocess
 
 
