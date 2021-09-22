@@ -14,6 +14,10 @@ def red(ids=None):
   set((0, 0, 255, 1.0), ids=ids)
 
 
+def orange(ids=None):
+  set((90, 0, 255, 0.2), ids=ids)
+
+
 def blue(ids=None):
   set((0, 255, 0, 1.0), ids=ids)
 
