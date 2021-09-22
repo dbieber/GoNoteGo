@@ -1,5 +1,6 @@
 import getpass
 import random
+import subprocess
 import time
 
 import dropbox
@@ -153,43 +154,64 @@ class RoamBrowser:
     print('Astrolabe gone.')
 
 
-def upload(note_events, headless=True):
-  options = Options()
-  if headless:
-    options.add_argument('-headless')
-  driver = webdriver.Firefox(options=options)
-  browser = RoamBrowser(driver)
+class Uploader:
 
-  username = secure_settings.ROAM_USER
-  password = secure_settings.ROAM_PASSWORD or getpass.getpass()
-  browser.sign_in(username, password)
-  browser.screenshot('screenshot-post-sign-in.png')
-  browser.go_graph(secure_settings.ROAM_GRAPH)
-  browser.screenshot('screenshot-graph-2.png')
-  time.sleep(0.5)
-  browser.screenshot('screenshot-graph-3.png')
+  def __init__(self, headless=True):
+    self.headless = headless
+    self._browser = None
 
-  browser.execute_helper_js()
-  dbx = dropbox.Dropbox(secure_settings.DROPBOX_ACCESS_TOKEN)
-  for note_event in note_events:
-    text = note_event.text.strip()
-    if note_event.audio_filepath:
-      text = f'{text} #[[unverified transcription]]'
-    block_uid = browser.insert_note(text)
-    print(f'Inserted: "{text}" at block (({block_uid}))')
-    if note_event.audio_filepath:
-      dropbox_path = f'/{note_event.audio_filepath}'
-      with open(note_event.audio_filepath, 'rb') as f:
-        file_metadata = dbx.files_upload(f.read(), dropbox_path)
-        link_metadata = dbx.sharing_create_shared_link(dropbox_path)
-        embed_url = link_metadata.url.replace('www.', 'dl.').replace('?dl=0', '')
-        embed_text = '{{audio: ' + embed_url + '}}'
-        print(f'Audio embed: {embed_text}')
-        if block_uid:
-          browser.create_child_block(block_uid, embed_text)
+  def get_browser(self):
+    if self._browser is not None:
+      return self._browser
 
-  time.sleep(1)
-  print('Screenshot')
-  browser.screenshot('screenshot-closing.png')
-  print('Closing browser')
-  driver.close()
+    options = Options()
+    if self.headless:
+      options.add_argument('-headless')
+    driver = webdriver.Firefox(options=options)
+    browser = RoamBrowser(driver)
+
+    # Sign in to Roam.
+    username = secure_settings.ROAM_USER
+    password = secure_settings.ROAM_PASSWORD or getpass.getpass()
+    browser.sign_in(username, password)
+    browser.screenshot('screenshot-post-sign-in.png')
+
+    self._browser = browser
+    return browser
+
+  def upload(self, note_events):
+    browser = self.get_browser()
+    driver = browser.driver
+
+    browser.go_graph(secure_settings.ROAM_GRAPH)
+    time.sleep(0.5)
+    browser.screenshot('screenshot-graph-later.png')
+
+    browser.execute_helper_js()
+    dbx = dropbox.Dropbox(secure_settings.DROPBOX_ACCESS_TOKEN)
+    for note_event in note_events:
+      text = note_event.text.strip()
+      if note_event.audio_filepath:
+        text = f'{text} #[[unverified transcription]]'
+      block_uid = browser.insert_note(text)
+      print(f'Inserted: "{text}" at block (({block_uid}))')
+      if note_event.audio_filepath:
+        dropbox_path = f'/{note_event.audio_filepath}'
+        with open(note_event.audio_filepath, 'rb') as f:
+          file_metadata = dbx.files_upload(f.read(), dropbox_path)
+          link_metadata = dbx.sharing_create_shared_link(dropbox_path)
+          embed_url = link_metadata.url.replace('www.', 'dl.').replace('?dl=0', '')
+          embed_text = '{{audio: ' + embed_url + '}}'
+          print(f'Audio embed: {embed_text}')
+          if block_uid:
+            browser.create_child_block(block_uid, embed_text)
+
+  def close_browser(self):
+    browser = self._browser
+    driver = browser.driver
+    if driver is not None:
+      driver.close()
+    self._browser = None
+
+    subprocess.call(['pkill', 'firefox'])
+    subprocess.call(['pkill', 'geckodriver'])

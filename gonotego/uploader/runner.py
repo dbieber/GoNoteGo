@@ -7,20 +7,18 @@ from gonotego.common import leds
 from gonotego.uploader import roam_uploader
 
 
-def upload(note_events):
-  roam_uploader.upload(note_events)
-
-
 def main():
   print('Starting uploader.')
   text_events_queue = interprocess.get_text_events_queue()
   note_events_queue = interprocess.get_note_events_queue()
+  uploader = roam_uploader.Uploader()
 
   internet_available = True
+  last_upload = None
   while True:
 
     # Don't even try uploading notes if we don't have a connection.
-    internet.wait_for_internet()
+    internet.wait_for_internet(on_disconnect=uploader.close_browser)
 
     note_events = []
     while text_events_queue.size() > 0:
@@ -38,9 +36,14 @@ def main():
 
     if note_events:
       leds.blue(2)
-      upload(note_events)
+      uploader.upload(note_events)
+      last_upload = time.time()
       print('Uploaded.')
       leds.off(2)
+
+    if last_upload and time.time() - last_upload > 600:
+      # X minutes have passed since the last upload.
+      uploader.close_browser()
 
     time.sleep(1)
 
