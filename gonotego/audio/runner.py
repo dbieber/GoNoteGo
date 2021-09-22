@@ -28,6 +28,7 @@ def main():
   print('Starting audio listener.')
   listener = audiolistener.AudioListener()
   audio_events_queue = interprocess.get_audio_events_queue()
+  leds.orange(0)
 
   filepath = None
   last_filepath = None
