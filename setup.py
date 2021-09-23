@@ -22,7 +22,9 @@ DEPENDENCIES = [
 packages = [
     'gonotego',
     'gonotego.audio',
+    'gonotego.command_center',
     'gonotego.common',
+    'gonotego.leds',
     'gonotego.settings',
     'gonotego.text',
     'gonotego.transcription',
