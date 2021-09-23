@@ -1,9 +1,12 @@
 import keyboard
+import time
 
 from gonotego.common import events
 from gonotego.common import interprocess
 from gonotego.common import leds
+from gonotego.common import status
 
+Status = status.Status
 
 shift_characters = {
     '1': '!',
@@ -41,6 +44,7 @@ class Shell:
 
   def on_press(self, event):
     leds.orange(1)
+    status.set(Status.TEXT_LAST_KEYPRESS, time.time())
     if event.name == 'delete':
       self.text = self.text[:-1]
       if keyboard.is_pressed('shift') or keyboard.is_pressed('right shift'):

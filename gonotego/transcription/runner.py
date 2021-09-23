@@ -4,7 +4,10 @@ from gonotego.common import events
 from gonotego.common import internet
 from gonotego.common import interprocess
 from gonotego.common import leds
+from gonotego.common import status
 from gonotego.transcription import transcriber
+
+Status = status.Status
 
 
 def main():
@@ -14,6 +17,7 @@ def main():
 
   internet_available = True
   t = transcriber.Transcriber()
+  status.set(Status.TRANSCRIPTION_READY, True)
   while True:
     audio_event_bytes = audio_events_queue.get()
 
@@ -24,6 +28,7 @@ def main():
       print(f'Event received: {audio_event_bytes}')
       event = events.AudioEvent.from_bytes(audio_event_bytes)
       if event.action == events.AUDIO_DONE:
+        status.set(Status.TRANSCRIPTION_ACTIVE, True)
         leds.green(1)
         transcript = t.transcribe(event.filepath)
         text_filepath = event.filepath.replace('.wav', '.txt')
@@ -33,6 +38,7 @@ def main():
         note_event = events.NoteEvent(transcript, event.filepath)
         note_events_queue.put(bytes(note_event))
         leds.off(1)
+        status.set(Status.TRANSCRIPTION_ACTIVE, False)
 
     time.sleep(3)
 

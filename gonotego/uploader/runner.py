@@ -4,7 +4,10 @@ from gonotego.common import events
 from gonotego.common import internet
 from gonotego.common import interprocess
 from gonotego.common import leds
+from gonotego.common import status
 from gonotego.uploader import roam_uploader
+
+Status = status.Status
 
 
 def main():
@@ -12,6 +15,7 @@ def main():
   text_events_queue = interprocess.get_text_events_queue()
   note_events_queue = interprocess.get_note_events_queue()
   uploader = roam_uploader.Uploader()
+  status.set(Status.UPLOADER_READY, True)
 
   internet_available = True
   last_upload = None
@@ -36,10 +40,12 @@ def main():
 
     if note_events:
       leds.blue(2)
+      status.set(Status.UPLOADER_ACTIVE, True)
       uploader.upload(note_events)
       last_upload = time.time()
       print('Uploaded.')
       leds.off(2)
+      status.set(Status.UPLOADER_ACTIVE, False)
 
     if last_upload and time.time() - last_upload > 600:
       # X minutes have passed since the last upload.
