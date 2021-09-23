@@ -22,7 +22,7 @@ def size():
 
 def get_status():
   for key in list(status.Status):
-    print(status.get(key))
+    print(key, status.get(key))
 
 
 if __name__ == '__main__':
