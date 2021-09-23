@@ -36,7 +36,8 @@ shift_characters = {
 class Shell:
 
   def __init__(self):
-    self.queue = interprocess.get_text_events_queue()
+    self.text_event_queue = interprocess.get_text_events_queue()
+    self.note_event_queue = interprocess.get_note_events_queue()
     self.text = ''
   
   def start(self):
@@ -50,9 +51,13 @@ class Shell:
       if keyboard.is_pressed('shift') or keyboard.is_pressed('right shift'):
         self.text = ''
     elif event.name == 'enter':
-      print(self.text)
-      text_event = events.TextEvent(self.text)
-      self.queue.put(bytes(text_event))
+      # Write both a text event (for the command center)
+      # and a note event (for the uploader).
+      text_event = events.TextEvent(text=self.text)
+      self.text_event_queue.put(bytes(text_event))
+      note_event = events.NoteEvent(text=self.text, audio_filepath=None)
+      self.note_event_queue.put(bytes(note_event))
+      # Reset the text buffer.
       self.text = ''
     elif event.name == 'space':
       self.text += ' '

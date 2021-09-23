@@ -14,6 +14,14 @@ def insert(text='test transcript', filepath=None):
   return 'Success'
 
 
+def insert_text(text='test transcript'):
+  text_events_queue = interprocess.get_text_events_queue()
+  text_event = events.TextEvent(text)
+  text_events_queue.put(bytes(text_event))
+  print(text_events_queue.size())
+  return 'Success'
+
+
 def size():
   note_events_queue = interprocess.get_note_events_queue()
   print(note_events_queue.size())

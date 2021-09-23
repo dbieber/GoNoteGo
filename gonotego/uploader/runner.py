@@ -12,7 +12,6 @@ Status = status.Status
 
 def main():
   print('Starting uploader.')
-  text_events_queue = interprocess.get_text_events_queue()
   note_events_queue = interprocess.get_note_events_queue()
   uploader = roam_uploader.Uploader()
   status.set(Status.UPLOADER_READY, True)
@@ -25,13 +24,6 @@ def main():
     internet.wait_for_internet(on_disconnect=uploader.close_browser)
 
     note_events = []
-    while text_events_queue.size() > 0:
-      print('Text event received. Converting to note event.')
-      text_event_bytes = text_events_queue.get()
-      text_event = events.TextEvent.from_bytes(text_event_bytes)
-      note_event = events.NoteEvent(text_event.text, audio_filepath=None)
-      note_events.append(note_event)
-
     while note_events_queue.size() > 0:
       print('Note event received')
       note_event_bytes = note_events_queue.get()
