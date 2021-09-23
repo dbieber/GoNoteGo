@@ -30,7 +30,8 @@ def main():
       text_event_bytes = text_events_queue.get()
       text_event = events.TextEvent.from_bytes(text_event_bytes)
       text = text_event.text
-      executor.execute(text)
+      if text.startswith(':'):
+        executor.execute(text[1:])
     time.sleep(1)
 
 
