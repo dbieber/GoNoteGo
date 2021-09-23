@@ -31,6 +31,8 @@ def get_redis_key(key):
 def get(key):
   r = interprocess.get_redis_client()
   value_bytes = r.get(get_redis_key(key))
+  if value_bytes is None:
+    return None
   value_str = value_bytes.decode('utf-8')
   value = ast.literal_eval(value_str)
   return value
