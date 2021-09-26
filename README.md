@@ -57,6 +57,9 @@ Want to contribute a new note-taking system?
 * sudo apt install portaudio19-dev
 * sudo apt install libatlas-base-dev
 * sudo apt install redis-server
+* sudo apt install espeak
+* sudo apt install iceweasel
+* sudo apt install xvfb
 * python setup.py install
 
 ## History

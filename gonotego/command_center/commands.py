@@ -26,7 +26,7 @@ def feel_lucky(query):
 
 @register_command('time')
 def time():
-  shell('say `date "+%A, %B%e %l:%M%p"` &')
+  shell('espeak `date "+%A, %B%e %l:%M%p"` &')
 
 
 @register_command('status')
@@ -36,11 +36,12 @@ def status():
 
 @register_command('say {}')
 def say(text):
+  # TODO(dbieber): Switch to espeak.
   dt = datetime.now().strftime('%k:%M:%S')
   with open('tmp-say', 'w') as tmp:
     print('[{}] Writing "{}" to tmp-say'.format(dt, text))
     tmp.write(text)
-  cmd = 'cat tmp-say | say &'
+  cmd = 'cat tmp-say | espeak &'
   shell(cmd)
 
 
