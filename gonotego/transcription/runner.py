@@ -40,10 +40,12 @@ def main():
         note_events_queue.put(bytes(note_event))
 
         # Audio commands:
-        if transcript.startswith('go go '):
-          command_text = transcript.replace('go go ', ':')
-          command_event = events.CommandEvent(command_text)
-          command_events_queue.put(bytes(command_event))
+        for trigger in ['go go', 'GoGo', 'Go-Go']:
+          extended_trigger = f'{trigger} '
+          if transcript.lower().startswith(extended_trigger.lower()):
+            command_text = transcript[len(extended_trigger):] + ':'
+            command_event = events.CommandEvent(command_text)
+            command_events_queue.put(bytes(command_event))
 
         leds.off(1)
         status.set(Status.TRANSCRIPTION_ACTIVE, False)
