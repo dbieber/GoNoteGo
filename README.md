@@ -2,6 +2,8 @@
 
 _Go Note Go is a note-taking system for when you're on the go, with a focus on driving and camping._
 
+[Read about it here.](https://davidbieber.com/projects/go-note-go/)
+
 ## Features
 
 * Take notes using audio or text
@@ -23,6 +25,11 @@ Want to contribute a new note-taking system?
 
 ## Built in commands
 
+Have a look at [command_center/commands.py](gonotego/command_center/commands.py) to see the currently supported commands.
+
+Some ideas for commands include:
+
+* Reading back old notes
 * Spaced Repetition
 * Perfect Pitch Practice
 * Reminders
