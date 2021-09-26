@@ -22,17 +22,16 @@ class Executor:
 
 def main():
   print('Starting command center.')
-  text_events_queue = interprocess.get_text_events_queue()
+  command_events_queue = interprocess.get_command_events_queue()
 
   executor = Executor(scheduler=scheduler.Scheduler())
   scheduler.executor_singleton = executor
   while True:
-    while text_events_queue.size() > 0:
-      text_event_bytes = text_events_queue.get()
-      text_event = events.TextEvent.from_bytes(text_event_bytes)
-      text = text_event.text
-      if text.startswith(':'):
-        executor.execute(text[1:])
+    while command_events_queue.size() > 0:
+      command_event_bytes = command_events_queue.get()
+      command_event = events.CommandEvent.from_bytes(command_event_bytes)
+      command_text = command_event.command_text
+      executor.execute(command_text)
     time.sleep(1)
 
 

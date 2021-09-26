@@ -36,7 +36,7 @@ shift_characters = {
 class Shell:
 
   def __init__(self):
-    self.text_event_queue = interprocess.get_text_events_queue()
+    self.command_event_queue = interprocess.get_command_events_queue()
     self.note_event_queue = interprocess.get_note_events_queue()
     self.text = ''
   
@@ -53,8 +53,9 @@ class Shell:
     elif event.name == 'enter':
       # Write both a text event (for the command center)
       # and a note event (for the uploader).
-      text_event = events.TextEvent(text=self.text)
-      self.text_event_queue.put(bytes(text_event))
+      if self.text.strip().startswith(':'):
+        command_event = events.CommandEvent(command_text=self.text.strip()[1:])
+        self.command_event_queue.put(bytes(command_event))
       note_event = events.NoteEvent(text=self.text, audio_filepath=None)
       self.note_event_queue.put(bytes(note_event))
       # Reset the text buffer.

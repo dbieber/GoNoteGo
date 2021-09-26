@@ -13,8 +13,8 @@ Status = status.Status
 def main():
   print('Starting transcription.')
   audio_events_queue = interprocess.get_audio_events_queue()
+  command_events_queue = interprocess.get_command_events_queue()
   note_events_queue = interprocess.get_note_events_queue()
-  text_events_queue = interprocess.get_text_events_queue()
 
   internet_available = True
   t = transcriber.Transcriber()
@@ -41,9 +41,9 @@ def main():
 
         # Audio commands:
         if transcript.startswith('go go '):
-          command = transcript.replace('go go ', ':')
-          text_event = events.TextEvent(command)
-          text_events_queue.put(bytes(text_event))
+          command_text = transcript.replace('go go ', ':')
+          command_event = events.CommandEvent(command_text)
+          command_events_queue.put(bytes(command_event))
 
         leds.off(1)
         status.set(Status.TRANSCRIPTION_ACTIVE, False)

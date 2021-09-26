@@ -25,8 +25,8 @@ def get_audio_events_queue():
   return InterprocessQueue('audio_events_queue')
 
 
-def get_text_events_queue():
-  return InterprocessQueue('text_events_queue')
+def get_command_events_queue():
+  return InterprocessQueue('command_events_queue')
 
 
 def get_note_events_queue():

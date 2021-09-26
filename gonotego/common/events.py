@@ -21,15 +21,15 @@ class AudioEvent:
 
 
 @dataclasses.dataclass
-class TextEvent:
-  text: Text
+class CommandEvent:
+  command_text: Text
 
   def __bytes__(self):
-    return self.text.encode('utf-8')
+    return self.command_text.encode('utf-8')
 
   def from_bytes(b):
-    text = b.decode('utf-8')
-    return TextEvent(text)
+    command_text = b.decode('utf-8')
+    return CommandEvent(command_text)
 
 
 @dataclasses.dataclass
