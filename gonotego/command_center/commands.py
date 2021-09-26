@@ -36,7 +36,6 @@ def status():
 
 @register_command('say {}')
 def say(text):
-  # TODO(dbieber): Switch to espeak.
   dt = datetime.now().strftime('%k:%M:%S')
   with open('tmp-say', 'w') as tmp:
     print('[{}] Writing "{}" to tmp-say'.format(dt, text))
