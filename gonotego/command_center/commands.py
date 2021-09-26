@@ -38,7 +38,7 @@ def status():
 def say(text):
   dt = datetime.now().strftime('%k:%M:%S')
   with open('tmp-say', 'w') as tmp:
-    print('[{}] Writing "{}" to tmp-say'.format(dt, text))
+    print(f'[{dt}] Writing "{text}" to tmp-say')
     tmp.write(text)
   cmd = 'cat tmp-say | espeak &'
   shell(cmd)
@@ -47,7 +47,7 @@ def say(text):
 @register_command('shell {}')
 def shell(cmd):
   dt = datetime.now().strftime('%k:%M:%S')
-  print("[{}] Executing command: '{}'".format(dt, cmd))
+  print(f"[{dt}] Executing command: '{cmd}'")
   os.system(cmd)
 
 
