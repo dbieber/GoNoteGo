@@ -40,8 +40,8 @@ def main():
         note_events_queue.put(bytes(note_event))
 
         # Audio commands:
-        if transcript.startswith('go go'):
-          command = transcript.replace('go go', ':')
+        if transcript.startswith('go go '):
+          command = transcript.replace('go go ', ':')
           text_event = events.TextEvent(command)
           text_events_queue.put(bytes(text_event))
 
