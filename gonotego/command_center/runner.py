@@ -13,6 +13,7 @@ class Executor:
     self.resources = resources
 
   def execute(self, text):
+    print(f'Executing: {text}')
     for command in registry.COMMANDS:
       executed = command.execute_if_match(text, self.resources)
       if executed:
