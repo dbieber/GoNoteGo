@@ -19,7 +19,8 @@ shift_characters = {
     '8': '*',
     '9': '(',
     '0': ')',
-    '-': '_',
+    '-': '_',  # Ordinary minus sign. ord(x) == 45.
+    '−': '_',  # The kind typed on the Raspberry Pi. ord(x) == 8722.
     '=': '+',
     '[': '{',
     ']': '}',
