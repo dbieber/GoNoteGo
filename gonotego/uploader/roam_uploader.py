@@ -208,9 +208,10 @@ class Uploader:
 
   def close_browser(self):
     browser = self._browser
-    driver = browser.driver
-    if driver is not None:
-      driver.close()
+    if browser:
+      driver = browser.driver
+      if driver is not None:
+        driver.close()
     self._browser = None
 
     subprocess.call(['pkill', 'firefox'])
