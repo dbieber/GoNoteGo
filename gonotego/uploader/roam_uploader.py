@@ -95,8 +95,8 @@ class RoamBrowser:
         print(self.driver.current_url)
         if self.is_element_with_class_name_stable('rm-plan'):
           return True
-      except:
-        print('Attempt failed with exception.')
+      except Exception as e:
+        print(f'Attempt failed with exception: {repr(e)}')
         time.sleep(1)
     print('Failed to sign in. No retries left.')
     return False
