@@ -23,6 +23,7 @@
   * sudo apt install iceweasel xvfb portaudio19-dev libatlas-base-dev redis-server espeak
 
   * cd /home/pi/code/github/dbieber/GoNoteGo
+  * mkdir out
   * pip3 install virtualenv
   * /home/pi/.local/bin/virtualenv env -p python3
   * ./env/bin/pip install -r requirements.txt 

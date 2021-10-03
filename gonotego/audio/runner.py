@@ -40,6 +40,12 @@ def main():
   last_press_time = None
   hold_triggered = False
   press_time = None
+
+  # Wait until not pressed before starting.
+  while trigger.is_pressed():
+    time.sleep(0.01)
+
+  print('Starting audio trigger loop.')
   while True:
     pressed = trigger.is_pressed()
     newly_pressed = pressed and not last_pressed
