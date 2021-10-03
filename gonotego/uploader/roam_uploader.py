@@ -97,6 +97,7 @@ class RoamBrowser:
           return True
       except:
         print('Attempt failed with exception.')
+        time.sleep(1)
     print('Failed to sign in. No retries left.')
     return False
 
