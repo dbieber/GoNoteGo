@@ -12,7 +12,7 @@ def get_max_volume(samples):
 class AudioListener:
 
   def __init__(self):
-    self.samplerate = sd.default.samplerate = 44100
+    self.samplerate = sd.default.samplerate = 48000
     self.channels = sd.default.channels = 1
 
     self.recording = False
