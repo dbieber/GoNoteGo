@@ -26,7 +26,7 @@ def feel_lucky(query):
 
 @register_command('time')
 def time():
-  shell('espeak `date "+%A, %B%e %l:%M%p"` &')
+  shell('date "+%A, %B%e %l:%M%p" | espeak &')
 
 
 @register_command('status')
