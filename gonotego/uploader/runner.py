@@ -17,6 +17,7 @@ def make_uploader():
     uploader = roam_uploader.Uploader()
   else:
     raise ValueError('Unexpected NOTE_TAKING_SYSTEM in settings', note_taking_system)
+  return uploader
 
 
 def main():
@@ -25,7 +26,6 @@ def main():
   uploader = make_uploader()
   status.set(Status.UPLOADER_READY, True)
 
-  internet_available = True
   last_upload = None
   while True:
 
