@@ -16,7 +16,6 @@ def main():
   command_events_queue = interprocess.get_command_events_queue()
   note_events_queue = interprocess.get_note_events_queue()
 
-  internet_available = True
   t = transcriber.Transcriber()
   status.set(Status.TRANSCRIPTION_READY, True)
   while True:

@@ -6,7 +6,6 @@ import time
 import dropbox
 
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 
@@ -133,7 +132,7 @@ class RoamBrowser:
     retries = 5
     while retries:
       try:
-        return self.driver.execute_script('return window.insertion_result;');
+        return self.driver.execute_script('return window.insertion_result;')
       except:
         print('Retrying script: window.insertion_result.')
         time.sleep(1)
@@ -182,8 +181,6 @@ class Uploader:
 
   def upload(self, note_events):
     browser = self.get_browser()
-    driver = browser.driver
-
     browser.go_graph(secure_settings.ROAM_GRAPH)
     time.sleep(0.5)
     browser.screenshot('screenshot-graph-later.png')
@@ -199,7 +196,7 @@ class Uploader:
       if note_event.audio_filepath:
         dropbox_path = f'/{note_event.audio_filepath}'
         with open(note_event.audio_filepath, 'rb') as f:
-          file_metadata = dbx.files_upload(f.read(), dropbox_path)
+          unused_file_metadata = dbx.files_upload(f.read(), dropbox_path)
           link_metadata = dbx.sharing_create_shared_link(dropbox_path)
           embed_url = link_metadata.url.replace('www.', 'dl.').replace('?dl=0', '')
           embed_text = '{{audio: ' + embed_url + '}}'

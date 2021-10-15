@@ -1,7 +1,6 @@
 from typing import Callable, Pattern, Text, Tuple
 
 import dataclasses
-import functools
 import re
 
 COMMANDS = []

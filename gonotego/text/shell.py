@@ -40,7 +40,7 @@ class Shell:
     self.command_event_queue = interprocess.get_command_events_queue()
     self.note_event_queue = interprocess.get_note_events_queue()
     self.text = ''
-  
+
   def start(self):
     keyboard.on_press(self.on_press)
 

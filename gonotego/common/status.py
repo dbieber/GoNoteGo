@@ -1,6 +1,5 @@
 import ast
 import enum
-import json
 
 from gonotego.common import interprocess
 

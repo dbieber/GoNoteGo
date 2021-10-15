@@ -36,6 +36,7 @@ class AudioListener:
     self.consecutive_quiet = 0
     self.consecutive_loud_frames = 0
     self.consecutive_quiet_frames = 0
+
     def record_callback(indata, frames, time, status):
       frame_max_volume = get_max_volume(indata)
       if frame_max_volume / self.max_volume > SILENCE_THRESHOLD:

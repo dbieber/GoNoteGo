@@ -1,5 +1,3 @@
-import time
-
 from gonotego.common import events
 from gonotego.common import interprocess
 
@@ -27,7 +25,7 @@ def green(ids=None):
 
 
 def set(color, ids=None):
-  led_events_queue = interprocess.get_led_events_queue()  
+  led_events_queue = interprocess.get_led_events_queue()
 
   if ids is None:
     ids = range(3)

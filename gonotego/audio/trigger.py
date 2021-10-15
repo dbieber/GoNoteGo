@@ -16,6 +16,7 @@ if board is not None:
 else:
   button = None
 
+
 def is_pressed():
   if button is not None:
     button_pressed = not button.value
