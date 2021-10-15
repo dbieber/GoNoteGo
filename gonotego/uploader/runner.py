@@ -5,6 +5,7 @@ from gonotego.common import internet
 from gonotego.common import interprocess
 from gonotego.common import leds
 from gonotego.common import status
+from gonotego.settings import secure_settings
 from gonotego.uploader import roam_uploader
 
 Status = status.Status
