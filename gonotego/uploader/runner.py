@@ -10,10 +10,18 @@ from gonotego.uploader import roam_uploader
 Status = status.Status
 
 
+def make_uploader():
+  note_taking_system = secure_settings.NOTE_TAKING_SYSTEM.lower()
+  if note_taking_system == 'roam':
+    uploader = roam_uploader.Uploader()
+  else:
+    raise ValueError('Unexpected NOTE_TAKING_SYSTEM in settings', note_taking_system)
+
+
 def main():
   print('Starting uploader.')
   note_events_queue = interprocess.get_note_events_queue()
-  uploader = roam_uploader.Uploader()
+  uploader = make_uploader()
   status.set(Status.UPLOADER_READY, True)
 
   internet_available = True
@@ -21,7 +29,7 @@ def main():
   while True:
 
     # Don't even try uploading notes if we don't have a connection.
-    internet.wait_for_internet(on_disconnect=uploader.close_browser)
+    internet.wait_for_internet(on_disconnect=uploader.handle_disconnect)
 
     note_events = []
     while note_events_queue.size() > 0:
@@ -41,7 +49,7 @@ def main():
 
     if last_upload and time.time() - last_upload > 600:
       # X minutes have passed since the last upload.
-      uploader.close_browser()
+      uploader.handle_inactivity()
 
     time.sleep(1)
 

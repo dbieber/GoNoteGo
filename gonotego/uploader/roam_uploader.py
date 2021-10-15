@@ -207,6 +207,12 @@ class Uploader:
           if block_uid:
             browser.create_child_block(block_uid, embed_text)
 
+  def handle_inactivity(self):
+    self.close_browser()
+
+  def handle_disconnect(self):
+    self.close_browser()
+
   def close_browser(self):
     browser = self._browser
     if browser:
