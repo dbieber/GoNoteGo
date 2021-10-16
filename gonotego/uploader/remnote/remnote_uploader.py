@@ -23,9 +23,6 @@ def create_rem(text, edit_later, parent_id=None):
 
 class Uploader:
 
-  def __init__(self):
-    pass
-
   def upload(self, note_events):
     client = blob_uploader.make_client()
     for note_event in note_events:
@@ -34,7 +31,7 @@ class Uploader:
       rem_id = create_rem(note_event.text, edit_later)
       if note_event.audio_filepath:
         url = blob_uploader.upload_blob(note_event.audio_filepath, client)
-        audio_rem_id = create_rem(url)
+        audio_rem_id = create_rem(url, edit_later=False, parent_id=rem_id)
 
 
   def handle_inactivity(self):
