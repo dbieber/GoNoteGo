@@ -3,13 +3,12 @@ import random
 import subprocess
 import time
 
-import dropbox
-
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 
 from gonotego.settings import secure_settings
+from gonotego.uploader.blob import blob_uploader
 
 
 class DriverUtils:
@@ -186,7 +185,7 @@ class Uploader:
     browser.screenshot('screenshot-graph-later.png')
 
     browser.execute_helper_js()
-    dbx = dropbox.Dropbox(secure_settings.DROPBOX_ACCESS_TOKEN)
+    client = blob_uploader.make_client()
     for note_event in note_events:
       text = note_event.text.strip()
       if note_event.audio_filepath:
@@ -194,15 +193,11 @@ class Uploader:
       block_uid = browser.insert_note(text)
       print(f'Inserted: "{text}" at block (({block_uid}))')
       if note_event.audio_filepath:
-        dropbox_path = f'/{note_event.audio_filepath}'
-        with open(note_event.audio_filepath, 'rb') as f:
-          unused_file_metadata = dbx.files_upload(f.read(), dropbox_path)
-          link_metadata = dbx.sharing_create_shared_link(dropbox_path)
-          embed_url = link_metadata.url.replace('www.', 'dl.').replace('?dl=0', '')
-          embed_text = '{{audio: ' + embed_url + '}}'
-          print(f'Audio embed: {embed_text}')
-          if block_uid:
-            browser.create_child_block(block_uid, embed_text)
+        embed_url = blob_uploader.upload_blob(note_event.audio_filepath, client)
+        embed_text = '{{audio: ' + embed_url + '}}'
+        print(f'Audio embed: {embed_text}')
+        if block_uid:
+          browser.create_child_block(block_uid, embed_text)
 
   def handle_inactivity(self):
     self.close_browser()
