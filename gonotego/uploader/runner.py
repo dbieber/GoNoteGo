@@ -6,18 +6,20 @@ from gonotego.common import interprocess
 from gonotego.common import leds
 from gonotego.common import status
 from gonotego.settings import secure_settings
-from gonotego.uploader import roam_uploader
+from gonotego.uploader.remnote import remnote_uploader
+from gonotego.uploader.roam import roam_uploader
 
 Status = status.Status
 
 
 def make_uploader():
   note_taking_system = secure_settings.NOTE_TAKING_SYSTEM.lower()
-  if note_taking_system == 'roam':
-    uploader = roam_uploader.Uploader()
+  if note_taking_system == 'remnote':
+    return remnote_uploader.Uploader()
+  elif note_taking_system == 'roam':
+    return roam_uploader.Uploader()
   else:
     raise ValueError('Unexpected NOTE_TAKING_SYSTEM in settings', note_taking_system)
-  return uploader
 
 
 def main():
