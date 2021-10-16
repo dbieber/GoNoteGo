@@ -29,6 +29,8 @@ packages = [
     'gonotego.text',
     'gonotego.transcription',
     'gonotego.uploader',
+    'gonotego.uploader.blob',
+    'gonotego.uploader.remnote',
     'gonotego.uploader.roam',
 ]
 setuptools.setup(
