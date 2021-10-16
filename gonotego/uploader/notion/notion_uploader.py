@@ -13,9 +13,8 @@ def upload_note(text, is_read=True):
       url=URL,
       json=dict(
           parent={'type': 'page_id', 'page_id': page_id},
-          isRead=is_read,
       ),
-      headers=dict(Authorization=f'Bearer {secure_settings.MEM_API_KEY}')
+      headers=dict(Authorization=f'Bearer {secure_settings.NOTION_INTEGRATION_TOKEN}')
   )
 
 
