@@ -8,9 +8,9 @@ CREATE_URL = 'https://api.mem.ai/v0/mems'
 
 
 def upload_mem(text, is_read=True):
-  requests.post(
+  return requests.post(
       url=CREATE_URL,
-      data=dict(
+      json=dict(
           content=text,
           isRead=is_read,
       ),
