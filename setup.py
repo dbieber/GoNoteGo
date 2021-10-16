@@ -34,11 +34,11 @@ packages = [
     'gonotego.uploader.roam',
 ]
 setuptools.setup(
-    name="GoNoteGo",
-    version="1.0.0",
+    name='GoNoteGo',
+    version='1.0.0',
     classifiers=[
-        "Programming Language :: Python :: 3",
-        "Operating System :: OS Independent",
+        'Programming Language :: Python :: 3',
+        'Operating System :: OS Independent',
     ],
     packages=packages,
     package_dir={d: d.replace('.', '/') for d in packages},
