@@ -2,9 +2,11 @@
 
 1.  Clone GoNoteGo
 
-  * mkdir -p /home/pi/code/github/dbieber
-  * cd /home/pi/code/github/dbieber
-  * git clone https://github.com/dbieber/GoNoteGo.git
+  ```bash
+mkdir -p /home/pi/code/github/dbieber
+cd /home/pi/code/github/dbieber
+git clone https://github.com/dbieber/GoNoteGo.git
+  ```
 
 2.  Set up settings
 
