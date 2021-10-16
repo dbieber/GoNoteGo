@@ -10,16 +10,15 @@ _Go Note Go is a note-taking system for when you're on the go, with a focus on d
 * Take notes offline
 * Automatically export notes to your favorite note-taking systems when internet becomes available
 * Automatic transcription from voice to text
-* No monitor.
-* No distractions. Audio notes are safe for driving.
+* No monitor. No distractions. Audio notes are safe for driving.
 * Free and open source software, inexpensive hardware
 * Add custom voice and text commands
 * Lots of built in commands
 
 ## Supported Note-taking Systems
 
-* Markdown files
-* Roam Research
+* [Roam Research](https://roamresearch.com/)
+* [RemNote](https://www.remnote.com/)
 
 Want to contribute a new note-taking system?
 
@@ -38,7 +37,7 @@ Some ideas for commands include:
 * Setting alarms
 * Programming with Codex
 * Question answering
-* Time
+* Hearing the Time
 
 ## Hardware Parts
 
@@ -52,23 +51,8 @@ Some ideas for commands include:
 
 ## Installation
 
-### On Mac
-
-* brew install portaudio
-* brew install geckodriver
-* python setup.py install
-
-### On Raspberry Pi
-
-* sudo apt update
-* sudo apt install portaudio19-dev
-* sudo apt install libatlas-base-dev
-* sudo apt install redis-server
-* sudo apt install espeak
-* sudo apt install iceweasel
-* sudo apt install xvfb
-* python setup.py install
+See the [installation instructions](installation.md) to get started.
 
 ## History
 
-[Learn about "Shh Shell" here](https://davidbieber.com/projects/shh-shell/).
+[Learn about "Shh Shell" here.](https://davidbieber.com/projects/shh-shell/)
