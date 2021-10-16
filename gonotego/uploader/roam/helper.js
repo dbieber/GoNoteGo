@@ -1,4 +1,6 @@
 function sleep(ms) {
+  // sleeps for the specified number of milliseconds.
+  // _ms_: the number of milliseconds to sleep for.
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -117,20 +119,12 @@ async function createChildBlock(parent_uid, block, order) {
   return block_uid;
 }
 
-window.sleep = sleep;
-window.getPage = getPage;
-window.getOrCreatePage = getOrCreatePage;
-window.getBlockOnPage = getBlockOnPage;
-window.createBlockOnPage = createBlockOnPage;
-window.getOrCreateBlockOnPage = getOrCreateBlockOnPage;
-window.getChildBlock = getChildBlock;
-window.getOrCreateChildBlock = getOrCreateChildBlock;
-window.createChildBlock = createChildBlock;
-// END COPIED FROM https://davidbieber.com/snippets/2021-02-12-javascript-functions-for-inserting-blocks-in-roam/
 
-let nthDate = d => {
-  if (d > 3 && d < 21) return 'th';
-  switch (d % 10) {
+let nthDate = n => {
+  // returns the suffix of the nth day of the month, either 'th', 'st', 'nd', or 'rd'.
+  // _n_: the number of the day of the month.
+  if (n > 3 && n < 21) return 'th';
+  switch (n % 10) {
     case 1:
       return 'st';
     case 2:
@@ -141,9 +135,10 @@ let nthDate = d => {
       return 'th';
   }
 }
-window.nthDate = nthDate;
 
 let getRoamDate = dateString => {
+  // returns the date in the format used by Roam Research page titles.
+  // _dateString_: a javascript compatible date string.
   let monthsDateProcessing = [
       'January', 'February', 'March', 'April', 'May',' June',
       'July', 'August', 'September', 'October', 'November', 'December'];
@@ -155,14 +150,28 @@ let getRoamDate = dateString => {
   const nthStr = nthDate(date);
   return `${month} ${date}${nthStr}, ${year}`;
 }
-window.getRoamDate = getRoamDate
 
 async function insertGoNoteGoNote(note) {
+  // inserts the note into the Go Note Go Notes section of your Daily Notes page.
+  // _note_: a string to insert as a new note.
   let $roam_date = getRoamDate(new Date());
 
-  // Add the note to the daily notes page.
+  // Add the note to the Daily Notes page.
   let block_uid = await getOrCreateBlockOnPage($roam_date, '[[Go Note Go]] Notes:', -1);
   let note_block = await createChildBlock(block_uid, note, -1);
   return note_block
 }
+
+window.sleep = sleep;
+window.getPage = getPage;
+window.getOrCreatePage = getOrCreatePage;
+window.getBlockOnPage = getBlockOnPage;
+window.createBlockOnPage = createBlockOnPage;
+window.getOrCreateBlockOnPage = getOrCreateBlockOnPage;
+window.getChildBlock = getChildBlock;
+window.getOrCreateChildBlock = getOrCreateChildBlock;
+window.createChildBlock = createChildBlock;
+
+window.nthDate = nthDate;
+window.getRoamDate = getRoamDate;
 window.insertGoNoteGoNote = insertGoNoteGoNote;
