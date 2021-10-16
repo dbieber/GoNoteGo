@@ -6,6 +6,7 @@ from gonotego.common import interprocess
 from gonotego.common import leds
 from gonotego.common import status
 from gonotego.settings import secure_settings
+from gonotego.uploader.ideaflow import ideaflow_uploader
 from gonotego.uploader.remnote import remnote_uploader
 from gonotego.uploader.roam import roam_uploader
 
@@ -18,6 +19,8 @@ def make_uploader():
     return remnote_uploader.Uploader()
   elif note_taking_system == 'roam':
     return roam_uploader.Uploader()
+  elif note_taking_system == 'ideaflow':
+    return ideaflow_uploader.Uploader()
   else:
     raise ValueError('Unexpected NOTE_TAKING_SYSTEM in settings', note_taking_system)
 
