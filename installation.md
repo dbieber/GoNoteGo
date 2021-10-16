@@ -6,13 +6,16 @@
 mkdir -p /home/pi/code/github/dbieber
 cd /home/pi/code/github/dbieber
 git clone https://github.com/dbieber/GoNoteGo.git
-  ```
+```
 
 2.  Set up settings
 
-  * cd /home/pi/code/github/dbieber/GoNoteGo
-  * cp gonotego/settings/secure_settings_template.py  gonotego/settings/secure_settings.py
-  * nano gonotego/settings/secure_settings.py
+  ```bash
+cd /home/pi/code/github/dbieber/GoNoteGo
+cp gonotego/settings/secure_settings_template.py  gonotego/settings/secure_settings.py
+nano gonotego/settings/secure_settings.py  
+```
+  * Configure your settings here.
 
 3. Put google service key on device
 
