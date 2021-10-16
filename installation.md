@@ -12,31 +12,34 @@ git clone https://github.com/dbieber/GoNoteGo.git
 
   ```bash
 cd /home/pi/code/github/dbieber/GoNoteGo
-cp gonotego/settings/secure_settings_template.py  gonotego/settings/secure_settings.py
-nano gonotego/settings/secure_settings.py  
+cp gonotego/settings/secure_settings_template.py gonotego/settings/secure_settings.py
+nano gonotego/settings/secure_settings.py # Configure your settings here.
 ```
-  * Configure your settings here.
 
-3. Put google service key on device
+3. Put Google service key on device
 
-  * mkdir /home/pi/secrets  # Run on Pi.
-  * scp /Users/dbieber/david-bieber-4509b70e0c20.json pi@192.168.0.106:/home/pi/secrets/  # Run on primary.
+  * `mkdir /home/pi/secrets  # Run on Pi.`
+  * `scp /Users/dbieber/david-bieber-4509b70e0c20.json pi@192.168.0.106:/home/pi/secrets/  # Run on primary.`
 
 4. Install dependencies
 
-  * sudo apt update
-  * sudo apt install iceweasel xvfb portaudio19-dev libatlas-base-dev redis-server espeak
+  ```bash
+sudo apt update
+sudo apt install iceweasel xvfb portaudio19-dev libatlas-base-dev redis-server espeak
 
-  * cd /home/pi/code/github/dbieber/GoNoteGo
-  * mkdir out
-  * pip3 install virtualenv
-  * /home/pi/.local/bin/virtualenv env -p python3
-  * ./env/bin/pip install -r requirements.txt 
+cd /home/pi/code/github/dbieber/GoNoteGo
+mkdir out
+pip3 install virtualenv
+/home/pi/.local/bin/virtualenv env -p python3
+./env/bin/pip install -r requirements.txt
+```
 
 5. Start on boot
 
-  * sudo nano /etc/rc.local
-  * /home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisord -c /home/pi/code/github/dbieber/GoNoteGo/gonotego/supervisord.conf  # Add this line to rc.local
+  ```bash
+sudo nano /etc/rc.local
+```
+  * `/home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisord -c /home/pi/code/github/dbieber/GoNoteGo/gonotego/supervisord.conf`  # Add this line to rc.local
 
 6. Install geckodriver to /usr/local/bin
 
