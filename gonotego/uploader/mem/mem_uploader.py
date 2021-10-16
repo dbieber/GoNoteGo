@@ -27,7 +27,7 @@ class Uploader:
       if note_event.audio_filepath:
         is_read = False  # Notes with audio should be checked for accuracy.
         url = blob_uploader.upload_blob(note_event.audio_filepath, client)
-        text = f'{text} #unverified-transcription ({url})'
+        text = f'{text} #transcription ({url})'
       else:
         is_read = True
       upload_mem(text, is_read=is_read)
