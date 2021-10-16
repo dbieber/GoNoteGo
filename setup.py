@@ -30,6 +30,10 @@ packages = [
     'gonotego.transcription',
     'gonotego.uploader',
     'gonotego.uploader.blob',
+    'gonotego.uploader.browser',
+    'gonotego.uploader.ideaflow',
+    'gonotego.uploader.mem',
+    'gonotego.uploader.notion',
     'gonotego.uploader.remnote',
     'gonotego.uploader.roam',
 ]

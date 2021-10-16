@@ -21,6 +21,7 @@ _Go Note Go is a note-taking system for when you're on the go, with a focus on d
 * [RemNote](https://www.remnote.com/)
 * [IdeaFlow](https://ideaflow.app/)
 * [Mem](https://mem.ai/)
+* [Notion](https://www.notion.so/)
 
 Want to contribute a new note-taking system?
 
