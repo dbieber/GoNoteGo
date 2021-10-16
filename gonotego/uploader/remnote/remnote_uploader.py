@@ -8,7 +8,7 @@ CREATE_URL = 'https://api.remnote.io/api/v0/create'
 
 
 def create_rem(text, edit_later, parent_id=None):
-  return requests.post(
+  response = requests.post(
       url=CREATE_URL,
       data=dict(
           apiKey=secure_settings.REMNOTE_API_KEY,
@@ -19,6 +19,7 @@ def create_rem(text, edit_later, parent_id=None):
           source='Go Note Go',
       ),
   )
+  return response.json().get('remId')
 
 
 class Uploader:
