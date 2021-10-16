@@ -15,12 +15,12 @@ Status = status.Status
 
 def make_uploader():
   note_taking_system = secure_settings.NOTE_TAKING_SYSTEM.lower()
-  if note_taking_system == 'remnote':
+  if note_taking_system == 'ideaflow':
+    return ideaflow_uploader.Uploader()
+  elif note_taking_system == 'remnote':
     return remnote_uploader.Uploader()
   elif note_taking_system == 'roam':
     return roam_uploader.Uploader()
-  elif note_taking_system == 'ideaflow':
-    return ideaflow_uploader.Uploader()
   else:
     raise ValueError('Unexpected NOTE_TAKING_SYSTEM in settings', note_taking_system)
 
