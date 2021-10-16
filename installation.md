@@ -13,13 +13,13 @@ git clone https://github.com/dbieber/GoNoteGo.git
   ```bash
 cd /home/pi/code/github/dbieber/GoNoteGo
 cp gonotego/settings/secure_settings_template.py gonotego/settings/secure_settings.py
-nano gonotego/settings/secure_settings.py # Configure your settings here.
+nano gonotego/settings/secure_settings.py  # Configure your settings here.
 ```
 
 3. Put Google service key on device
 
-  * `mkdir /home/pi/secrets  # Run on Pi.`
-  * `scp /Users/dbieber/david-bieber-4509b70e0c20.json pi@192.168.0.106:/home/pi/secrets/  # Run on primary.`
+  * `mkdir /home/pi/secrets`  # Run on Raspberry Pi.
+  * `scp /Users/dbieber/david-bieber-4509b70e0c20.json pi@192.168.0.106:/home/pi/secrets/`  # Run on primary.
 
 4. Install dependencies
 
@@ -39,21 +39,31 @@ pip3 install virtualenv
   ```bash
 sudo nano /etc/rc.local
 ```
-  * `/home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisord -c /home/pi/code/github/dbieber/GoNoteGo/gonotego/supervisord.conf`  # Add this line to rc.local
+  Add this line to rc.local:
+  `/home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisord -c /home/pi/code/github/dbieber/GoNoteGo/gonotego/supervisord.conf`
 
 6. Install geckodriver to /usr/local/bin
 
-  * cd
-  * wget https://github.com/mozilla/geckodriver/releases/download/v0.23.0/geckodriver-v0.23.0-arm7hf.tar.gz
-  * tar -xvf geckodriver-v0.23.0-arm7hf.tar.gz
-  * rm geckodriver-v0.23.0-arm7hf.tar.gz
-  * sudo mv geckodriver /usr/local/bin
+  ```bash
+cd
+wget https://github.com/mozilla/geckodriver/releases/download/v0.23.0/geckodriver-v0.23.0-arm7hf.tar.gz
+tar -xvf geckodriver-v0.23.0-arm7hf.tar.gz
+rm geckodriver-v0.23.0-arm7hf.tar.gz
+sudo mv geckodriver /usr/local/bin
+```
 
 7. Set up Internet
 
-  * Follow the guide at https://www.raspberrypi.org/documentation/computers/configuration.html to set your wpa_supplicant.
-  * sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+  * Run `sudo nano /etc/wpa_supplicant/wpa_supplicant.conf`
+  * Follow the guide at https://www.raspberrypi.org/documentation/computers/configuration.html to set up your wpa_supplicant.conf file.
 
 8. Set up your audio
 
   * Follow the guide at https://learn.adafruit.com/adafruit-voice-bonnet/raspberry-pi-setup if using an Adafruit Voice Bonnet.
+
+9. Verify everything's working!
+
+  * Type a text note and press enter; it should appear in your notes.
+  * Press your hotkey and speak an audio note; it too should appear in your notes.
+  * If you're having any trouble getting set up, open a [new GitHub issue](https://github.com/dbieber/GoNoteGo/issues).
+  * That's it; you're good to go! Happy note-taking!
