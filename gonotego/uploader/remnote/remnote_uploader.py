@@ -19,7 +19,10 @@ def create_rem(text, edit_later, parent_id=None):
           source='Go Note Go',
       ),
   )
-  return response.json().get('remId')
+  try:
+    return response.json().get('remId')
+  except:
+    pass
 
 
 class Uploader:
