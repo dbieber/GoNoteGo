@@ -54,7 +54,7 @@ class IdeaflowBrowser:
   def insert_note(self, text):
     driver = self.driver
     el = driver.find_element_by_css_selector('#editor-container')
-    el.send_keys(Keys.CONTROL + 'k') 
+    el.send_keys(Keys.CONTROL + 'k')
     editor_el = driver.find_element_by_css_selector('.editor-div')
     editor_el.send_keys(text)
 
