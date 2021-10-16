@@ -37,7 +37,6 @@ class Uploader:
         url = blob_uploader.upload_blob(note_event.audio_filepath, client)
         audio_rem_id = create_rem(url, edit_later=False, parent_id=rem_id)
 
-
   def handle_inactivity(self):
     pass
 
