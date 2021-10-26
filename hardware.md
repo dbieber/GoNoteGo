@@ -100,4 +100,4 @@ These might be useful for connecting the button to the GPIO pins on the Pi:
 https://www.amazon.com/dp/B0774NMT1S
 I don't know. In my experience these were too lose to fit nicely on the GPIO pins.
 
-I'm going to try these next: GenBasic 40 Piece Female to Female Jumper Wires (4 Inch) https://www.amazon.com/dp/B077N58HFK
+I'm going to try these next: GenBasic 40 Piece Female to Female Jumper Wires (4 Inch) https://www.amazon.com/dp/B077N58HFK ($5)
