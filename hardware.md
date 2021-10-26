@@ -94,12 +94,12 @@ Notes: I don't know if this is the best choice for wire; a higher gauge might be
 
 I haven't had to use solder yet, but might need to for hooking up the button.
 
-Hot glue or heat shrink and a heat gun might be nice to haves too to ensure solid stable connections.
+Hot glue or heat shrink and a heat gun might be nice-to-haves too to ensure solid stable connections.
 
 ### Possible other parts for button
 
 These might be useful for connecting the button to the GPIO pins on the Pi:
 https://www.amazon.com/dp/B0774NMT1S
-I don't know. In my experience these were too lose to fit nicely on the GPIO pins.
+I don't know. In my experience these were too loose to fit nicely on the GPIO pins.
 
 I'm going to try these next: GenBasic 40 Piece Female to Female Jumper Wires (4 Inch) https://www.amazon.com/dp/B077N58HFK ($5)
