@@ -52,6 +52,8 @@ Some ideas for commands include:
 * 3 ft USB - USB C cable
 * 6 in USB - USB C cable
 
+See the [hardware guide](hardware.md) to know exactly what to buy.
+
 ## Installation
 
 See the [installation instructions](installation.md) to get started.
