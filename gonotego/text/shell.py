@@ -45,7 +45,6 @@ class Shell:
     keyboard.on_press(self.on_press)
 
   def on_press(self, event):
-    leds.orange(1)
     status.set(Status.TEXT_LAST_KEYPRESS, time.time())
     if event.name == 'delete':
       self.text = self.text[:-1]
@@ -68,7 +67,6 @@ class Shell:
       if keyboard.is_pressed('shift') or keyboard.is_pressed('right shift'):
         character = shift_characters.get(character, character.upper())
       self.text += character
-    leds.off(1)
 
   def wait(self):
     keyboard.wait()
