@@ -94,6 +94,8 @@ Notes: I don't know if this is the best choice for wire; a higher gauge might be
 
 I haven't had to use solder yet, but might need to for hooking up the button.
 
+Hot glue or heat shrink and a heat gun might be nice to haves too to ensure solid stable connections.
+
 ### Possible other parts for button
 
 These might be useful for connecting the button to the GPIO pins on the Pi:
