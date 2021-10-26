@@ -1,6 +1,7 @@
 from datetime import datetime
 import os
 import random
+import sys
 
 from gonotego.command_center import registry
 
@@ -20,7 +21,7 @@ def alarm():
 @register_command('lucky {}')
 def feel_lucky(query):
   query = query.replace(" ", "+")
-  cmd = 'open "http://www.google.com/search?q={}&btnI"'.format(query)
+  cmd = f'chromium-browser "http://www.google.com/search?q={query}&btnI"'
   shell(cmd)
 
 
@@ -54,3 +55,9 @@ def shell(cmd):
 @register_command('at {}:{}', requirements=('scheduler',))
 def schedule(at, what, scheduler):
   scheduler.schedule(at, what)
+
+
+@register_command('flush')
+def flush():
+  sys.stdout.flush()
+  sys.stderr.flush()
