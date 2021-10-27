@@ -61,3 +61,9 @@ def schedule(at, what, scheduler):
 def flush():
   sys.stdout.flush()
   sys.stderr.flush()
+
+
+@register_command('update')
+def update():
+  shell('git pull')
+  shell('reboot')
