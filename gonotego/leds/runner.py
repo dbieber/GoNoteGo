@@ -4,8 +4,10 @@ import adafruit_dotstar
 import board
 
 from gonotego.common import events
-from gonotego.common import interprocess
+from gonotego.common import status
+from gonotego.leds import colors
 
+Status = status.Status
 
 DOTSTAR_DATA = board.D5
 DOTSTAR_CLOCK = board.D6
@@ -14,25 +16,27 @@ DOTSTAR_CLOCK = board.D6
 def main():
   dots = adafruit_dotstar.DotStar(DOTSTAR_CLOCK, DOTSTAR_DATA, 3, brightness=0.2)
 
-  led_events_queue = interprocess.get_led_events_queue()
-  colors = [
-      (0, 0, 0),
-      (0, 0, 0),
-      (0, 0, 0),
-  ]
   while True:
-    while led_events_queue.size() > 0:
-      led_event_bytes = led_events_queue.get()
-      led_event = events.LEDEvent.from_bytes(led_event_bytes)
+    audio_recording = status.get(Status.AUDIO_RECORDING)
+    text_last_keypress = status.get(Status.TEXT_LAST_KEYPRESS)
+    time_since_keypress = time.time() - text_last_keypress
+    transcription_active = status.get(Status.TRANSCRIPTION_ACTIVE)
+    uploader_active = status.get(Status.UPLOADER_ACTIVE)
 
-      for i in led_event.ids:
-        colors[i] = led_event.color
-      for i in range(3):
-        dots[i] = colors[i]
-      dots.show()
-      time.sleep(0.005)
+    led_colors = [colors.OFF, colors.OFF, colors.OFF]
+    if audio_recording:
+      led_colors[0] = colors.RED
+    if time_since_keypress < 5:
+      led_colors[1] = colors.ORANGE
+    if transcription_active:
+      led_colors[1] = colors.GREEN
+    if uploader_active:
+      led_colors[2] = colors.BLUE
 
-      led_events_queue.commit(led_event_bytes)
+    for i in range(3):
+      dots[i] = led_colors[i]
+    dots.show()
+
     time.sleep(0.05)
 
 

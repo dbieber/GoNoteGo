@@ -53,12 +53,10 @@ def main():
       note_events.append(note_event)
 
     if note_events:
-      leds.blue(2)
       status.set(Status.UPLOADER_ACTIVE, True)
       uploader.upload(note_events)
       last_upload = time.time()
       print('Uploaded.')
-      leds.off(2)
       status.set(Status.UPLOADER_ACTIVE, False)
 
     for note_event_bytes in note_event_bytes_list:

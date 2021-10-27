@@ -4,7 +4,6 @@ import random
 import sys
 
 from gonotego.command_center import registry
-from gonotego.common import leds
 
 register_command = registry.register_command
 
@@ -67,4 +66,3 @@ def flush():
 @register_command('update')
 def update():
   shell('git pull')
-  leds.orange(1)
