@@ -26,11 +26,11 @@ def main():
     led_colors = [colors.OFF, colors.OFF, colors.OFF]
     if audio_recording:
       led_colors[0] = colors.RED
-    if time_since_keypress < 5:
+    if time_since_keypress < 4:
       led_colors[1] = colors.ORANGE
-      if time_since_keypress > 2.5:
+      if time_since_keypress > 3:
         led_colors[1] = colors.brightness_adjusted(
-            led_colors[1], (5 - time_since_keypress) / 2.5)
+            led_colors[1], 0.5)
     if transcription_active:
       led_colors[1] = colors.GREEN
     if uploader_active:
