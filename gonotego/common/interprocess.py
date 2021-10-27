@@ -44,7 +44,7 @@ class InterprocessQueue:
     assert value == pop_value
 
   def size(self):
-    return self.r.llen(self.key)
+    return self.r.llen(self.key) - self.index
 
 
 def get_audio_events_queue():
