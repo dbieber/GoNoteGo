@@ -28,6 +28,9 @@ def main():
       led_colors[0] = colors.RED
     if time_since_keypress < 5:
       led_colors[1] = colors.ORANGE
+      if time_since_keypress > 4:
+        led_colors[1] = colors.brightness_adjusted(
+            led_colors[1], (5 - time_since_keypress))
     if transcription_active:
       led_colors[1] = colors.GREEN
     if uploader_active:
