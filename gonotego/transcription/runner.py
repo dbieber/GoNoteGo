@@ -48,6 +48,7 @@ def main():
 
         leds.off(1)
         status.set(Status.TRANSCRIPTION_ACTIVE, False)
+    audio_events_queue.commit(audio_event_bytes)
 
     time.sleep(3)
 

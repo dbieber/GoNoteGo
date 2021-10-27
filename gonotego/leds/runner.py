@@ -31,6 +31,8 @@ def main():
         dots[i] = colors[i]
       dots.show()
       time.sleep(0.005)
+
+      led_events_queue.commit(led_event_bytes)
     time.sleep(0.05)
 
 

@@ -43,10 +43,12 @@ def main():
     # Don't even try uploading notes if we don't have a connection.
     internet.wait_for_internet(on_disconnect=uploader.handle_disconnect)
 
+    note_event_bytes_list = []
     note_events = []
     while note_events_queue.size() > 0:
       print('Note event received')
       note_event_bytes = note_events_queue.get()
+      note_event_bytes_list.append(note_event_bytes)
       note_event = events.NoteEvent.from_bytes(note_event_bytes)
       note_events.append(note_event)
 
@@ -58,6 +60,9 @@ def main():
       print('Uploaded.')
       leds.off(2)
       status.set(Status.UPLOADER_ACTIVE, False)
+
+    for note_event_bytes in note_event_bytes_list:
+      note_events_queue.commit(note_event_bytes)
 
     if last_upload and time.time() - last_upload > 600:
       # X minutes have passed since the last upload.
