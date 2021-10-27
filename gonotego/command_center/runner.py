@@ -28,7 +28,11 @@ def main():
   scheduler.executor_singleton = executor
   while True:
     while command_events_queue.size() > 0:
+      # We commit the item before executing the command.
+      # So, if the command fails, it will not be re-executed.
       command_event_bytes = command_events_queue.get()
+      command_events_queue.commit(command_event_bytes)
+
       command_event = events.CommandEvent.from_bytes(command_event_bytes)
       command_text = command_event.command_text
       executor.execute(command_text)
