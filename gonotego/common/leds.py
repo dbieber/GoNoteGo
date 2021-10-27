@@ -3,25 +3,27 @@ from gonotego.common import interprocess
 
 # Colors are (G, B, R, A)
 
+POWER = 0.1
+
 
 def off(ids=None):
   set((0, 0, 0, 0.0), ids=ids)
 
 
 def red(ids=None):
-  set((0, 0, 255, 1.0), ids=ids)
+  set((0, 0, 255, POWER), ids=ids)
 
 
 def orange(ids=None):
-  set((90, 0, 255, 0.2), ids=ids)
+  set((90, 0, 255, POWER), ids=ids)
 
 
 def blue(ids=None):
-  set((0, 255, 0, 1.0), ids=ids)
+  set((0, 255, 0, POWER), ids=ids)
 
 
 def green(ids=None):
-  set((255, 0, 0, 1.0), ids=ids)
+  set((255, 0, 0, POWER), ids=ids)
 
 
 def set(color, ids=None):
