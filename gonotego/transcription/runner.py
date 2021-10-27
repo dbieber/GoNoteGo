@@ -21,11 +21,12 @@ def main():
   while True:
     audio_event_bytes = audio_events_queue.get()
 
-    # Don't even try transcribing if we don't have a connection.
-    internet.wait_for_internet()
-
     if audio_event_bytes is not None:
       print(f'Event received: {audio_event_bytes}')
+
+      # Don't even try transcribing if we don't have a connection.
+      internet.wait_for_internet()
+
       event = events.AudioEvent.from_bytes(audio_event_bytes)
       if event.action == events.AUDIO_DONE:
         status.set(Status.TRANSCRIPTION_ACTIVE, True)
