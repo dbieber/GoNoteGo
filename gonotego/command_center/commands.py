@@ -68,4 +68,3 @@ def flush():
 def update():
   shell('git pull')
   leds.orange(1)
-  shell('reboot')

@@ -5,6 +5,7 @@ from gonotego.common import events
 from gonotego.common import interprocess
 from gonotego.common import leds
 from gonotego.common import status
+from gonotego.settings import secure_settings
 
 Status = status.Status
 
@@ -46,7 +47,10 @@ class Shell:
 
   def on_press(self, event):
     status.set(Status.TEXT_LAST_KEYPRESS, time.time())
-    if event.name == 'delete':
+    if keyboard.is_pressed(secure_settings.HOTKEY):
+      # Ignore presses while the hotkey is pressed.
+      return
+    elif event.name == 'delete':
       self.text = self.text[:-1]
       if keyboard.is_pressed('shift') or keyboard.is_pressed('right shift'):
         self.text = ''
