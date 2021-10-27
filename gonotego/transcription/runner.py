@@ -3,7 +3,6 @@ import time
 from gonotego.common import events
 from gonotego.common import internet
 from gonotego.common import interprocess
-from gonotego.common import leds
 from gonotego.common import status
 from gonotego.transcription import transcriber
 
