@@ -40,7 +40,7 @@ def main():
       dots[i] = led_colors[i]
     dots.show()
 
-    time.sleep(0.05)
+    time.sleep(0.005)
 
 
 if __name__ == '__main__':
