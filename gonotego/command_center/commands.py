@@ -34,7 +34,8 @@ def time():
 
 
 @register_command('status')
-def status():
+@register_command('ok')
+def status_command():
   say('ok')
 
 
