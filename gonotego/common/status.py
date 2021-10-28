@@ -21,6 +21,7 @@ class Status(enum.Enum):
   UPLOADER_READY = enum.auto()
   UPLOADER_ACTIVE = enum.auto()
   INTERNET_AVAILABLE = enum.auto()
+  LEDS_SETTING = enum.auto()
 
 
 def get_redis_key(key):
@@ -32,13 +33,13 @@ def get(key):
   value_bytes = r.get(get_redis_key(key))
   if value_bytes is None:
     return None
-  value_str = value_bytes.decode('utf-8')
-  value = ast.literal_eval(value_str)
+  value_repr = value_bytes.decode('utf-8')
+  value = ast.literal_eval(value_repr)
   return value
 
 
 def set(key, value):
   r = interprocess.get_redis_client()
-  value_str = str(value)
-  value_bytes = value_str.encode('utf-8')
+  value_repr = repr(value)
+  value_bytes = value_repr.encode('utf-8')
   r.set(get_redis_key(key), value_bytes)

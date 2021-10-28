@@ -22,19 +22,24 @@ def main():
     time_since_keypress = time.time() - text_last_keypress
     transcription_active = status.get(Status.TRANSCRIPTION_ACTIVE)
     uploader_active = status.get(Status.UPLOADER_ACTIVE)
+    leds_setting = status.get(Status.LEDS_SETTING)
 
     led_colors = [colors.OFF, colors.OFF, colors.OFF]
-    if audio_recording:
-      led_colors[0] = colors.RED
-    if time_since_keypress < 4:
-      led_colors[1] = colors.ORANGE
-      if time_since_keypress > 3:
-        led_colors[1] = colors.brightness_adjusted(
-            led_colors[1], 0.5)
-    if transcription_active:
-      led_colors[1] = colors.GREEN
-    if uploader_active:
-      led_colors[2] = colors.BLUE
+    if leds_setting == 'low':
+      if time_since_keypress < 4:
+        led_colors[1] = colors.brightness_adjusted(colors.ORANGE, 0.2)
+
+    if leds_setting != 'off':
+      if audio_recording:
+        led_colors[0] = colors.RED
+      if time_since_keypress < 4:
+        led_colors[1] = colors.ORANGE
+        if time_since_keypress > 3:
+          led_colors[1] = colors.brightness_adjusted(colors.ORANGE, 0.5)
+      if transcription_active:
+        led_colors[1] = colors.GREEN
+      if uploader_active:
+        led_colors[2] = colors.BLUE
 
     for i in range(3):
       dots[i] = led_colors[i]

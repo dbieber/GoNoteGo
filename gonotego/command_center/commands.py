@@ -3,9 +3,12 @@ import os
 import random
 import sys
 
+from gonotego.common import status
 from gonotego.command_center import registry
 
 register_command = registry.register_command
+
+Status = status.Status
 
 
 @register_command('alarm')
@@ -66,3 +69,9 @@ def flush():
 @register_command('update')
 def update():
   shell('git pull')
+
+
+@register_command('leds {}')
+def leds(value):
+  if value in ('off', 'on', 'low'):
+    status.set(Status.LEDS_SETTING, value)
