@@ -3,7 +3,6 @@ import time
 from gonotego.common import events
 from gonotego.common import internet
 from gonotego.common import interprocess
-from gonotego.common import leds
 from gonotego.common import status
 from gonotego.transcription import transcriber
 
@@ -30,7 +29,6 @@ def main():
       event = events.AudioEvent.from_bytes(audio_event_bytes)
       if event.action == events.AUDIO_DONE:
         status.set(Status.TRANSCRIPTION_ACTIVE, True)
-        leds.green(1)
         transcript = t.transcribe(event.filepath)
         text_filepath = event.filepath.replace('.wav', '.txt')
         with open(text_filepath, 'w') as f:
@@ -47,7 +45,6 @@ def main():
             command_event = events.CommandEvent(command_text)
             command_events_queue.put(bytes(command_event))
 
-        leds.off(1)
         status.set(Status.TRANSCRIPTION_ACTIVE, False)
     audio_events_queue.commit(audio_event_bytes)
 
