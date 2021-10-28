@@ -28,7 +28,7 @@ def main():
 
     if leds_setting == 'low':
       if time_since_keypress < 4:
-        led_colors[1] = colors.brightness_adjusted(colors.ORANGE, 0.2)
+        led_colors[1] = colors.brightness_adjusted(colors.ORANGE, 0.5)
 
     elif leds_setting != 'off':
       if audio_recording:
