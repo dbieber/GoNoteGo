@@ -40,12 +40,14 @@ class Shell:
     self.command_event_queue = interprocess.get_command_events_queue()
     self.note_event_queue = interprocess.get_note_events_queue()
     self.text = ''
+    self.last_press = None
 
   def start(self):
     keyboard.on_press(self.on_press)
 
   def on_press(self, event):
-    status.set(Status.TEXT_LAST_KEYPRESS, time.time())
+    self.last_press = time.time()
+    status.set(Status.TEXT_LAST_KEYPRESS, self.last_press)
     if keyboard.is_pressed(secure_settings.HOTKEY):
       # Ignore presses while the hotkey is pressed.
       return
@@ -59,10 +61,7 @@ class Shell:
       if self.text.strip().startswith(':'):
         command_event = events.CommandEvent(command_text=self.text.strip()[1:])
         self.command_event_queue.put(bytes(command_event))
-      note_event = events.NoteEvent(text=self.text, audio_filepath=None)
-      self.note_event_queue.put(bytes(note_event))
-      # Reset the text buffer.
-      self.text = ''
+      self.submit_note()
     elif event.name == 'space':
       self.text += ' '
     elif len(event.name) == 1:
@@ -71,5 +70,21 @@ class Shell:
         character = shift_characters.get(character, character.upper())
       self.text += character
 
+  def submit_note(self):
+    if self.text:
+      note_event = events.NoteEvent(text=self.text, audio_filepath=None)
+      self.note_event_queue.put(bytes(note_event))
+      # Reset the text buffer.
+      self.text = ''
+
+  def handle_inactivity(self):
+    self.submit_note()
+
   def wait(self):
-    keyboard.wait()
+    while True:
+      time.sleep(5)
+
+      # If 3 minutes elapse, submit the buffer as a note and clear it.
+      if self.last_press and time.time() - self.last_press > 180:
+        self.last_press = None
+        self.handle_inactivity()
