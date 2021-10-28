@@ -19,7 +19,7 @@ nano gonotego/settings/secure_settings.py  # Configure your settings here.
 3. Put Google service key on device
 
   * `mkdir /home/pi/secrets`  # Run on Raspberry Pi.
-  * `scp /Users/dbieber/david-bieber-4509b70e0c20.json pi@192.168.0.106:/home/pi/secrets/`  # Run on primary.
+  * `scp path/to/google_credentials.json pi@192.168.0.106:/home/pi/secrets/`  # Run on primary.
 
 4. Install dependencies
 
