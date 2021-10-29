@@ -65,5 +65,6 @@ sudo mv geckodriver /usr/local/bin
 
   * Type a text note and press enter; it should appear in your notes.
   * Press your hotkey and speak an audio note; it too should appear in your notes.
+  * Type ":ok" and press enter; you should hear the machine say "ok".
   * If you're having any trouble getting set up, open a [new GitHub issue](https://github.com/dbieber/GoNoteGo/issues).
   * That's it; you're good to go! Happy note-taking!
