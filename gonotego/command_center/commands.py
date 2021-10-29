@@ -23,7 +23,7 @@ def alarm():
 
 @register_command('lucky {}')
 def feel_lucky(query):
-  query = query.replace(" ", "+")
+  query = query.replace(' ', '+')
   cmd = f'chromium-browser "http://www.google.com/search?q={query}&btnI"'
   shell(cmd)
 
