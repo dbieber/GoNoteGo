@@ -3,6 +3,7 @@ import os
 import random
 import sys
 
+from gonotego.common import internet
 from gonotego.common import status
 from gonotego.command_center import registry
 
@@ -86,3 +87,9 @@ def leds(value):
 @register_command('env')
 def env():
   shell('env | sort')
+
+
+@register_command('i')
+@register_command('internet')
+def check_internet():
+  say('yes' if internet.is_internet_available() else 'no')
