@@ -72,6 +72,11 @@ def update():
   shell('git pull')
 
 
+@register_command('restart')
+def update():
+  shell('./env/bin/supervisorctl -u go -p notego restart all')
+
+
 @register_command('leds {}')
 def leds(value):
   if value in ('off', 'on', 'low'):
