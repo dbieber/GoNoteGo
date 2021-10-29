@@ -76,3 +76,8 @@ def update():
 def leds(value):
   if value in ('off', 'on', 'low'):
     status.set(Status.LEDS_SETTING, value)
+
+
+@register_command('env')
+def env():
+  shell('env | sort')
