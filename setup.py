@@ -13,7 +13,8 @@ DEPENDENCIES = [
     'numpy',
     'parsedatetime',
     'redis',
-    'selenium',
+    # selenium 4.0 breaks with arm geckodriver.
+    'selenium==3.141.0',
     'sounddevice',
     'soundfile',
     'supervisor',

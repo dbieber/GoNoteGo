@@ -62,15 +62,16 @@ Link: https://www.amazon.com/gp/product/B00T6RCGNC
 
 Cost: $9
 
-### Alternative Mic and Speaker
+### Alternative Mic and Speakers
 
 Links:
 * Microphone: https://www.adafruit.com/product/3367 ($6)
-* Speaker: https://www.adafruit.com/product/3369 ($13)
+* Adafruit Speaker: https://www.adafruit.com/product/3369 ($13)
+* Etsy Speaker: https://www.etsy.com/listing/1056790095/usb-speaker-stick ($30)
 
-Notes: I haven't gotten these set up with Go Note Go yet, but am considering them as an alternative to the Adafruit Voice Bonnet. I really like the LEDs on the voice bonnet though, so TBD.
+Notes: I am considering these as an alternative to the Adafruit Voice Bonnet. I really like the LEDs on the voice bonnet though, so TBD.
 
-Cost: $19
+Cost: $19 - $36
 
 ---
 
