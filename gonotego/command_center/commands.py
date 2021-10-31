@@ -3,7 +3,9 @@ import os
 import random
 import sys
 
+from gonotego.common import events
 from gonotego.common import internet
+from gonotego.common import interprocess
 from gonotego.common import status
 from gonotego.command_center import registry
 
@@ -93,3 +95,12 @@ def env():
 @register_command('internet')
 def check_internet():
   say('yes' if internet.is_internet_available() else 'no')
+
+
+@register_command('r')
+@register_command('read')
+def read_latest():
+  note_events_queue = interprocess.get_note_events_queue()
+  note_event_bytes = note_events_queue.latest()
+  note_event = events.NoteEvent.from_bytes(note_event_bytes)
+  say(note_event.text)

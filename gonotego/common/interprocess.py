@@ -13,6 +13,7 @@ class InterprocessQueue:
     self.index = 0
 
   def put(self, value):
+    self.r.set(f'{self.key}:latest', value)
     return self.r.rpush(self.key, value)
 
   def get(self):
@@ -46,6 +47,9 @@ class InterprocessQueue:
 
   def size(self):
     return self.r.llen(self.key) - self.index
+
+  def latest(self):
+    return self.r.get(f'{self.key}:latest')
 
 
 def get_audio_events_queue():
