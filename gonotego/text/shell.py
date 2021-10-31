@@ -38,7 +38,7 @@ class Shell:
 
   def __init__(self):
     self.command_event_queue = interprocess.get_command_events_queue()
-    self.note_event_queue = interprocess.get_note_events_queue()
+    self.note_events_queue = interprocess.get_note_events_queue()
     self.text = ''
     self.last_press = None
 
@@ -73,7 +73,7 @@ class Shell:
   def submit_note(self):
     if self.text:
       note_event = events.NoteEvent(text=self.text, audio_filepath=None)
-      self.note_event_queue.put(bytes(note_event))
+      self.note_events_queue.put(bytes(note_event))
       # Reset the text buffer.
       self.text = ''
 
