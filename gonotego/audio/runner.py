@@ -108,7 +108,7 @@ def main():
         status.set(Status.AUDIO_RECORDING, listener.recording)
         subprocess.call(['rm', filepath])
         filepath = None
-      subprocess.call(['afplay', last_filepath])
+      subprocess.call(['aplay', last_filepath])
 
     last_pressed = pressed
     time.sleep(0.01)
