@@ -10,3 +10,4 @@ screenshot-*.png
 geckodriver.log
 scratch
 env
+tmp-say
