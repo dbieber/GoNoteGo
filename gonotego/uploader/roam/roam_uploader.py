@@ -98,7 +98,12 @@ class RoamBrowser:
     self.utils.execute_script_tag(js)
 
   def insert_note(self, text):
-    text = text.replace('`', r'\`').replace('${', r'\${')
+    text = (
+        text
+        .replace('\\', r'\\')  # Escape backslashes.
+        .replace('`', r'\`')
+        .replace('${', r'\${')
+    )
     js = f'window.insertion_result = insertGoNoteGoNote(`{text}`);'
     try:
       self.utils.execute_script_tag(js)
