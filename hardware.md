@@ -36,7 +36,7 @@ Cost: $3
 
 Link: https://www.amazon.com/gp/product/B07JYYRT7T
 
-Notes: There are lots of options for the battery. This one works just fine. Could choose one with more storage for longer battery life if desired, but might get clunky.
+Notes: There are lots of options for the battery. This one works just fine. Could choose one with more storage for longer battery life if desired, but might get clunky. You also don't strictly _need_ a battery. You can also power Go Note Go directly from your car, laptop, or a standard outlet via USB. So if your use case allows Go Note Go to remain plugged in during use, you can forego the battery.
 
 Cost: $19 (currently $14)
 
