@@ -1,3 +1,4 @@
+import os
 import requests
 
 from gonotego.settings import secure_settings
@@ -30,7 +31,7 @@ class Uploader:
       # Notes with audio should be checked for accuracy.
       edit_later = bool(note_event.audio_filepath)
       rem_id = create_rem(note_event.text, edit_later)
-      if note_event.audio_filepath:
+      if note_event.audio_filepath and os.path.exists(note_event.audio_filepath):
         url = blob_uploader.upload_blob(note_event.audio_filepath, client)
         audio_rem_id = create_rem(url, edit_later=False, parent_id=rem_id)
 

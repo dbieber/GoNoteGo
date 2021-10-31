@@ -1,3 +1,4 @@
+import os
 import requests
 
 from gonotego.settings import secure_settings
@@ -24,7 +25,7 @@ class Uploader:
     client = blob_uploader.make_client()
     for note_event in note_events:
       text = note_event.text.strip()
-      if note_event.audio_filepath:
+      if note_event.audio_filepath and os.path.exists(note_event.audio_filepath):
         is_read = False  # Notes with audio should be checked for accuracy.
         url = blob_uploader.upload_blob(note_event.audio_filepath, client)
         text = f'{text} #transcription ({url})'

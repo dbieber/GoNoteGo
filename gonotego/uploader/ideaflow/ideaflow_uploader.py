@@ -1,4 +1,5 @@
 import getpass
+import os
 import subprocess
 import time
 
@@ -98,7 +99,7 @@ class Uploader:
     client = blob_uploader.make_client()
     for note_event in note_events:
       text = note_event.text.strip()
-      if note_event.audio_filepath:
+      if note_event.audio_filepath and os.path.exists(note_event.audio_filepath):
         audio_url = blob_uploader.upload_blob(note_event.audio_filepath, client)
         text = f'{text} #unverified-transcription ({audio_url})'
       browser.insert_note(text)

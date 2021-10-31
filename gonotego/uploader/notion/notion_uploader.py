@@ -1,4 +1,5 @@
 from datetime import datetime
+import os
 import requests
 
 from gonotego.settings import secure_settings
@@ -78,7 +79,7 @@ class Uploader:
     for note_event in note_events:
       text = note_event.text.strip()
       blocks.append(make_text_block(text))
-      if note_event.audio_filepath:
+      if note_event.audio_filepath and os.path.exists(note_event.audio_filepath):
         url = blob_uploader.upload_blob(note_event.audio_filepath, client)
         blocks.append(make_audio_block(url))
     append_notes(blocks, page_id=self.current_page_id)

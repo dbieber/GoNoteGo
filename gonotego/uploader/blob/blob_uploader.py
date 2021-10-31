@@ -1,3 +1,5 @@
+import os
+
 import dropbox
 
 from gonotego.settings import secure_settings
@@ -9,6 +11,8 @@ def make_client():
 
 def upload_blob(filepath, client):
   """Uploads a blob, and returns a URL to that blob."""
+  if not os.path.exists(filepath):
+    return ''
   dropbox_path = f'/{filepath}'
   with open(filepath, 'rb') as f:
     unused_file_metadata = client.files_upload(f.read(), dropbox_path)

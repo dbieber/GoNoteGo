@@ -1,4 +1,5 @@
 import getpass
+import os
 import random
 import subprocess
 import time
@@ -171,11 +172,12 @@ class Uploader:
     client = blob_uploader.make_client()
     for note_event in note_events:
       text = note_event.text.strip()
-      if note_event.audio_filepath:
+      has_audio = note_event.audio_filepath and os.path.exists(note_event.audio_filepath)
+      if has_audio:
         text = f'{text} #[[unverified transcription]]'
       block_uid = browser.insert_note(text)
       print(f'Inserted: "{text}" at block (({block_uid}))')
-      if note_event.audio_filepath:
+      if has_audio:
         embed_url = blob_uploader.upload_blob(note_event.audio_filepath, client)
         embed_text = '{{audio: ' + embed_url + '}}'
         print(f'Audio embed: {embed_text}')
