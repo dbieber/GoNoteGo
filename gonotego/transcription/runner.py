@@ -1,3 +1,4 @@
+import os
 import time
 
 from gonotego.common import events
@@ -27,7 +28,7 @@ def main():
       internet.wait_for_internet()
 
       event = events.AudioEvent.from_bytes(audio_event_bytes)
-      if event.action == events.AUDIO_DONE:
+      if event.action == events.AUDIO_DONE and os.path.exists(event.filepath):
         status.set(Status.TRANSCRIPTION_ACTIVE, True)
         transcript = t.transcribe(event.filepath)
         text_filepath = event.filepath.replace('.wav', '.txt')
