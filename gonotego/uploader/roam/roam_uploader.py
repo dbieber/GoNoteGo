@@ -100,7 +100,11 @@ class RoamBrowser:
   def insert_note(self, text):
     text = text.replace('`', r'\`').replace('${', r'\${')
     js = f'window.insertion_result = insertGoNoteGoNote(`{text}`);'
-    self.utils.execute_script_tag(js)
+    try:
+      self.utils.execute_script_tag(js)
+    except Exception as e:
+      print(f'Failed to insert note: {text}')
+      raise e
     time.sleep(0.25)
     retries = 5
     while retries:
