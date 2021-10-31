@@ -10,16 +10,25 @@ from gonotego.settings import secure_settings
 
 
 if board is not None:
-  button = DigitalInOut(board.D17)
-  button.direction = Direction.INPUT
-  button.pull = Pull.UP
+  # The "onboard button" is the physical button on the Voice Bonnet.
+  onboard_button = DigitalInOut(board.D17)
+  onboard_button.direction = Direction.INPUT
+  onboard_button.pull = Pull.UP
+
+  # The "red button" is the handheld round one that's really satisfying to push.
+  red_button = DigitalInOut(board.D27)
+  red_button.direction = Direction.INPUT
+  red_button.pull = Pull.UP
 else:
-  button = None
+  onboard_button = None
+  red_button = None
 
 
 def is_pressed():
-  if button is not None:
-    button_pressed = not button.value
+  if onboard_button is not None:
+    button_pressed = (
+        not onboard_button.value
+        or red_button.value)
   else:
     button_pressed = False
   return (
