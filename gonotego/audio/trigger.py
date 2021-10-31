@@ -28,7 +28,8 @@ def is_pressed():
   if onboard_button is not None:
     button_pressed = (
         not onboard_button.value
-        or red_button.value)
+        or not red_button.value
+    )
   else:
     button_pressed = False
   return (
