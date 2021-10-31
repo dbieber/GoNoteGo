@@ -24,7 +24,7 @@ def main():
     if audio_event_bytes is not None:
       print(f'Event received: {audio_event_bytes}')
 
-      # Don't even try transcribing if we don't have a connection.
+      # Don't start transcribing until we have an internet connection.
       internet.wait_for_internet()
 
       event = events.AudioEvent.from_bytes(audio_event_bytes)
@@ -47,9 +47,11 @@ def main():
             command_events_queue.put(bytes(command_event))
 
         status.set(Status.TRANSCRIPTION_ACTIVE, False)
-    audio_events_queue.commit(audio_event_bytes)
+    else:
+      # No audio ready to transcribe. Sleep.
+      time.sleep(1)
 
-    time.sleep(3)
+    audio_events_queue.commit(audio_event_bytes)
 
 
 if __name__ == '__main__':
