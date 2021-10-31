@@ -18,7 +18,8 @@ class InterprocessQueue:
   def get(self):
     """Gets the next item in the queue. Does not remove it from the queue."""
     value = self.r.lindex(self.key, self.index)
-    self.index += 1
+    if value is not None:
+      self.index += 1
     return value
 
   def commit(self, value):
