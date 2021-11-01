@@ -61,6 +61,7 @@ class Shell:
       if self.text.strip().startswith(':'):
         command_event = events.CommandEvent(command_text=self.text.strip()[1:])
         self.command_event_queue.put(bytes(command_event))
+        self.text = ''
       else:
         self.submit_note()
     elif event.name == 'space':
