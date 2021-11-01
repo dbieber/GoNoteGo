@@ -1,5 +1,4 @@
 import mouse
-import sys
 import time
 
 from gonotego.common import status
