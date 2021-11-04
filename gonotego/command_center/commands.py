@@ -31,6 +31,7 @@ def feel_lucky(query):
   shell(cmd)
 
 
+@register_command('t')
 @register_command('time')
 def time():
   shell('date "+%A, %B%e %l:%M%p" | espeak &')
@@ -104,3 +105,10 @@ def read_latest():
   note_event_bytes = note_events_queue.latest()
   note_event = events.NoteEvent.from_bytes(note_event_bytes)
   say(note_event.text)
+
+
+@register_command('v {}')
+@register_command('volume {}')
+def set_volume(v):
+  if value in ('off', 'on'):
+    status.set(Status.VOLUME_SETTING, value)

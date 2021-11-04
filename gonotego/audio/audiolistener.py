@@ -2,6 +2,10 @@ import numpy as np
 import sounddevice as sd
 import soundfile as sf
 
+from gonotego.common import status
+
+Status = status.Status
+
 SILENCE_THRESHOLD = 0.10
 
 
@@ -20,7 +24,8 @@ class AudioListener:
     self.file = None
 
   def record(self, filepath):
-    subprocess.call(['aplay', 'assets/beep_hi.wav'])
+    if status.get(Status.VOLUME_SETTING) != 'off':
+      subprocess.call(['aplay', 'assets/beep_hi.wav'])
     self.recording = True
 
     self.file = sf.SoundFile(
@@ -66,7 +71,8 @@ class AudioListener:
     return self.consecutive_quiet_frames / self.samplerate
 
   def stop(self):
-    subprocess.call(['aplay', 'assets/beep_lo.wav'])
+    if status.get(Status.VOLUME_SETTING) != 'off':
+      subprocess.call(['aplay', 'assets/beep_lo.wav'])
     self.recording = False
     self.stream.stop()
     self.stream.close()
