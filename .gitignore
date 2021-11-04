@@ -2,7 +2,6 @@
 __pycache__
 *~
 out
-*.wav
 *.egg-info
 events.txt
 secure_settings.py
