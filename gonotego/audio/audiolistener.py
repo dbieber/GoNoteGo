@@ -27,7 +27,7 @@ class AudioListener:
 
   def record(self, filepath):
     if status.get(Status.VOLUME_SETTING) != 'off':
-      subprocess.call(['aplay', 'assets/beep_hi.wav'])
+      subprocess.call(['aplay', 'gonotego/assets/beep_hi.wav'])
     self.recording = True
 
     self.file = sf.SoundFile(
@@ -74,7 +74,7 @@ class AudioListener:
 
   def stop(self):
     if status.get(Status.VOLUME_SETTING) != 'off':
-      subprocess.call(['aplay', 'assets/beep_lo.wav'])
+      subprocess.call(['aplay', 'gonotego/assets/beep_lo.wav'])
     self.recording = False
     self.stream.stop()
     self.stream.close()
