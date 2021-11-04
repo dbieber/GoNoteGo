@@ -109,6 +109,6 @@ def read_latest():
 
 @register_command('v {}')
 @register_command('volume {}')
-def set_volume(v):
+def set_volume(value):
   if value in ('off', 'on'):
     status.set(Status.VOLUME_SETTING, value)

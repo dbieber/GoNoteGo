@@ -1,3 +1,5 @@
+import subprocess
+
 import numpy as np
 import sounddevice as sd
 import soundfile as sf
