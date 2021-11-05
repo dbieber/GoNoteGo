@@ -23,6 +23,7 @@ class Status(enum.Enum):
   UPLOADER_ACTIVE = enum.auto()
   INTERNET_AVAILABLE = enum.auto()
   LEDS_SETTING = enum.auto()
+  VOLUME_SETTING = enum.auto()
 
 
 def get_redis_key(key):
