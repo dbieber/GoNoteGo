@@ -2,6 +2,7 @@ import io
 
 import fire
 
+from google.api_core import exceptions
 from google.cloud import speech
 
 
@@ -20,7 +21,11 @@ class Transcriber:
       content = audio_file.read()
 
     audio = speech.RecognitionAudio(content=content)
-    response = self.client.recognize(config=self.config, audio=audio)
+    try:
+      response = self.client.recognize(config=self.config, audio=audio)
+    except exceptions.InvalidArgument:
+      # Could be: "payload size exceeds the limit: 10485760 bytes"
+      return
 
     return ''.join(
         result.alternatives[0].transcript + '\n'
