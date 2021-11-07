@@ -31,20 +31,21 @@ def main():
       if event.action == events.AUDIO_DONE and os.path.exists(event.filepath):
         status.set(Status.TRANSCRIPTION_ACTIVE, True)
         transcript = t.transcribe(event.filepath)
-        text_filepath = event.filepath.replace('.wav', '.txt')
-        with open(text_filepath, 'w') as f:
-          f.write(transcript)
-        print(transcript)
-        note_event = events.NoteEvent(transcript, event.filepath)
-        note_events_queue.put(bytes(note_event))
+        if transcript:
+          text_filepath = event.filepath.replace('.wav', '.txt')
+          with open(text_filepath, 'w') as f:
+            f.write(transcript)
+          print(transcript)
+          note_event = events.NoteEvent(transcript, event.filepath)
+          note_events_queue.put(bytes(note_event))
 
-        # Audio commands:
-        for trigger in ['go go', 'GoGo', 'Go-Go']:
-          extended_trigger = f'{trigger} '
-          if transcript.lower().startswith(extended_trigger.lower()):
-            command_text = transcript[len(extended_trigger):] + ':'
-            command_event = events.CommandEvent(command_text)
-            command_events_queue.put(bytes(command_event))
+          # Audio commands:
+          for trigger in ['go go', 'GoGo', 'Go-Go']:
+            extended_trigger = f'{trigger} '
+            if transcript.lower().startswith(extended_trigger.lower()):
+              command_text = transcript[len(extended_trigger):] + ':'
+              command_event = events.CommandEvent(command_text)
+              command_events_queue.put(bytes(command_event))
 
         status.set(Status.TRANSCRIPTION_ACTIVE, False)
     else:
