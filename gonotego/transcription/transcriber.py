@@ -25,6 +25,7 @@ class Transcriber:
       response = self.client.recognize(config=self.config, audio=audio)
     except exceptions.InvalidArgument:
       # Could be: "payload size exceeds the limit: 10485760 bytes"
+      # TODO(dbieber): Support transcribing large clips.
       return
 
     return ''.join(
