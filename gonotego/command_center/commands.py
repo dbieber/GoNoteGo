@@ -122,5 +122,5 @@ def set_volume(value):
 
 @register_command('ip')
 def ip_address(value):
-  ifconfig_output = subprocess.check_output('ifconfig')
-  say(ifconfig_output)
+  hostname_output = subprocess.check_output('hostname -I')
+  say(hostname_output)
