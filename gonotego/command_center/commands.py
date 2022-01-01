@@ -77,7 +77,7 @@ def update():
 
 
 @register_command('restart')
-def update():
+def restart():
   shell('./env/bin/supervisorctl -u go -p notego restart all')
 
 
