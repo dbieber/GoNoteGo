@@ -1,4 +1,5 @@
 import getpass
+import json
 import os
 import random
 import subprocess
@@ -99,13 +100,8 @@ class RoamBrowser:
     self.utils.execute_script_tag(js)
 
   def insert_note(self, text):
-    text = (
-        text
-        .replace('\\', r'\\')  # Escape backslashes.
-        .replace('`', r'\`')
-        .replace('${', r'\${')
-    )
-    js = f'window.insertion_result = insertGoNoteGoNote(`{text}`);'
+    text_json = json.dumps(text)
+    js = f'window.insertion_result = insertGoNoteGoNote({text_json});'
     try:
       self.utils.execute_script_tag(js)
     except Exception as e:
@@ -122,9 +118,9 @@ class RoamBrowser:
         retries -= 1
 
   def create_child_block(self, parent_uid, block, order=-1):
-    parent_uid = parent_uid.replace('`', r'\`').replace('${', r'\${')
-    block = block.replace('`', r'\`').replace('${', r'\${')
-    js = f'window.insertion_result = createChildBlock(`{parent_uid}`, `{block}`, {order});'
+    parent_uid_json = json.dumps(parent_uid)
+    block_json = json.dumps(block)
+    js = f'window.insertion_result = createChildBlock({parent_uid_json}, {block_json}, {order});'
     self.utils.execute_script_tag(js)
 
   def sleep_until_astrolabe_gone(self, timeout=30):
