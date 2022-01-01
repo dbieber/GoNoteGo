@@ -53,6 +53,8 @@ def main():
 
     if note_events:
       status.set(Status.UPLOADER_ACTIVE, True)
+      # TODO(dbieber): Allow uploader to yield note events as it finishes them.
+      # So that if it fails midway, we can still mark the completed events as done.
       uploader.upload(note_events)
       last_upload = time.time()
       print('Uploaded.')
