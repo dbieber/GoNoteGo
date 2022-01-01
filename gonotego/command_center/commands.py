@@ -1,6 +1,7 @@
 from datetime import datetime
 import os
 import random
+import subprocess
 import sys
 
 from gonotego.common import events
@@ -77,8 +78,13 @@ def update():
 
 
 @register_command('restart')
-def update():
+def restart():
   shell('./env/bin/supervisorctl -u go -p notego restart all')
+
+
+@register_command('reboot')
+def reboot():
+  shell('sudo reboot')
 
 
 @register_command('leds {}')
@@ -112,3 +118,9 @@ def read_latest():
 def set_volume(value):
   if value in ('off', 'on'):
     status.set(Status.VOLUME_SETTING, value)
+
+
+@register_command('ip')
+def ip_address(value):
+  hostname_output = subprocess.check_output('hostname -I')
+  say(hostname_output)

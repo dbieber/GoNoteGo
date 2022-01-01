@@ -62,7 +62,6 @@ def main():
       logging.info(f'Three seconds of silence. Stopping. {filepath}')
       print(f'Three seconds of silence. Stopping. {filepath}')
       listener.stop()
-      status.set(Status.AUDIO_RECORDING, listener.recording)
       enqueue_recording(audio_events_queue, filepath)
       last_filepath = filepath
       filepath = None
@@ -72,7 +71,6 @@ def main():
       if listener.recording:
         # We just started recording with the first push. Now we're going to stop.
         listener.stop()
-        status.set(Status.AUDIO_RECORDING, listener.recording)
         subprocess.call(['rm', filepath])
         filepath = None
       else:
@@ -88,13 +86,11 @@ def main():
       logging.info(f'Start recording. {filepath}')
       print(f'Start recording. {filepath}')
       listener.record(filepath)
-      status.set(Status.AUDIO_RECORDING, listener.recording)
     elif newly_pressed and listener.recording:
       # Stop a recording by press.
       logging.info(f'Stop recording. {filepath}')
       print(f'Stop recording. {filepath}')
       listener.stop()
-      status.set(Status.AUDIO_RECORDING, listener.recording)
       # TODO(dbieber): Should wait to make sure it's not a double press.
       enqueue_recording(audio_events_queue, filepath)
       last_filepath = filepath
@@ -105,7 +101,6 @@ def main():
       print('Held down for 1 second. Cancel and read back.')
       if listener.recording:
         listener.stop()
-        status.set(Status.AUDIO_RECORDING, listener.recording)
         subprocess.call(['rm', filepath])
         filepath = None
       subprocess.call(['aplay', last_filepath])
