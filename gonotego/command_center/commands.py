@@ -122,5 +122,5 @@ def set_volume(value):
 
 @register_command('ip')
 def ip_address(value):
-  hostname_output = subprocess.check_output('hostname -I')
+  hostname_output = subprocess.check_output(['hostname', '-I']).strip()
   say(hostname_output)
