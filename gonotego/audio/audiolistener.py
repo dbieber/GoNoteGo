@@ -26,9 +26,10 @@ class AudioListener:
     self.file = None
 
   def record(self, filepath):
+    self.recording = True
+    status.set(Status.AUDIO_RECORDING, self.recording)
     if status.get(Status.VOLUME_SETTING) != 'off':
       subprocess.call(['aplay', 'gonotego/assets/beep_hi.wav'])
-    self.recording = True
 
     self.file = sf.SoundFile(
         filepath,
@@ -73,9 +74,10 @@ class AudioListener:
     return self.consecutive_quiet_frames / self.samplerate
 
   def stop(self):
+    self.recording = False
+    status.set(Status.AUDIO_RECORDING, self.recording)
     if status.get(Status.VOLUME_SETTING) != 'off':
       subprocess.call(['aplay', 'gonotego/assets/beep_lo.wav'])
-    self.recording = False
     self.stream.stop()
     self.stream.close()
     self.file.flush()
