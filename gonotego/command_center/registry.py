@@ -29,7 +29,7 @@ class Command(object):
 
 def register_command(pattern, **params):
   def command_decorator(func):
-    regex_str = pattern.replace('{}', '(.*)')
+    regex_str = '^' + pattern.replace('{}', '(.*)') + '$'
     regex = re.compile(regex_str)
     name = params.pop('name', func.__name__)
     requirements = params.pop('requirements', ())
