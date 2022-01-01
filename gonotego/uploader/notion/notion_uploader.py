@@ -31,7 +31,7 @@ def make_text_block(text):
       'object': 'block',
       'type': 'paragraph',
       'paragraph': {
-          'text': [{ 'type': 'text', 'text': {'content': text}}],
+          'text': [{'type': 'text', 'text': {'content': text}}],
       },
   }
 
