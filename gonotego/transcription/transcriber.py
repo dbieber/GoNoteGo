@@ -28,8 +28,8 @@ class Transcriber:
       # TODO(dbieber): Support transcribing large clips.
       return
 
-    return ''.join(
-        result.alternatives[0].transcript + '\n'
+    return '\n'.join(
+        result.alternatives[0].transcript
         for result in response.results)
 
 
