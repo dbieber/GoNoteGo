@@ -208,7 +208,11 @@ class Uploader:
         has_audio = note_event.audio_filepath and os.path.exists(note_event.audio_filepath)
         if has_audio:
           text = f'{text} #[[unverified transcription]]'
-        block_uid = browser.create_child_block(self.session_uid, text)
+        if self.stack:
+          parent_uid = self.stack[-1]
+        else:
+          parent_uid = self.session_uid
+        block_uid = browser.create_child_block(parent_uid, text)
         self.session_used = True
         self.last_note_uid = block_uid
         print(f'Inserted: "{text}" at block (({block_uid}))')
