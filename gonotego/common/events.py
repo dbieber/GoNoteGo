@@ -1,9 +1,16 @@
 from typing import Text, Tuple
 
 import dataclasses
+import datetime
 import json
 
 AUDIO_DONE = 'done'
+
+SUBMIT = 'submit'
+UNINDENT = 'unindent'
+INDENT = 'indent'
+CLEAR_EMPTY = 'clear_empty'
+ENTER_EMPTY = 'enter_empty'
 
 
 @dataclasses.dataclass
@@ -35,7 +42,9 @@ class CommandEvent:
 @dataclasses.dataclass
 class NoteEvent:
   text: Text
+  action: Text
   audio_filepath: Text
+  timestamp: datetime.Datetime
 
   def __bytes__(self):
     return json.dumps(dataclasses.asdict(self)).encode('utf-8')

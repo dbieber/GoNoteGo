@@ -7,6 +7,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 
+from gonotego.common import events
 from gonotego.settings import secure_settings
 from gonotego.uploader.blob import blob_uploader
 from gonotego.uploader.browser import driver_utils
@@ -98,11 +99,12 @@ class Uploader:
 
     client = blob_uploader.make_client()
     for note_event in note_events:
-      text = note_event.text.strip()
-      if note_event.audio_filepath and os.path.exists(note_event.audio_filepath):
-        audio_url = blob_uploader.upload_blob(note_event.audio_filepath, client)
-        text = f'{text} #unverified-transcription ({audio_url})'
-      browser.insert_note(text)
+      if note_event.action == events.SUBMIT:
+        text = note_event.text.strip()
+        if note_event.audio_filepath and os.path.exists(note_event.audio_filepath):
+          audio_url = blob_uploader.upload_blob(note_event.audio_filepath, client)
+          text = f'{text} #unverified-transcription ({audio_url})'
+        browser.insert_note(text)
 
   def handle_inactivity(self):
     self.close_browser()

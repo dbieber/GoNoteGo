@@ -3,7 +3,6 @@ import time
 import adafruit_dotstar
 import board
 
-from gonotego.common import events
 from gonotego.common import status
 from gonotego.leds import colors
 

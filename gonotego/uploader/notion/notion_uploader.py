@@ -2,6 +2,7 @@ from datetime import datetime
 import os
 import requests
 
+from gonotego.common import events
 from gonotego.settings import secure_settings
 from gonotego.uploader.blob import blob_uploader
 
@@ -48,7 +49,6 @@ def make_audio_block(url):
 
 
 def append_notes(blocks, page_id):
-  children = []
   return requests.patch(
       url=APPEND_CHILD_URL_FORMAT.format(block_id=page_id),
       json=dict(children=blocks),
@@ -77,11 +77,12 @@ class Uploader:
     client = blob_uploader.make_client()
     blocks = []
     for note_event in note_events:
-      text = note_event.text.strip()
-      blocks.append(make_text_block(text))
-      if note_event.audio_filepath and os.path.exists(note_event.audio_filepath):
-        url = blob_uploader.upload_blob(note_event.audio_filepath, client)
-        blocks.append(make_audio_block(url))
+      if note_event.action == events.SUBMIT:
+        text = note_event.text.strip()
+        blocks.append(make_text_block(text))
+        if note_event.audio_filepath and os.path.exists(note_event.audio_filepath):
+          url = blob_uploader.upload_blob(note_event.audio_filepath, client)
+          blocks.append(make_audio_block(url))
     append_notes(blocks, page_id=self.current_page_id)
 
   def handle_inactivity(self):

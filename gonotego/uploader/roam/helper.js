@@ -69,6 +69,20 @@ async function getOrCreateBlockOnPage(page, block, order) {
   return createBlockOnPage(page, block, order);
 }
 
+function getChildBlocks(parent_uid) {
+  // returns the uids of all child blocks directly underneath a given parent block.
+  // _parent_uid_: the uid of the parent block.
+  let results = window.roamAlphaAPI.q(`
+    [:find ?block_uid
+     :in $ ?parent_uid
+     :where
+     [?parent :block/uid ?parent_uid]
+     [?parent :block/children ?block]
+     [?block :block/uid ?block_uid]
+    ]`, parent_uid);
+  return results.flat();
+}
+
 function getChildBlock(parent_uid, block) {
   // returns the uid of a specific child block underneath a specific parent block.
   // _parent_uid_: the uid of the parent block.
@@ -104,6 +118,10 @@ async function createChildBlock(parent_uid, block, order) {
   // _order_: (optional) controls where to create the block, 0 for inserting at the top, -1 for inserting at the bottom.
   if (!order) {
     order = 0;
+  }
+  if (order < 0) {
+    let num_children = getChildBlocks(parent_uid).length;
+    order = num_children + order + 1;
   }
   window.roamAlphaAPI.createBlock(
     {

@@ -1,6 +1,7 @@
 import os
 import requests
 
+from gonotego.common import events
 from gonotego.settings import secure_settings
 from gonotego.uploader.blob import blob_uploader
 
@@ -30,16 +31,17 @@ class Uploader:
 
     client = blob_uploader.make_client()
     for note_event in note_events:
-      # Notes with audio should be checked for accuracy.
-      edit_later = bool(note_event.audio_filepath)
+      if note_event.action == events.SUBMIT:
+        # Notes with audio should be checked for accuracy.
+        edit_later = bool(note_event.audio_filepath)
 
-      rem_id = create_rem(
-          text=note_event.text,
-          edit_later=edit_later,
-          parent_id=secure_settings.REMNOTE_ROOT_REM)
-      if note_event.audio_filepath and os.path.exists(note_event.audio_filepath):
-        url = blob_uploader.upload_blob(note_event.audio_filepath, client)
-        audio_rem_id = create_rem(url, edit_later=False, parent_id=rem_id)
+        rem_id = create_rem(
+            text=note_event.text,
+            edit_later=edit_later,
+            parent_id=secure_settings.REMNOTE_ROOT_REM)
+        if note_event.audio_filepath and os.path.exists(note_event.audio_filepath):
+          url = blob_uploader.upload_blob(note_event.audio_filepath, client)
+          create_rem(url, edit_later=False, parent_id=rem_id)
 
   def handle_inactivity(self):
     pass

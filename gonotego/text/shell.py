@@ -34,6 +34,10 @@ shift_characters = {
 }
 
 
+def get_timestamp():
+  return time.time()
+
+
 class Shell:
 
   def __init__(self):
@@ -51,14 +55,45 @@ class Shell:
     if keyboard.is_pressed(secure_settings.HOTKEY):
       # Ignore presses while the hotkey is pressed.
       return
+    elif event.name == 'tab':
+      if keyboard.is_pressed('shift') or keyboard.is_pressed('right shift'):
+        # Shift-Tab
+        note_event = events.NoteEvent(
+            text=None,
+            action=events.UNINDENT,
+            audio_filepath=None,
+            timestamp=get_timestamp())
+        self.note_events_queue.put(bytes(note_event))
+      else:
+        # Tab
+        note_event = events.NoteEvent(
+            text=None,
+            action=events.INDENT,
+            audio_filepath=None,
+            timestamp=get_timestamp())
+        self.note_events_queue.put(bytes(note_event))
     elif event.name == 'delete':
+      if self.text == '':
+        note_event = events.NoteEvent(
+            text=None,
+            action=events.CLEAR_EMPTY,
+            audio_filepath=None,
+            timestamp=get_timestamp())
+        self.note_events_queue.put(bytes(note_event))
       self.text = self.text[:-1]
       if keyboard.is_pressed('shift') or keyboard.is_pressed('right shift'):
         self.text = ''
     elif event.name == 'enter':
       # Write both a text event (for the command center)
       # and a note event (for the uploader).
-      if self.text.strip().startswith(':'):
+      if self.text == '':
+        note_event = events.NoteEvent(
+            text=None,
+            action=events.ENTER_EMPTY,
+            audio_filepath=None,
+            timestamp=get_timestamp())
+        self.note_events_queue.put(bytes(note_event))
+      elif self.text.strip().startswith(':'):
         command_event = events.CommandEvent(command_text=self.text.strip()[1:])
         self.command_event_queue.put(bytes(command_event))
         self.text = ''
@@ -74,7 +109,11 @@ class Shell:
 
   def submit_note(self):
     if self.text:
-      note_event = events.NoteEvent(text=self.text, audio_filepath=None)
+      note_event = events.NoteEvent(
+          text=self.text,
+          action=events.SUBMIT,
+          audio_filepath=None,
+          timestamp_str=get_timestamp())
       self.note_events_queue.put(bytes(note_event))
       # Reset the text buffer.
       self.text = ''

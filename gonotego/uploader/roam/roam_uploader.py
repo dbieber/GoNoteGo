@@ -1,3 +1,4 @@
+from datetime import datetime
 import getpass
 import json
 import os
@@ -9,6 +10,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 
+from gonotego.common import events
 from gonotego.settings import secure_settings
 from gonotego.uploader.blob import blob_uploader
 from gonotego.uploader.browser import driver_utils
@@ -99,7 +101,7 @@ class RoamBrowser:
       js = f.read()
     self.utils.execute_script_tag(js)
 
-  def insert_note(self, text):
+  def insert_note(self, text, parent_uid):
     text_json = json.dumps(text)
     js = f'window.insertion_result = insertGoNoteGoNote({text_json});'
     try:
@@ -139,6 +141,11 @@ class Uploader:
     self.headless = headless
     self._browser = None
 
+    self.session_uid = None
+    self.last_note_uid = None
+    self.stack = []
+    self.session_used = False
+
   def get_browser(self):
     if self._browser is not None:
       return self._browser
@@ -158,33 +165,73 @@ class Uploader:
     self._browser = browser
     return browser
 
+  def new_session(self):
+    browser = self.get_browser()
+    time_str = datetime.now().strftime("%H:%M %p")
+    block_uid = browser.insert_note(time_str)
+    self.session_uid = block_uid
+
   def upload(self, note_events):
     browser = self.get_browser()
     browser.go_graph(secure_settings.ROAM_GRAPH)
     time.sleep(0.5)
     browser.screenshot('screenshot-graph-later.png')
-
     browser.execute_helper_js()
+
+    if self.session_uid is None:
+      self.new_session()
+
     client = blob_uploader.make_client()
     for note_event in note_events:
-      text = note_event.text.strip()
-      has_audio = note_event.audio_filepath and os.path.exists(note_event.audio_filepath)
-      if has_audio:
-        text = f'{text} #[[unverified transcription]]'
-      block_uid = browser.insert_note(text)
-      print(f'Inserted: "{text}" at block (({block_uid}))')
-      if has_audio:
-        embed_url = blob_uploader.upload_blob(note_event.audio_filepath, client)
-        embed_text = '{{audio: ' + embed_url + '}}'
-        print(f'Audio embed: {embed_text}')
-        if block_uid:
-          browser.create_child_block(block_uid, embed_text)
+      if note_event.action == events.INDENT:
+        # When you press tab, that adds your most-recent note to a stack.
+        if self.last_note_uid and self.last_note_uid not in self.stack:
+          self.stack.append(self.last_note_uid)
+      elif note_event.action == events.UNINDENT:
+        # When you shift-tab, that pops from the stack.
+        if self.stack:
+          self.stack.pop()
+      elif note_event.action == events.CLEAR_EMPTY:
+        # When you shift-delete from an empty note, that clears the stack.
+        self.stack = []
+      elif note_event.action == events.ENTER_EMPTY:
+        # When you submit from an empty note, that pops from the stack
+        # (and if the stack is empty and the session is non-empty,
+        # it creates a new session).
+        if self.stack:
+          self.stack.pop()
+        elif self.session_used:
+          # The stack is empty and the session is non-empty.
+          self.end_session()
+      elif note_event.action == events.SUBMIT:
+        text = note_event.text.strip()
+        has_audio = note_event.audio_filepath and os.path.exists(note_event.audio_filepath)
+        if has_audio:
+          text = f'{text} #[[unverified transcription]]'
+        block_uid = browser.create_child_block(self.session_uid, text)
+        self.session_used = True
+        self.last_note_uid = block_uid
+        print(f'Inserted: "{text}" at block (({block_uid}))')
+        if has_audio:
+          embed_url = blob_uploader.upload_blob(note_event.audio_filepath, client)
+          embed_text = '{{audio: ' + embed_url + '}}'
+          print(f'Audio embed: {embed_text}')
+          if block_uid:
+            browser.create_child_block(block_uid, embed_text)
 
   def handle_inactivity(self):
+    self.end_session()
     self.close_browser()
 
   def handle_disconnect(self):
+    self.end_session()
     self.close_browser()
+
+  def end_session(self):
+    self.session_uid = None
+    self.last_note_uid = None
+    self.stack = []
+    self.session_used = False
 
   def close_browser(self):
     browser = self._browser
