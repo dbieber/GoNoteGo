@@ -114,7 +114,7 @@ class Shell:
           text=self.text,
           action=events.SUBMIT,
           audio_filepath=None,
-          timestamp_str=get_timestamp())
+          timestamp=get_timestamp())
       self.note_events_queue.put(bytes(note_event))
       # Reset the text buffer.
       self.text = ''
