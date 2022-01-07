@@ -1,7 +1,7 @@
 from typing import Text, Tuple
 
 import dataclasses
-import datetime
+from datetime import datetime
 import json
 
 AUDIO_DONE = 'done'
