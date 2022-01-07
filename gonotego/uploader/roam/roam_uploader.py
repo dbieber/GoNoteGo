@@ -101,7 +101,7 @@ class RoamBrowser:
       js = f.read()
     self.utils.execute_script_tag(js)
 
-  def insert_note(self, text, parent_uid):
+  def insert_top_level_note(self, text):
     text_json = json.dumps(text)
     js = f'window.insertion_result = insertGoNoteGoNote({text_json});'
     try:
@@ -168,7 +168,7 @@ class Uploader:
   def new_session(self):
     browser = self.get_browser()
     time_str = datetime.now().strftime("%H:%M %p")
-    block_uid = browser.insert_note(time_str)
+    block_uid = browser.insert_top_level_note(time_str)
     self.session_uid = block_uid
 
   def upload(self, note_events):
