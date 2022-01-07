@@ -44,7 +44,7 @@ class NoteEvent:
   text: Text
   action: Text
   audio_filepath: Text
-  timestamp: datetime.Datetime
+  timestamp: datetime
 
   def __bytes__(self):
     return json.dumps(dataclasses.asdict(self)).encode('utf-8')
