@@ -191,8 +191,6 @@ class Uploader:
         # When you press tab, that adds your most-recent note to a stack.
         if self.last_note_uid and self.last_note_uid not in self.stack:
           self.stack.append(self.last_note_uid)
-        print(self.stack)
-        print(self.last_note_uid)
       elif note_event.action == events.UNINDENT:
         # When you shift-tab, that pops from the stack.
         if self.stack:
