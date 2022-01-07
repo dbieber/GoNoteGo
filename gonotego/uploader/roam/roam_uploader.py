@@ -101,7 +101,7 @@ class RoamBrowser:
       js = f.read()
     self.utils.execute_script_tag(js)
 
-  def insert_note(self, text, parent_uid):
+  def insert_top_level_note(self, text):
     text_json = json.dumps(text)
     js = f'window.insertion_result = insertGoNoteGoNote({text_json});'
     try:
@@ -110,6 +110,9 @@ class RoamBrowser:
       print(f'Failed to insert note: {text}')
       raise e
     time.sleep(0.25)
+    return self.get_insertion_result()
+
+  def get_insertion_result(self):
     retries = 5
     while retries:
       try:
@@ -124,6 +127,8 @@ class RoamBrowser:
     block_json = json.dumps(block)
     js = f'window.insertion_result = createChildBlock({parent_uid_json}, {block_json}, {order});'
     self.utils.execute_script_tag(js)
+    time.sleep(0.25)
+    return self.get_insertion_result()
 
   def sleep_until_astrolabe_gone(self, timeout=30):
     while self.driver.find_elements_by_class_name('loading-astrolabe'):
@@ -144,7 +149,6 @@ class Uploader:
     self.session_uid = None
     self.last_note_uid = None
     self.stack = []
-    self.session_used = False
 
   def get_browser(self):
     if self._browser is not None:
@@ -168,7 +172,7 @@ class Uploader:
   def new_session(self):
     browser = self.get_browser()
     time_str = datetime.now().strftime("%H:%M %p")
-    block_uid = browser.insert_note(time_str)
+    block_uid = browser.insert_top_level_note(time_str)
     self.session_uid = block_uid
 
   def upload(self, note_events):
@@ -195,21 +199,21 @@ class Uploader:
         # When you shift-delete from an empty note, that clears the stack.
         self.stack = []
       elif note_event.action == events.ENTER_EMPTY:
-        # When you submit from an empty note, that pops from the stack
-        # (and if the stack is empty and the session is non-empty,
-        # it creates a new session).
+        # When you submit from an empty note, that pops from the stack.
         if self.stack:
           self.stack.pop()
-        elif self.session_used:
-          # The stack is empty and the session is non-empty.
-          self.end_session()
+      elif note_event.action == events.END_SESSION:
+        self.end_session()
       elif note_event.action == events.SUBMIT:
         text = note_event.text.strip()
         has_audio = note_event.audio_filepath and os.path.exists(note_event.audio_filepath)
         if has_audio:
           text = f'{text} #[[unverified transcription]]'
-        block_uid = browser.create_child_block(self.session_uid, text)
-        self.session_used = True
+        if self.stack:
+          parent_uid = self.stack[-1]
+        else:
+          parent_uid = self.session_uid
+        block_uid = browser.create_child_block(parent_uid, text)
         self.last_note_uid = block_uid
         print(f'Inserted: "{text}" at block (({block_uid}))')
         if has_audio:
@@ -231,7 +235,6 @@ class Uploader:
     self.session_uid = None
     self.last_note_uid = None
     self.stack = []
-    self.session_used = False
 
   def close_browser(self):
     browser = self._browser

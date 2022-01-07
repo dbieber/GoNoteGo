@@ -11,6 +11,7 @@ UNINDENT = 'unindent'
 INDENT = 'indent'
 CLEAR_EMPTY = 'clear_empty'
 ENTER_EMPTY = 'enter_empty'
+END_SESSION = 'end_session'
 
 
 @dataclasses.dataclass
