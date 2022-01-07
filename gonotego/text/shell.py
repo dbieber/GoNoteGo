@@ -52,6 +52,7 @@ class Shell:
   def on_press(self, event):
     self.last_press = time.time()
     status.set(Status.TEXT_LAST_KEYPRESS, self.last_press)
+    print(event)
     if keyboard.is_pressed(secure_settings.HOTKEY):
       # Ignore presses while the hotkey is pressed.
       return
