@@ -110,6 +110,9 @@ class RoamBrowser:
       print(f'Failed to insert note: {text}')
       raise e
     time.sleep(0.25)
+    return self.get_insertion_result()
+
+  def get_insertion_result(self):
     retries = 5
     while retries:
       try:
@@ -124,6 +127,8 @@ class RoamBrowser:
     block_json = json.dumps(block)
     js = f'window.insertion_result = createChildBlock({parent_uid_json}, {block_json}, {order});'
     self.utils.execute_script_tag(js)
+    time.sleep(0.25)
+    return self.get_insertion_result()
 
   def sleep_until_astrolabe_gone(self, timeout=30):
     while self.driver.find_elements_by_class_name('loading-astrolabe'):
@@ -187,7 +192,8 @@ class Uploader:
         # When you press tab, that adds your most-recent note to a stack.
         if self.last_note_uid and self.last_note_uid not in self.stack:
           self.stack.append(self.last_note_uid)
-          print(self.stack)
+        print(self.stack)
+        print(self.last_note_uid)
       elif note_event.action == events.UNINDENT:
         # When you shift-tab, that pops from the stack.
         if self.stack:
