@@ -2,7 +2,7 @@ import unittest
 from gonotego.common import events
 
 
-class ModelsTest(unittest.TestCase):
+class EventsTest(unittest.TestCase):
 
   def test_audio_event(self):
     event = events.AudioEvent(
@@ -22,7 +22,9 @@ class ModelsTest(unittest.TestCase):
   def test_note_event(self):
     event = events.NoteEvent(
         text='Example note.',
-        audio_filepath='/tmp/audio')
+        action=events.SUBMIT,
+        audio_filepath='/tmp/audio',
+        timestamp=None)
     event_bytes = bytes(event)
     event2 = events.NoteEvent.from_bytes(event_bytes)
     self.assertEqual(event, event2)
