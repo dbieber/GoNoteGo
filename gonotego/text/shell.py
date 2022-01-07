@@ -85,6 +85,13 @@ class Shell:
       if keyboard.is_pressed('shift') or keyboard.is_pressed('right shift'):
         self.text = ''
     elif event.name == 'enter':
+      if keyboard.is_pressed('shift') or keyboard.is_pressed('right shift'):
+        note_event = events.NoteEvent(
+            text=None,
+            action=events.end_session,
+            audio_filepath=None,
+            timestamp=get_timestamp())
+        self.note_events_queue.put(bytes(note_event))
       # Write both a text event (for the command center)
       # and a note event (for the uploader).
       if self.text == '':

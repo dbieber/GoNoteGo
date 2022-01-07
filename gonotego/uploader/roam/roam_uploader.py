@@ -149,7 +149,6 @@ class Uploader:
     self.session_uid = None
     self.last_note_uid = None
     self.stack = []
-    self.session_used = False
 
   def get_browser(self):
     if self._browser is not None:
@@ -202,14 +201,11 @@ class Uploader:
         # When you shift-delete from an empty note, that clears the stack.
         self.stack = []
       elif note_event.action == events.ENTER_EMPTY:
-        # When you submit from an empty note, that pops from the stack
-        # (and if the stack is empty and the session is non-empty,
-        # it creates a new session).
+        # When you submit from an empty note, that pops from the stack.
         if self.stack:
           self.stack.pop()
-        elif self.session_used:
-          # The stack is empty and the session is non-empty.
-          self.end_session()
+      elif note_event.action == events.END_SESSION:
+        self.end_session()
       elif note_event.action == events.SUBMIT:
         text = note_event.text.strip()
         has_audio = note_event.audio_filepath and os.path.exists(note_event.audio_filepath)
@@ -220,7 +216,6 @@ class Uploader:
         else:
           parent_uid = self.session_uid
         block_uid = browser.create_child_block(parent_uid, text)
-        self.session_used = True
         self.last_note_uid = block_uid
         print(f'Inserted: "{text}" at block (({block_uid}))')
         if has_audio:
@@ -242,7 +237,6 @@ class Uploader:
     self.session_uid = None
     self.last_note_uid = None
     self.stack = []
-    self.session_used = False
 
   def close_browser(self):
     browser = self._browser
