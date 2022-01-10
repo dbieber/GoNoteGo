@@ -87,7 +87,7 @@ class Shell:
       if keyboard.is_pressed('shift') or keyboard.is_pressed('right shift'):
         note_event = events.NoteEvent(
             text=None,
-            action=events.end_session,
+            action=events.END_SESSION,
             audio_filepath=None,
             timestamp=get_timestamp())
         self.note_events_queue.put(bytes(note_event))
