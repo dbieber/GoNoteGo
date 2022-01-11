@@ -36,7 +36,12 @@ def main():
           with open(text_filepath, 'w') as f:
             f.write(transcript)
           print(transcript)
-          note_event = events.NoteEvent(transcript, event.filepath)
+          note_event = events.NoteEvent(
+              text=transcript,
+              action=events.SUBMIT,
+              audio_filepath=event.filepath,
+              timestamp=time.time(),
+          )
           note_events_queue.put(bytes(note_event))
 
           # Audio commands:
