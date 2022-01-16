@@ -8,6 +8,9 @@ from gonotego.settings import secure_settings
 
 Status = status.Status
 
+MINUS = chr(8722)
+assert MINUS == '−'  # This is a unicode minus sign, not an ordinary hyphen.
+
 shift_characters = {
     '1': '!',
     '2': '@',
@@ -19,8 +22,8 @@ shift_characters = {
     '8': '*',
     '9': '(',
     '0': ')',
-    '-': '_',  # Ordinary minus sign. ord(x) == 45.
-    '−': '_',  # The kind typed on the Raspberry Pi. ord(x) == 8722.
+    '-': '_',  # Ordinary hyphen. ord(x) == 45.
+    MINUS: '_',  # The kind typed on the Raspberry Pi. ord(x) == 8722.
     '=': '+',
     '[': '{',
     ']': '}',
@@ -31,6 +34,10 @@ shift_characters = {
     ',': '<',
     '.': '>',
     '/': '?',
+}
+
+character_substitutions = {
+    MINUS: '-',  # Replace unicode minus with ordinary hyphens.
 }
 
 
@@ -110,6 +117,8 @@ class Shell:
       self.text += ' '
     elif len(event.name) == 1:
       character = event.name
+      if character in character_substitutions:
+        character = character_substitutions[character]
       if keyboard.is_pressed('shift') or keyboard.is_pressed('right shift'):
         character = shift_characters.get(character, character.upper())
       self.text += character
