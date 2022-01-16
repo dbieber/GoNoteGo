@@ -8,6 +8,9 @@ from gonotego.settings import secure_settings
 
 Status = status.Status
 
+MINUS = chr(8722)
+assert MINUS == '−'  # This is a unicode minus sign, not an ordinary hyphen.
+
 shift_characters = {
     '1': '!',
     '2': '@',
@@ -19,8 +22,8 @@ shift_characters = {
     '8': '*',
     '9': '(',
     '0': ')',
-    '-': '_',  # Ordinary minus sign. ord(x) == 45.
-    '−': '_',  # The kind typed on the Raspberry Pi. ord(x) == 8722.
+    '-': '_',  # Ordinary hyphen. ord(x) == 45.
+    MINUS: '_',  # The kind typed on the Raspberry Pi. ord(x) == 8722.
     '=': '+',
     '[': '{',
     ']': '}',
@@ -34,7 +37,7 @@ shift_characters = {
 }
 
 character_substitutions = {
-    '−': '-',  # The kind typed on the Raspberry Pi. ord(x) == 8722.
+    MINUS: '-',  # Replace unicode minus with ordinary hyphens.
 }
 
 
