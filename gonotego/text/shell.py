@@ -33,6 +33,10 @@ shift_characters = {
     '/': '?',
 }
 
+character_substitutions = {
+    '−': '-',  # The kind typed on the Raspberry Pi. ord(x) == 8722.
+}
+
 
 def get_timestamp():
   return time.time()
@@ -110,6 +114,8 @@ class Shell:
       self.text += ' '
     elif len(event.name) == 1:
       character = event.name
+      if character in character_substitutions:
+        character = character_substitutions[character]
       if keyboard.is_pressed('shift') or keyboard.is_pressed('right shift'):
         character = shift_characters.get(character, character.upper())
       self.text += character
