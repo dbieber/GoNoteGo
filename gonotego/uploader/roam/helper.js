@@ -175,7 +175,7 @@ async function insertGoNoteGoNote(note) {
   let $roam_date = getRoamDate(new Date());
 
   // Add the note to the Daily Notes page.
-  let block_uid = await getOrCreateBlockOnPage($roam_date, '[[Go Note Go]] Notes:', -1);
+  let block_uid = await getOrCreateBlockOnPage($roam_date, '[[Go Note Go Notes]]:', -1);
   let note_block = await createChildBlock(block_uid, note, -1);
   return note_block
 }
