@@ -39,7 +39,7 @@ def split_to_tweets(text, delimiter=None, limit=280):
       texts.extend(split_to_tweets(t, delimiter=None, limit=limit))
     return texts
   spacers = ['\n\n\n', '\n\n', '\n', ' ']
-  preferred_breaks = [';', ',', '-', '+', ')']
+  preferred_breaks = ['.', '!', '?', ';', ',', '-', '+', ,'*', '&', ')']
   while len(text) > limit:
     for spacer in spacers + preferred_breaks:
       try:
