@@ -1,13 +1,10 @@
-import os
 import random
-import requests
 import time
 
 import twython
 
 from gonotego.common import events
 from gonotego.settings import secure_settings
-from gonotego.uploader.blob import blob_uploader
 
 
 def _tweet(client, text, tweet_id=None):
@@ -28,7 +25,7 @@ def _tweet_thread(client, texts, tweet_id=None):
       tweet = _tweet(client, text, tweet_id=tweet_id)
     else:
       time.sleep(random.random())
-      tweet = _tweet_reply(
+      tweet = _tweet(
           client, text, tweet_id=tweets[-1]['id_str'])
     tweets.append(tweet)
   return tweets
