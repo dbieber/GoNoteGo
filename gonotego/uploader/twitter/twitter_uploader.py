@@ -3,6 +3,8 @@ import random
 import requests
 import time
 
+import twython
+
 from gonotego.common import events
 from gonotego.settings import secure_settings
 from gonotego.uploader.blob import blob_uploader
