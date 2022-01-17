@@ -19,6 +19,7 @@ DEPENDENCIES = [
     'sounddevice',
     'soundfile',
     'supervisor',
+    'twython',
 ]
 
 packages = [
