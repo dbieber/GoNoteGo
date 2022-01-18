@@ -21,7 +21,7 @@ def create_page(title):
           }
       ),
       headers={
-          'Authorization': f'Bearer {settings.get('NOTION_INTEGRATION_TOKEN')}',
+          'Authorization': f'Bearer {settings.get("NOTION_INTEGRATION_TOKEN")}',
           'Notion-Version': '2021-08-16',
       },
   )
