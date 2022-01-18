@@ -6,6 +6,7 @@ in secure_settings.py.
 Run ":clear KEY" to clear an individual setting on Go Note Go, reverting it back
 to it's value from secure_settings.py.
 """
+import ast
 from gonotego.settings import secure_settings
 from gonotego.common import interprocess
 
