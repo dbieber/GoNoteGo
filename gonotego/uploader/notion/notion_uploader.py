@@ -3,7 +3,7 @@ import os
 import requests
 
 from gonotego.common import events
-from gonotego.settings import secure_settings
+from gonotego.settings import settings
 from gonotego.uploader.blob import blob_uploader
 
 
@@ -15,13 +15,13 @@ def create_page(title):
   return requests.post(
       url=PAGES_URL,
       json=dict(
-          parent={'database_id': secure_settings.NOTION_DATABASE_ID},
+          parent={'database_id': settings.get('NOTION_DATABASE_ID')},
           properties={
               'Name': {'title': [{'text': {'content': title}}]},
           }
       ),
       headers={
-          'Authorization': f'Bearer {secure_settings.NOTION_INTEGRATION_TOKEN}',
+          'Authorization': f'Bearer {settings.get('NOTION_INTEGRATION_TOKEN')}',
           'Notion-Version': '2021-08-16',
       },
   )
@@ -53,7 +53,7 @@ def append_notes(blocks, page_id):
       url=APPEND_CHILD_URL_FORMAT.format(block_id=page_id),
       json=dict(children=blocks),
       headers={
-          'Authorization': f'Bearer {secure_settings.NOTION_INTEGRATION_TOKEN}',
+          'Authorization': f'Bearer {settings.get('NOTION_INTEGRATION_TOKEN')}',
           'Notion-Version': '2021-08-16',
       },
   )

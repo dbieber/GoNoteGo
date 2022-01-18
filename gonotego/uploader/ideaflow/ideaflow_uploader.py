@@ -8,7 +8,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 
 from gonotego.common import events
-from gonotego.settings import secure_settings
+from gonotego.settings import settings
 from gonotego.uploader.blob import blob_uploader
 from gonotego.uploader.browser import driver_utils
 
@@ -86,8 +86,8 @@ class Uploader:
     browser = IdeaflowBrowser(driver)
 
     # Sign in to Ideaflow.
-    username = secure_settings.IDEAFLOW_USER
-    password = secure_settings.IDEAFLOW_PASSWORD or getpass.getpass()
+    username = settings.get('IDEAFLOW_USER')
+    password = settings.get('IDEAFLOW_PASSWORD') or getpass.getpass()
     browser.sign_in(username, password)
     browser.screenshot('screenshot-post-sign-in.png')
 

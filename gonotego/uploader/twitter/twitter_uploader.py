@@ -4,7 +4,7 @@ import time
 import twython
 
 from gonotego.common import events
-from gonotego.settings import secure_settings
+from gonotego.settings import settings
 
 
 def _tweet(client, text, tweet_id=None):
@@ -79,10 +79,10 @@ class Uploader:
     if self._client:
       return self._client
     self._client = twython.Twython(
-        secure_settings.TWITTER_CONSUMER_KEY,
-        secure_settings.TWITTER_CONSUMER_SECRET,
-        secure_settings.TWITTER_ACCESS_TOKEN,
-        secure_settings.TWITTER_ACCESS_TOKEN_SECRET)
+        settings.get("TWITTER_CONSUMER_KEY"),
+        settings.get("TWITTER_CONSUMER_SECRET"),
+        settings.get("TWITTER_ACCESS_TOKEN"),
+        settings.get("TWITTER_ACCESS_TOKEN_SECRET"))
     return self._client
 
   def upload(self, note_events):

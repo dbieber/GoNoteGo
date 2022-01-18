@@ -2,11 +2,11 @@ import os
 
 import dropbox
 
-from gonotego.settings import secure_settings
+from gonotego.settings import settings
 
 
 def make_client():
-  return dropbox.Dropbox(secure_settings.DROPBOX_ACCESS_TOKEN)
+  return dropbox.Dropbox(settings.get('DROPBOX_ACCESS_TOKEN'))
 
 
 def upload_blob(filepath, client):

@@ -4,7 +4,7 @@ import time
 from gonotego.common import events
 from gonotego.common import interprocess
 from gonotego.common import status
-from gonotego.settings import secure_settings
+from gonotego.settings import settings
 
 Status = status.Status
 
@@ -59,7 +59,7 @@ class Shell:
   def on_press(self, event):
     self.last_press = time.time()
     status.set(Status.TEXT_LAST_KEYPRESS, self.last_press)
-    if keyboard.is_pressed(secure_settings.HOTKEY):
+    if keyboard.is_pressed(settings.get('HOTKEY')):
       # Ignore presses while the hotkey is pressed.
       return
     elif event.name == 'tab':

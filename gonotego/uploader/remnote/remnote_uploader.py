@@ -2,7 +2,7 @@ import os
 import requests
 
 from gonotego.common import events
-from gonotego.settings import secure_settings
+from gonotego.settings import settings
 from gonotego.uploader.blob import blob_uploader
 
 CREATE_URL = 'https://api.remnote.io/api/v0/create'
@@ -10,8 +10,8 @@ CREATE_URL = 'https://api.remnote.io/api/v0/create'
 
 def create_rem(text, edit_later, parent_id=None):
   data = dict(
-      apiKey=secure_settings.REMNOTE_API_KEY,
-      userId=secure_settings.REMNOTE_USER_ID,
+      apiKey=settings.get('REMNOTE_API_KEY'),
+      userId=settings.get('REMNOTE_USER_ID'),
       text=text,
       addToEditLater=edit_later,
       parentId=parent_id,
@@ -26,7 +26,7 @@ def create_rem(text, edit_later, parent_id=None):
 class Uploader:
 
   def upload(self, note_events):
-    if not secure_settings.REMNOTE_ROOT_REM:
+    if not settings.get('REMNOTE_ROOT_REM'):
       raise ValueError('Must provide REMNOTE_ROOT_REM')
 
     client = blob_uploader.make_client()
@@ -38,7 +38,7 @@ class Uploader:
         rem_id = create_rem(
             text=note_event.text,
             edit_later=edit_later,
-            parent_id=secure_settings.REMNOTE_ROOT_REM)
+            parent_id=settings.get('REMNOTE_ROOT_REM'))
         if note_event.audio_filepath and os.path.exists(note_event.audio_filepath):
           url = blob_uploader.upload_blob(note_event.audio_filepath, client)
           create_rem(url, edit_later=False, parent_id=rem_id)
