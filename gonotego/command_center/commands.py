@@ -149,6 +149,7 @@ def set(key, value):
 
 @register_command('get {key}')
 def get_setting(key):
+  say(key)
   if key.lower() in SETTING_NAME_MAPPINGS:
     key = SETTING_NAME_MAPPINGS[key.lower()]
   if key.lower() in SETTINGS_NAMES:
