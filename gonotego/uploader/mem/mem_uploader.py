@@ -16,7 +16,7 @@ def upload_mem(text, is_read=True):
           content=text,
           isRead=is_read,
       ),
-      headers=dict(Authorization=f'ApiAccessToken {settings.get('MEM_API_KEY')}')
+      headers=dict(Authorization=f'ApiAccessToken {settings.get("MEM_API_KEY")}')
   )
 
 
