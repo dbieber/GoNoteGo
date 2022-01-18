@@ -15,8 +15,7 @@ from gonotego.uploader.twitter import twitter_uploader
 Status = status.Status
 
 
-def make_uploader():
-  note_taking_system = settings.get('NOTE_TAKING_SYSTEM').lower()
+def make_uploader(note_taking_system):
   if note_taking_system == 'ideaflow':
     return ideaflow_uploader.Uploader()
   elif note_taking_system == 'remnote':
@@ -36,7 +35,8 @@ def make_uploader():
 def main():
   print('Starting uploader.')
   note_events_queue = interprocess.get_note_events_queue()
-  uploader = make_uploader()
+  note_taking_system = settings.get('NOTE_TAKING_SYSTEM').lower()
+  uploader = make_uploader(note_taking_system)
   status.set(Status.UPLOADER_READY, True)
 
   last_upload = None
@@ -44,6 +44,11 @@ def main():
 
     # Don't even try uploading notes if we don't have a connection.
     internet.wait_for_internet(on_disconnect=uploader.handle_disconnect)
+
+    note_taking_system_setting = settings.get('NOTE_TAKING_SYSTEM').lower()
+    if note_taking_system_setting != note_taking_system:
+      note_taking_system = note_taking_system_setting
+      uploader = make_uploader(note_taking_system)
 
     note_event_bytes_list = []
     note_events = []
