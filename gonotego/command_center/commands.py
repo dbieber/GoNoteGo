@@ -135,7 +135,7 @@ SETTING_NAME_MAPPINGS = {
 SETTINGS_NAMES = [s.lower() for s in dir(secure_settings) if not s.startswith('_')]
 
 
-@register_command('set {key} {value}')
+@register_command('set {} {}')
 def set(key, value):
   if key.lower() in SETTING_NAME_MAPPINGS:
     key = SETTING_NAME_MAPPINGS[key.lower()]
@@ -147,7 +147,7 @@ def set(key, value):
     set_leds(value)
 
 
-@register_command('get {key}')
+@register_command('get {}')
 def get_setting(key):
   say(key)
   if key.lower() in SETTING_NAME_MAPPINGS:
@@ -156,7 +156,7 @@ def get_setting(key):
     say(settings.get(key))
 
 
-@register_command('clear {key}')
+@register_command('clear {}')
 def clear_setting(key):
   if key.lower() in SETTING_NAME_MAPPINGS:
     key = SETTING_NAME_MAPPINGS[key.lower()]
