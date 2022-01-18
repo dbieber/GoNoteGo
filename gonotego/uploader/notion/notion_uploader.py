@@ -53,7 +53,7 @@ def append_notes(blocks, page_id):
       url=APPEND_CHILD_URL_FORMAT.format(block_id=page_id),
       json=dict(children=blocks),
       headers={
-          'Authorization': f'Bearer {settings.get('NOTION_INTEGRATION_TOKEN')}',
+          'Authorization': f'Bearer {settings.get("NOTION_INTEGRATION_TOKEN")}',
           'Notion-Version': '2021-08-16',
       },
   )
