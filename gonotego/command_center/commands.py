@@ -128,10 +128,12 @@ def ip_address():
   say(hostname_output)
 
 
+# Settings commands. Commands for setting settings.
 SETTING_NAME_MAPPINGS = {
     'uploader': 'NOTE_TAKING_SYSTEM',
 }
 SETTINGS_NAMES = [s.lower() for s in dir(secure_settings) if not s.startswith('_')]
+
 
 @register_command('set {key} {value}')
 def set(key, value):
@@ -160,6 +162,7 @@ def clear_setting(key):
   if key.lower() in SETTINGS_NAMES:
     settings.clear(key)
     say('New value: {settings.get(key)}')
+
 
 @register_command('clear')
 def clear_all_settings(key):
