@@ -161,7 +161,8 @@ def clear_setting(key):
     key = SETTING_NAME_MAPPINGS[key.lower()]
   if key.lower() in SETTINGS_NAMES:
     settings.clear(key)
-    say('New value: {settings.get(key)}')
+    value = settings.get(key)
+    say(f'New value: {value}')
 
 
 @register_command('clear')
