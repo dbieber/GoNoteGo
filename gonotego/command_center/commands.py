@@ -9,6 +9,8 @@ from gonotego.common import internet
 from gonotego.common import interprocess
 from gonotego.common import status
 from gonotego.command_center import registry
+from gonotego.settings import settings
+from gonotego.settings import secure_settings
 
 register_command = registry.register_command
 
@@ -88,7 +90,7 @@ def reboot():
 
 
 @register_command('leds {}')
-def leds(value):
+def set_leds(value):
   if value in ('off', 'on', 'low'):
     status.set(Status.LEDS_SETTING, value)
 
@@ -124,3 +126,45 @@ def set_volume(value):
 def ip_address():
   hostname_output = subprocess.check_output(['hostname', '-I']).decode('utf-8').strip()
   say(hostname_output)
+
+
+SETTING_NAME_MAPPINGS = {
+    'uploader': 'NOTE_TAKING_SYSTEM',
+}
+SETTINGS_NAMES = [s.lower() for s in dir(secure_settings) if not s.startswith('_')]
+
+@register_command('set {key} {value}')
+def set(key, value):
+  if key.lower() in SETTING_NAME_MAPPINGS:
+    key = SETTING_NAME_MAPPINGS[key.lower()]
+  if key.lower() in SETTINGS_NAMES:
+    settings.set(key, value)
+  if key.lower() in ('v', 'volume'):
+    set_volume(value)
+  if key.lower() in ('leds'):
+    set_leds(value)
+
+
+@register_command('get {key}')
+def get_setting(key):
+  if key.lower() in SETTING_NAME_MAPPINGS:
+    key = SETTING_NAME_MAPPINGS[key.lower()]
+  if key.lower() in SETTINGS_NAMES:
+    say(settings.get(key))
+
+
+@register_command('clear {key}')
+def clear_setting(key):
+  if key.lower() in SETTING_NAME_MAPPINGS:
+    key = SETTING_NAME_MAPPINGS[key.lower()]
+  if key.lower() in SETTINGS_NAMES:
+    settings.clear(key)
+    say('New value: {settings.get(key)}')
+
+@register_command('clear')
+def clear_all_settings(key):
+  if key.lower() in SETTING_NAME_MAPPINGS:
+    key = SETTING_NAME_MAPPINGS[key.lower()]
+  if key.lower() in SETTINGS_NAMES:
+    settings.clear_all()
+    say('Cleared.')
