@@ -52,7 +52,7 @@ def set_twitter_user(screen_name):
 def start_auth():
   api_key = settings.get('TWITTER_API_KEY')
   secret_key = settings.get('TWITTER_API_SECRET')
-  client = twython.Twitter(api_key, secret_key)
+  client = twython.Twython(api_key, secret_key)
   auth = client.get_authentication_tokens(callback_url='oob')
   oauth_token = auth['oauth_token']
   oauth_token_secret = auth['oauth_token_secret']
@@ -90,7 +90,7 @@ def complete_auth(pin):
   secret_key = settings.get('TWITTER_API_SECRET')
   oauth_token = settings.get('twitter.oauth_token')
   oauth_token_secret = settings.get('twitter.oauth_token_secret')
-  client = twython.Twitter(api_key, secret_key, oauth_token, oauth_token_secret)
+  client = twython.Twython(api_key, secret_key, oauth_token, oauth_token_secret)
   auth = client.get_authorized_tokens(pin)
 
   oauth_token = auth['oauth_token']
