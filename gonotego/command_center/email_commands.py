@@ -21,8 +21,8 @@ def email(to, subject, text, attach=None):
   msg = message.EmailMessage()
   msg.set_content(text)
 
-  msg['Subject'] = f'The contents of {textfile}'
-  msg['From'] = email_user
+  msg['Subject'] = subject
+  msg['From'] = email_user or 'Go-Note-Go@example.com'
   msg['To'] = to
   if email_server and email_pwd:
     server = smtplib.SMTP(email_server, 587)
