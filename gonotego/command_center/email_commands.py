@@ -29,7 +29,8 @@ def email(to, subject, text, attach=None):
     server.ehlo()
     server.starttls()
     server.ehlo()
-    server.login(email_user, email_pwd)  else:
+    server.login(email_user, email_pwd)
+  else:
     server = smtplib.SMTP('localhost')
   server.send_message(msg)
   server.quit()
