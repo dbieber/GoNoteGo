@@ -23,6 +23,8 @@ Run the following to finish logging in:
 import twython
 
 from gonotego.common import status
+from gonotego.command_center import email_commands
+from gonotego.command_center import system_commands
 from gonotego.command_center import registry
 from gonotego.settings import settings
 
@@ -66,22 +68,21 @@ def start_auth():
   return auth_url
 
 
-# # TODO(dbieber): Support email commands.
-# @register_command('twitter auth {}')
-# def start_auth_with_email(email):
-#   auth_url = start_auth()
-#   email_commands.send_email(
-#       recipient=email, sender='Go Note Go', subject='Connect Go Note Go with Twitter',
-#       message=f"""You requested to connect your Twitter account to your Go Note Go.
+@register_command('twitter auth {}')
+def start_auth_with_email(email):
+  auth_url = start_auth()
+  email_commands.email(
+      to=email, subject='Connect Go Note Go with Twitter',
+      text=f"""You requested to connect your Twitter account to your Go Note Go.
 
-# You can do so at this link:
-# {auth_url}
+You can do so at this link:
+{auth_url}
 
-# Once you authorize Go Note Go to connect to your Twitter account, run the following on your Go Note Go:
-# :twitter pin <pin>
+Once you authorize Go Note Go to connect to your Twitter account, run the following on your Go Note Go:
+:twitter pin <pin>
 
-# If you did not request to connect your Twitter account to your Go Note Go, you can safely ignore this email.
-# """)
+If you did not request to connect your Twitter account to your Go Note Go, you can safely ignore this email.
+""")
 
 
 @register_command('twitter pin {}')
