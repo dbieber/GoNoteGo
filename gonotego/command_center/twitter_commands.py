@@ -50,8 +50,8 @@ def set_twitter_user(screen_name):
 
 @register_command('twitter auth')
 def start_auth():
-  api_key = settings.get('TWITTER_API_KEY_GO_NOTE_GO')
-  secret_key = settings.get('TWITTER_API_SECRET_KEY_GO_NOTE_GO')
+  api_key = settings.get('TWITTER_API_KEY')
+  secret_key = settings.get('TWITTER_API_SECRET')
   client = twython.Twitter(api_key, secret_key)
   auth = client.get_authentication_tokens(callback_url='oob')
   oauth_token = auth['oauth_token']
