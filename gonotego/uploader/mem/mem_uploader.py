@@ -2,7 +2,7 @@ import os
 import requests
 
 from gonotego.common import events
-from gonotego.settings import secure_settings
+from gonotego.settings import settings
 from gonotego.uploader.blob import blob_uploader
 
 
@@ -16,7 +16,7 @@ def upload_mem(text, is_read=True):
           content=text,
           isRead=is_read,
       ),
-      headers=dict(Authorization=f'ApiAccessToken {secure_settings.MEM_API_KEY}')
+      headers=dict(Authorization=f'ApiAccessToken {settings.get("MEM_API_KEY")}')
   )
 
 

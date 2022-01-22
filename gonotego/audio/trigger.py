@@ -6,7 +6,7 @@ except:
   board = None
 import keyboard
 
-from gonotego.settings import secure_settings
+from gonotego.settings import settings
 
 
 if board is not None:
@@ -33,6 +33,6 @@ def is_pressed():
   else:
     button_pressed = False
   return (
-      keyboard.is_pressed(secure_settings.HOTKEY)
+      keyboard.is_pressed(settings.get("HOTKEY"))
       or button_pressed
   )

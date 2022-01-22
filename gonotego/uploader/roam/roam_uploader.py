@@ -11,7 +11,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 
 from gonotego.common import events
-from gonotego.settings import secure_settings
+from gonotego.settings import settings
 from gonotego.uploader.blob import blob_uploader
 from gonotego.uploader.browser import driver_utils
 
@@ -161,8 +161,8 @@ class Uploader:
     browser = RoamBrowser(driver)
 
     # Sign in to Roam.
-    username = secure_settings.ROAM_USER
-    password = secure_settings.ROAM_PASSWORD or getpass.getpass()
+    username = settings.get('ROAM_USER')
+    password = settings.get('ROAM_PASSWORD') or getpass.getpass()
     browser.sign_in(username, password)
     browser.screenshot('screenshot-post-sign-in.png')
 
@@ -177,7 +177,7 @@ class Uploader:
 
   def upload(self, note_events):
     browser = self.get_browser()
-    browser.go_graph(secure_settings.ROAM_GRAPH)
+    browser.go_graph(settings.get("ROAM_GRAPH"))
     time.sleep(0.5)
     browser.screenshot('screenshot-graph-later.png')
     browser.execute_helper_js()
