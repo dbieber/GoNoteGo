@@ -79,7 +79,7 @@ class Shell:
             audio_filepath=None,
             timestamp=get_timestamp())
         self.note_events_queue.put(bytes(note_event))
-    elif event.name == 'delete':
+    elif event.name == 'delete' or event.name == 'backspace':
       if self.text == '':
         note_event = events.NoteEvent(
             text=None,
