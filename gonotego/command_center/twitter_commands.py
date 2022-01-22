@@ -38,7 +38,7 @@ def twitter():
 
 @register_command('twitter user')
 def get_twitter_user():
-  settings.get('twitter.screen_name')
+  system_commands.say(settings.get('twitter.screen_name'))
 
 
 @register_command('twitter user {}')
