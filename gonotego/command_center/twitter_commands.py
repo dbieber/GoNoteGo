@@ -33,7 +33,7 @@ Status = status.Status
 
 @register_command('twitter')
 def twitter():
-  settings.set('UPLOADER', 'twitter')
+  settings.set('NOTE_TAKING_SYSTEM', 'twitter')
 
 
 @register_command('twitter user')
