@@ -6,6 +6,7 @@ import sys
 from gonotego.common import internet
 from gonotego.common import status
 from gonotego.command_center import registry
+from gonotego.settings import settings
 
 register_command = registry.register_command
 
