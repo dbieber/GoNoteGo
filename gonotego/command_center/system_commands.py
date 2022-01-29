@@ -6,10 +6,30 @@ import sys
 from gonotego.common import internet
 from gonotego.common import status
 from gonotego.command_center import registry
+from gonotego.settings import settings
 
 register_command = registry.register_command
 
 Status = status.Status
+
+
+@register_command('whoami')
+@register_command('who am i')
+def whoami():
+  note_taking_system = settings.get('NOTE_TAKING_SYSTEM')
+  if note_taking_system == 'ideaflow':
+    user = settings.get('IDEAFLOW_USER')
+  elif note_taking_system == 'remnote':
+    user = settings.get('REMNOTE_USER_ID')[:6]
+  elif note_taking_system == 'roam':
+    user = f'{settings.get("ROAM_GRAPH")} {settings.get("ROAM_USER")}'
+  elif note_taking_system == 'mem':
+    user = settings.get('MEM_API_KEY')[:6]
+  elif note_taking_system == 'notion':
+    user = settings.get('NOTION_DATABASE_ID')[:6]
+  elif note_taking_system == 'twitter':
+    user = settings.get('twitter.screen_name')
+  say(f'uploader {note_taking_system} ; user {user}')
 
 
 @register_command('t')
