@@ -171,7 +171,7 @@ class Uploader:
 
   def new_session(self):
     browser = self.get_browser()
-    time_str = datetime.now().strftime("%H:%M %p")
+    time_str = datetime.now().strftime('%H:%M %p')
     block_uid = browser.insert_top_level_note(time_str)
     self.session_uid = block_uid
 
