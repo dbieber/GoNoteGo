@@ -6,11 +6,15 @@ from gonotego.settings import settings
 
 
 def make_client():
-  return dropbox.Dropbox(settings.get('DROPBOX_ACCESS_TOKEN'))
+  if settings.get('BLOB_STORAGE_SYSTEM') == 'dropbox':
+    return dropbox.Dropbox(settings.get('DROPBOX_ACCESS_TOKEN'))
 
 
 def upload_blob(filepath, client):
   """Uploads a blob, and returns a URL to that blob."""
+  if not client:
+    return ''
+
   if not os.path.exists(filepath):
     return ''
   dropbox_path = f'/{filepath}'
