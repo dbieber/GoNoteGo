@@ -102,7 +102,6 @@ class RoamBrowser:
     self.utils.execute_script_tag(js)
 
   def insert_top_level_note(self, text):
-    print(f'Inserting top-level note: {text}')
     text_json = json.dumps(text)
     js = f'window.insertion_result = insertGoNoteGoNote({text_json});'
     try:
@@ -124,7 +123,6 @@ class RoamBrowser:
         retries -= 1
 
   def create_child_block(self, parent_uid, block, order=-1):
-    print(f'Creating child block under {parent_uid}: {block}')
     parent_uid_json = json.dumps(parent_uid)
     block_json = json.dumps(block)
     js = f'window.insertion_result = createChildBlock({parent_uid_json}, {block_json}, {order});'
