@@ -177,13 +177,14 @@ class Uploader:
 
   def upload(self, note_events):
     browser = self.get_browser()
-    browser.go_graph(settings.get("ROAM_GRAPH"))
+    browser.go_graph(settings.get('ROAM_GRAPH'))
     time.sleep(0.5)
     browser.screenshot('screenshot-graph-later.png')
     browser.execute_helper_js()
 
     if self.session_uid is None:
       self.new_session()
+      print('New session creation complete.')
 
     client = blob_uploader.make_client()
     for note_event in note_events:
