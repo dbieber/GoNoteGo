@@ -184,12 +184,12 @@ class Uploader:
     browser.screenshot('screenshot-graph-later.png')
     browser.execute_helper_js()
 
-    if self.session_uid is None:
-      self.new_session()
-      print('New session creation complete.')
-
     client = blob_uploader.make_client()
     for note_event in note_events:
+      if self.session_uid is None:
+        self.new_session()
+        print('New session creation complete.')
+
       if note_event.action == events.INDENT:
         # When you press tab, that adds your most-recent note to a stack.
         if self.last_note_uid and self.last_note_uid not in self.stack:
