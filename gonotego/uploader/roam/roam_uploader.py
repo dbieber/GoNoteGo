@@ -204,7 +204,6 @@ class Uploader:
       elif note_event.action == events.SUBMIT:
         if self.session_uid is None:
           self.new_session()
-          print('New session creation complete.')
         text = note_event.text.strip()
         has_audio = note_event.audio_filepath and os.path.exists(note_event.audio_filepath)
         if has_audio:
