@@ -17,7 +17,7 @@ def main():
 
   while True:
     audio_recording = status.get(Status.AUDIO_RECORDING)
-    text_last_keypress = status.get(Status.TEXT_LAST_KEYPRESS)
+    text_last_keypress = status.get(Status.TEXT_LAST_KEYPRESS) or 0
     time_since_keypress = time.time() - text_last_keypress
     transcription_active = status.get(Status.TRANSCRIPTION_ACTIVE)
     uploader_active = status.get(Status.UPLOADER_ACTIVE)

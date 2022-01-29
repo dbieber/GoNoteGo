@@ -40,6 +40,7 @@ packages = [
     'gonotego.uploader.notion',
     'gonotego.uploader.remnote',
     'gonotego.uploader.roam',
+    'gonotego.uploader.twitter',
 ]
 setuptools.setup(
     name='GoNoteGo',

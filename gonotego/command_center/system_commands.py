@@ -1,0 +1,84 @@
+from datetime import datetime
+import os
+import subprocess
+import sys
+
+from gonotego.common import internet
+from gonotego.common import status
+from gonotego.command_center import registry
+
+register_command = registry.register_command
+
+Status = status.Status
+
+
+@register_command('t')
+@register_command('time')
+def time():
+  shell('date "+%A, %B%e %l:%M%p" | espeak &')
+
+
+@register_command('at {}:{}', requirements=('scheduler',))
+def schedule(at, what, scheduler):
+  scheduler.schedule(at, what)
+
+
+@register_command('status')
+@register_command('ok')
+def status_command():
+  say('ok')
+
+
+@register_command('say {}')
+def say(text):
+  dt = datetime.now().strftime('%k:%M:%S')
+  with open('tmp-say', 'w') as tmp:
+    print(f'[{dt}] Writing "{text}" to tmp-say')
+    tmp.write(text)
+  cmd = 'cat tmp-say | espeak &'
+  shell(cmd)
+
+
+@register_command('shell {}')
+def shell(cmd):
+  dt = datetime.now().strftime('%k:%M:%S')
+  print(f"[{dt}] Executing command: '{cmd}'")
+  os.system(cmd)
+
+
+@register_command('flush')
+def flush():
+  sys.stdout.flush()
+  sys.stderr.flush()
+
+
+@register_command('update')
+def update():
+  shell('git pull')
+
+
+@register_command('restart')
+def restart():
+  shell('./env/bin/supervisorctl -u go -p notego restart all')
+
+
+@register_command('reboot')
+def reboot():
+  shell('sudo reboot')
+
+
+@register_command('env')
+def env():
+  shell('env | sort')
+
+
+@register_command('ip')
+def ip_address():
+  hostname_output = subprocess.check_output(['hostname', '-I']).decode('utf-8').strip()
+  say(hostname_output)
+
+
+@register_command('i')
+@register_command('internet')
+def check_internet():
+  say('yes' if internet.is_internet_available() else 'no')

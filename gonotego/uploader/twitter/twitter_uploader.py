@@ -68,6 +68,18 @@ def send(client, text, tweet_id=None):
   return _tweet_thread(client, texts, tweet_id)
 
 
+def get_oauth_tokens():
+  user_id = settings.get('twitter.user_id')
+  oauth_token = settings.get(f'twitter.user_ids.{user_id}.oauth_token')
+  oauth_token_secret = settings.get(f'twitter.user_ids.{user_id}.oauth_token_secret')
+
+  # TODO(dbieber): Add fallback to settings:
+  # settings.get('TWITTER_ACCESS_TOKEN')
+  # settings.get('TWITTER_ACCESS_TOKEN_SECRET')
+
+  return oauth_token, oauth_token_secret
+
+
 class Uploader:
 
   def __init__(self):
@@ -78,11 +90,12 @@ class Uploader:
   def client(self):
     if self._client:
       return self._client
+    oauth_token, oauth_token_secret = get_oauth_tokens()
     self._client = twython.Twython(
-        settings.get("TWITTER_CONSUMER_KEY"),
-        settings.get("TWITTER_CONSUMER_SECRET"),
-        settings.get("TWITTER_ACCESS_TOKEN"),
-        settings.get("TWITTER_ACCESS_TOKEN_SECRET"))
+        settings.get('TWITTER_API_KEY'),
+        settings.get('TWITTER_API_SECRET'),
+        oauth_token,
+        oauth_token_secret)
     return self._client
 
   def upload(self, note_events):
