@@ -59,10 +59,14 @@ class Shell:
   def on_press(self, event):
     self.last_press = time.time()
     status.set(Status.TEXT_LAST_KEYPRESS, self.last_press)
-    if keyboard.is_pressed(settings.get('HOTKEY')):
-      # Ignore presses while the hotkey is pressed.
-      return
-    elif event.name == 'tab':
+    try:
+      if keyboard.is_pressed(settings.get('HOTKEY')):
+        # Ignore presses while the hotkey is pressed.
+        return
+    except ValueError:
+      # If HOTKEY is not a valid key, continue.
+      pass
+    if event.name == 'tab':
       if keyboard.is_pressed('shift') or keyboard.is_pressed('right shift'):
         # Shift-Tab
         note_event = events.NoteEvent(
