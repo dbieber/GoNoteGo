@@ -186,10 +186,6 @@ class Uploader:
 
     client = blob_uploader.make_client()
     for note_event in note_events:
-      if self.session_uid is None:
-        self.new_session()
-        print('New session creation complete.')
-
       if note_event.action == events.INDENT:
         # When you press tab, that adds your most-recent note to a stack.
         if self.last_note_uid and self.last_note_uid not in self.stack:
@@ -208,6 +204,9 @@ class Uploader:
       elif note_event.action == events.END_SESSION:
         self.end_session()
       elif note_event.action == events.SUBMIT:
+        if self.session_uid is None:
+          self.new_session()
+          print('New session creation complete.')
         text = note_event.text.strip()
         has_audio = note_event.audio_filepath and os.path.exists(note_event.audio_filepath)
         if has_audio:
