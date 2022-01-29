@@ -177,13 +177,10 @@ class Uploader:
 
   def upload(self, note_events):
     browser = self.get_browser()
-    browser.go_graph(settings.get("ROAM_GRAPH"))
+    browser.go_graph(settings.get('ROAM_GRAPH'))
     time.sleep(0.5)
     browser.screenshot('screenshot-graph-later.png')
     browser.execute_helper_js()
-
-    if self.session_uid is None:
-      self.new_session()
 
     client = blob_uploader.make_client()
     for note_event in note_events:
@@ -205,6 +202,8 @@ class Uploader:
       elif note_event.action == events.END_SESSION:
         self.end_session()
       elif note_event.action == events.SUBMIT:
+        if self.session_uid is None:
+          self.new_session()
         text = note_event.text.strip()
         has_audio = note_event.audio_filepath and os.path.exists(note_event.audio_filepath)
         if has_audio:
