@@ -16,7 +16,7 @@ Status = status.Status
 @register_command('whoami')
 @register_command('who am i')
 def whoami():
-  uploader = settings.get('NOTE_TAKING_SYSTEM')
+  note_taking_system = settings.get('NOTE_TAKING_SYSTEM')
   if note_taking_system == 'ideaflow':
     user = settings.get('IDEAFLOW_USER')
   elif note_taking_system == 'remnote':
@@ -29,7 +29,7 @@ def whoami():
     user = settings.get('NOTION_DATABASE_ID')[:6]
   elif note_taking_system == 'twitter':
     user = settings.get('twitter.screen_name')
-  say(f'uploader {uploader} ; user {user}')
+  say(f'uploader {note_taking_system} ; user {user}')
 
 
 @register_command('t')
