@@ -3,6 +3,7 @@ import os
 import subprocess
 import sys
 
+from gonotego.common import events
 from gonotego.common import internet
 from gonotego.common import status
 from gonotego.command_center import registry
@@ -41,6 +42,21 @@ def time():
 @register_command('at {}:{}', requirements=('scheduler',))
 def schedule(at, what, scheduler):
   scheduler.schedule(at, what)
+
+
+@register_command('on {}:{}')
+def schedule(on, what):
+  ip = settings.get_machine_ip(on)
+  password = settings.get_machine_password(on)
+  command_event = events.CommandEvent(command_text=what)
+  command_event_bytes = bytes(command_event)
+  command = [
+      'sshpass', '-p', password, 'ssh', ip,
+      'redis-cli',
+      'set', 'command_events_queue:latest', command_event_bytes,
+      # 'rpush', 'command_events_queue', command_event_bytes]
+  ]
+  subprocess.check_output(command)
 
 
 @register_command('status')
