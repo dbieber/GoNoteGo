@@ -13,10 +13,10 @@ The text and audio recording processes use this status to determine whether to r
 any notes.
 
 TODOs:
-- [] Add keyboard shortcut for toggling active status.
-- [] Show active status in toolbar.
-- [] Respect active status in text.
-- [] Respect active status in audio.
+- [x] Add keyboard shortcut for toggling active status.
+- [x] Show active status in toolbar.
+- [x] Respect active status in text.
+- [x] Respect active status in audio.
 
 - [x] On quit, spin down all processes.
 - [] Restart subprocesses if they fail.
