@@ -7,6 +7,8 @@ Status = status.Status
 
 
 def handle_mouse_event(event):
+  status.set(Status.PAUSED, True)
+
   if isinstance(event, mouse.MoveEvent):
     status.set(Status.MOUSE_LAST_MOVE, time.time())
 

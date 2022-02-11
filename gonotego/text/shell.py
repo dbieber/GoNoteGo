@@ -66,6 +66,21 @@ class Shell:
     except ValueError:
       # If HOTKEY is not a valid key, continue.
       pass
+    try:
+      if keyboard.is_pressed(settings.get('PAUSE_HOTKEY')):
+        # Toggle the paused status.
+        paused = status.get(Status.PAUSED)
+        status.set(Status.PAUSED, not paused)
+        # Ignore presses while the hotkey is pressed.
+        return
+    except ValueError:
+      # If HOTKEY is not a valid key, continue.
+      pass
+
+    if status.get(Status.PAUSED):
+      # Don't collect key presses while paused.
+      return
+
     if event.name == 'tab':
       if keyboard.is_pressed('shift') or keyboard.is_pressed('right shift'):
         # Shift-Tab
