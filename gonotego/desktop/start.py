@@ -27,6 +27,7 @@ import rumps
 
 from gonotego.audio import runner as audio_runner
 from gonotego.command_center import runner as command_center_runner
+from gonotego.mouse import runner as mouse_runner
 from gonotego.text import runner as text_runner
 from gonotego.transcription import runner as transcription_runner
 from gonotego.uploader import runner as uploader_runner
@@ -64,6 +65,7 @@ if __name__ == '__main__':
   processes = [
       multiprocessing.Process(target=audio_runner.main),
       multiprocessing.Process(target=command_center_runner.main),
+      multiprocessing.Process(target=mouse_runner.main),
       multiprocessing.Process(target=text_runner.main),
       multiprocessing.Process(target=transcription_runner.main),
       multiprocessing.Process(target=uploader_runner.main),
