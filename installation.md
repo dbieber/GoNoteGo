@@ -25,12 +25,15 @@ nano gonotego/settings/secure_settings.py  # Configure your settings here.
 
   ```bash
 sudo apt update
-sudo apt install iceweasel xvfb portaudio19-dev libatlas-base-dev redis-server espeak
+sudo apt upgrade
+sudo apt install firefox-esr xvfb portaudio19-dev libatlas-base-dev redis-server espeak rustc python3-dev
 
 cd /home/pi/code/github/dbieber/GoNoteGo
 mkdir out
 pip3 install virtualenv
 /home/pi/.local/bin/virtualenv env -p python3
+./env/bin/pip install grpcio -U --no-binary=grpcio
+CFLAGS="-fcommon" ./env/bin/pip install adafruit-circuitpython-bmp280 adafruit-circuitpython-dotstar
 ./env/bin/pip install -r requirements.txt
 ```
 
