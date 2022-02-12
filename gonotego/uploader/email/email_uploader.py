@@ -1,3 +1,5 @@
+from gonotego.common import events
+from gonotego.settings import settings
 from gonotego.command_center import email_commands
 
 DRAFT_FILENAME = 'draft'
@@ -44,6 +46,7 @@ class Uploader:
 
   def end_session(self):
     # First, send the message.
+    to = settings.get('EMAIL')
     with open(DRAFT_FILENAME, 'r') as f:
       text = f.read()
     subject = text.split('\n', 1)[0]
