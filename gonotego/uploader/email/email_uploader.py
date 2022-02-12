@@ -1,5 +1,7 @@
 from gonotego.command_center import email_commands
 
+DRAFT_FILENAME = 'draft'
+
 
 def clip(x, a, b):
   """Clips x to be between a and b inclusive."""
@@ -11,8 +13,7 @@ def clip(x, a, b):
 class Uploader:
 
   def __init__(self):
-    self.lines = []
-    self.last_indent_level = 0
+    self.last_indent_level = -1
     self.indent_level = 0
 
   def upload(self, note_events):
@@ -31,7 +32,8 @@ class Uploader:
       elif note_event.action == events.SUBMIT:
         text = note_event.text.strip()
         line = '  ' * self.indent_level + text
-        self.lines.append(line)
+        with open(DRAFT_FILENAME, 'a') as f:
+          f.write(line + '\n')
         self.last_indent_level = self.indent_level
 
   def handle_inactivity(self):
@@ -42,11 +44,12 @@ class Uploader:
 
   def end_session(self):
     # First, send the message.
-    text = '\n'.join(self.lines)
-    subject = self.lines[0]
+    with open(DRAFT_FILENAME, 'r') as f:
+      text = f.read()
+    subject = text.split('\n', 1)[0]
     email_commands.email(to, subject, text)
 
     # Then reset, the session.
-    self.lines = []
-    self.last_indent_level = 0
+    open(DRAFT_FILENAME, 'w').close()
+    self.last_indent_level = -1
     self.indent_level = 0
