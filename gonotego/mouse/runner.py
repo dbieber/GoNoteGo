@@ -1,22 +1,18 @@
-import mouse
 import time
-
+from pynput import mouse
 from gonotego.common import status
 
 Status = status.Status
 
 
-def handle_mouse_event(event):
+def handle_mouse_event(x, y):
   status.set(Status.PAUSED, True)
-
-  if isinstance(event, mouse.MoveEvent):
-    status.set(Status.MOUSE_LAST_MOVE, time.time())
+  status.set(Status.MOUSE_LAST_MOVE, time.time())
 
 
 def main():
-  mouse.hook(handle_mouse_event)
-  while True:
-    time.sleep(5)
+  with mouse.Listener(on_move=handle_mouse_event) as listener:
+    listener.join()
 
 
 if __name__ == '__main__':

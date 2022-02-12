@@ -1,4 +1,9 @@
 import keyboard
+import platform
+try:
+  import pyperclip
+except:
+  print('Cannot import pyperclip')
 import time
 
 from gonotego.common import events
@@ -10,6 +15,7 @@ Status = status.Status
 
 MINUS = chr(8722)
 assert MINUS == '−'  # This is a unicode minus sign, not an ordinary hyphen.
+MAC_LEFT_SHIFT = 56
 
 shift_characters = {
     '1': '!',
@@ -43,6 +49,15 @@ character_substitutions = {
 
 def get_timestamp():
   return time.time()
+
+
+def is_shift_pressed():
+  if keyboard.is_pressed('shift') or keyboard.is_pressed('right shift'):
+    return True
+  if platform.system() == 'Darwin':
+    if keyboard.is_pressed(MAC_LEFT_SHIFT):
+      return True
+  return False
 
 
 class Shell:
@@ -82,7 +97,7 @@ class Shell:
       return
 
     if event.name == 'tab':
-      if keyboard.is_pressed('shift') or keyboard.is_pressed('right shift'):
+      if is_shift_pressed():
         # Shift-Tab
         note_event = events.NoteEvent(
             text=None,
@@ -107,10 +122,15 @@ class Shell:
             timestamp=get_timestamp())
         self.note_events_queue.put(bytes(note_event))
       self.text = self.text[:-1]
-      if keyboard.is_pressed('shift') or keyboard.is_pressed('right shift'):
+      if is_shift_pressed():
         self.text = ''
+    elif event.name == 'v' and keyboard.is_pressed('cmd'):
+      # If on Mac, paste into the buffer.
+      if platform.system() == 'Darwin':
+        clipboard = pyperclip.paste()
+        self.text += clipboard
     elif event.name == 'enter':
-      if keyboard.is_pressed('shift') or keyboard.is_pressed('right shift'):
+      if is_shift_pressed():
         note_event = events.NoteEvent(
             text=None,
             action=events.END_SESSION,
@@ -138,7 +158,7 @@ class Shell:
       character = event.name
       if character in character_substitutions:
         character = character_substitutions[character]
-      if keyboard.is_pressed('shift') or keyboard.is_pressed('right shift'):
+      if is_shift_pressed():
         character = shift_characters.get(character, character.upper())
       self.text += character
 
