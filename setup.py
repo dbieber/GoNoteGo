@@ -37,6 +37,7 @@ packages = [
     'gonotego.uploader',
     'gonotego.uploader.blob',
     'gonotego.uploader.browser',
+    'gonotego.uploader.email',
     'gonotego.uploader.ideaflow',
     'gonotego.uploader.mem',
     'gonotego.uploader.notion',
