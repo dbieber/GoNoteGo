@@ -5,6 +5,7 @@ from gonotego.common import internet
 from gonotego.common import interprocess
 from gonotego.common import status
 from gonotego.settings import settings
+from gonotego.uploader.email import email_uploader
 from gonotego.uploader.ideaflow import ideaflow_uploader
 from gonotego.uploader.remnote import remnote_uploader
 from gonotego.uploader.roam import roam_uploader
@@ -16,7 +17,9 @@ Status = status.Status
 
 
 def make_uploader(note_taking_system):
-  if note_taking_system == 'ideaflow':
+  if note_taking_system == 'email':
+    return email_uploader.Uploader()
+  elif note_taking_system == 'ideaflow':
     return ideaflow_uploader.Uploader()
   elif note_taking_system == 'remnote':
     return remnote_uploader.Uploader()

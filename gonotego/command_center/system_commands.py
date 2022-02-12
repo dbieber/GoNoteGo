@@ -17,6 +17,8 @@ Status = status.Status
 @register_command('who am i')
 def whoami():
   note_taking_system = settings.get('NOTE_TAKING_SYSTEM')
+  if note_taking_system == 'email':
+    user = settings.get('EMAIL')
   if note_taking_system == 'ideaflow':
     user = settings.get('IDEAFLOW_USER')
   elif note_taking_system == 'remnote':
