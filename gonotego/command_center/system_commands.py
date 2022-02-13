@@ -19,7 +19,7 @@ def whoami():
   note_taking_system = settings.get('NOTE_TAKING_SYSTEM')
   if note_taking_system == 'email':
     user = settings.get('EMAIL')
-  if note_taking_system == 'ideaflow':
+  elif note_taking_system == 'ideaflow':
     user = settings.get('IDEAFLOW_USER')
   elif note_taking_system == 'remnote':
     user = settings.get('REMNOTE_USER_ID')[:6]
