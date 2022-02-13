@@ -1,6 +1,5 @@
 from email import message
 import smtplib
-import os
 
 from gonotego.command_center import registry
 from gonotego.settings import settings
