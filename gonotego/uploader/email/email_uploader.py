@@ -50,7 +50,8 @@ class Uploader:
     with open(DRAFT_FILENAME, 'r') as f:
       text = f.read()
     subject = text.split('\n', 1)[0]
-    email_commands.email(to, subject, text)
+    if text.strip():
+      email_commands.email(to, subject, text)
 
     # Then reset, the session.
     open(DRAFT_FILENAME, 'w').close()
