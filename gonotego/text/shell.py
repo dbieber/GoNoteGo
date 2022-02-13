@@ -89,7 +89,7 @@ class Shell:
         # Ignore presses while the hotkey is pressed.
         return
     except ValueError:
-      # If HOTKEY is not a valid key, continue.
+      # If PAUSE_HOTKEY is not a valid key, continue.
       pass
 
     if status.get(Status.PAUSED):
