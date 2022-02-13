@@ -1,5 +1,6 @@
 from datetime import datetime
 import os
+import platform
 import subprocess
 import sys
 
@@ -11,6 +12,9 @@ from gonotego.settings import settings
 register_command = registry.register_command
 
 Status = status.Status
+
+
+SAY_COMMAND = 'say' if platform.system() == 'Darwin' else 'espeak'
 
 
 @register_command('whoami')
@@ -37,7 +41,7 @@ def whoami():
 @register_command('t')
 @register_command('time')
 def time():
-  shell('date "+%A, %B%e %l:%M%p" | espeak &')
+  shell(f'date "+%A, %B%e %l:%M%p" | {SAY_COMMAND} &')
 
 
 @register_command('at {}:{}', requirements=('scheduler',))
@@ -57,7 +61,7 @@ def say(text):
   with open('tmp-say', 'w') as tmp:
     print(f'[{dt}] Writing "{text}" to tmp-say')
     tmp.write(text)
-  cmd = 'cat tmp-say | espeak &'
+  cmd = f'cat tmp-say | {SAY_COMMAND} &'
   shell(cmd)
 
 

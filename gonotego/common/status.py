@@ -24,6 +24,7 @@ class Status(enum.Enum):
   INTERNET_AVAILABLE = enum.auto()
   LEDS_SETTING = enum.auto()
   VOLUME_SETTING = enum.auto()
+  PAUSED = enum.auto()
 
 
 def get_redis_key(key):

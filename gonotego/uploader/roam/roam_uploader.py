@@ -26,7 +26,11 @@ class RoamBrowser:
     self.driver.get('https://roamresearch.com/')
 
   def go_graph_attempt(self, graph_name):
-    self.driver.get(f'https://roamresearch.com/#/app/{graph_name}')
+    if graph_name.startswith('offline/') or graph_name.startswith('app/'):
+      graph_url = f'https://roamresearch.com/#/{graph_name}'
+    else:
+      graph_url = f'https://roamresearch.com/#/app/{graph_name}'
+    self.driver.get(graph_url)
     self.sleep_until_astrolabe_gone()
     time.sleep(1)
     self.sleep_until_astrolabe_gone()
