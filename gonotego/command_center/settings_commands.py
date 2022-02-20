@@ -30,6 +30,14 @@ def set(key, value):
     set_leds(value)
 
 
+@register_command('get status {}')
+def get_status(key):
+  if 'secret' in key.lower() or 'password' in key.lower():
+    return
+  status_key = getattr(status.Status, key)
+  say(str(status.get(status_key)))
+
+
 @register_command('get {}')
 def get_setting(key):
   if 'secret' in key.lower() or 'password' in key.lower():
@@ -38,14 +46,6 @@ def get_setting(key):
     key = SETTING_NAME_MAPPINGS[key.lower()]
   if key.lower() in SETTINGS_NAMES:
     say(settings.get(key))
-
-
-@register_command('get status {}')
-def get_status(key):
-  if 'secret' in key.lower() or 'password' in key.lower():
-    return
-  status_key = getattr(status.Status, key)
-  say(str(status.get(status_key)))
 
 
 @register_command('clear {}')
