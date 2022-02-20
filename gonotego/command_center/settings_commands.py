@@ -45,7 +45,7 @@ def get_status(key):
   if 'secret' in key.lower() or 'password' in key.lower():
     return
   status_key = getattr(status.Status, key)
-  say(status.get(status_key))
+  say(str(status.get(status_key)))
 
 
 @register_command('clear {}')
