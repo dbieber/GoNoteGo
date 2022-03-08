@@ -4,6 +4,7 @@ import json
 import os
 import random
 import subprocess
+import sys
 import time
 
 from selenium import webdriver
@@ -225,6 +226,9 @@ class Uploader:
           print(f'Audio embed: {embed_text}')
           if block_uid:
             browser.create_child_block(block_uid, embed_text)
+
+      sys.stdout.flush()
+      sys.stderr.flush()
 
   def handle_inactivity(self):
     self.end_session()
