@@ -4,6 +4,7 @@ import json
 import os
 import random
 import subprocess
+import sys
 import time
 
 from selenium import webdriver
@@ -14,6 +15,17 @@ from gonotego.common import events
 from gonotego.settings import settings
 from gonotego.uploader.blob import blob_uploader
 from gonotego.uploader.browser import driver_utils
+
+
+def flush():
+  sys.stdout.flush()
+  sys.stderr.flush()
+
+
+def json_encode(text):
+  text = text.replace('"', r'\"')
+  text = text.replace('\\', r'\\')
+  return json.dumps(text)
 
 
 class RoamBrowser:
@@ -36,6 +48,7 @@ class RoamBrowser:
     self.sleep_until_astrolabe_gone()
     print('Graph loaded: ' + self.driver.current_url)
     self.screenshot('screenshot-graph.png')
+    flush()
 
   def go_graph(self, graph_name, retries=5):
     while retries > 0:
@@ -78,6 +91,7 @@ class RoamBrowser:
       except Exception as e:
         print(f'Attempt failed with exception: {repr(e)}')
         time.sleep(1)
+      flush()
     print('Failed to sign in. No retries left.')
     return False
 
@@ -106,7 +120,7 @@ class RoamBrowser:
     self.utils.execute_script_tag(js)
 
   def insert_top_level_note(self, text):
-    text_json = json.dumps(text)
+    text_json = json_encode(text)
     js = f'window.insertion_result = insertGoNoteGoNote({text_json});'
     try:
       self.utils.execute_script_tag(js)
@@ -127,8 +141,8 @@ class RoamBrowser:
         retries -= 1
 
   def create_child_block(self, parent_uid, block, order=-1):
-    parent_uid_json = json.dumps(parent_uid)
-    block_json = json.dumps(block)
+    parent_uid_json = json_encode(parent_uid)
+    block_json = json_encode(block)
     js = f'window.insertion_result = createChildBlock({parent_uid_json}, {block_json}, {order});'
     self.utils.execute_script_tag(js)
     time.sleep(0.25)
@@ -171,6 +185,7 @@ class Uploader:
     browser.screenshot('screenshot-post-sign-in.png')
 
     self._browser = browser
+    flush()
     return browser
 
   def new_session(self):
@@ -225,6 +240,8 @@ class Uploader:
           print(f'Audio embed: {embed_text}')
           if block_uid:
             browser.create_child_block(block_uid, embed_text)
+
+      flush()
 
   def handle_inactivity(self):
     self.end_session()
