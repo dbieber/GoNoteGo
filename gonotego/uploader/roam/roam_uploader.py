@@ -22,6 +22,11 @@ def flush():
   sys.stderr.flush()
 
 
+def json_encode(text):
+  text = text.replace('"', r'\"')
+  return json.dumps(text)
+
+
 class RoamBrowser:
 
   def __init__(self, driver):
@@ -114,8 +119,8 @@ class RoamBrowser:
     self.utils.execute_script_tag(js)
 
   def insert_top_level_note(self, text):
-    text_json = json.dumps(text)
-    js = f'window.insertion_result = insertGoNoteGoNote(JSON.parse({text_json}));'
+    text_json = json_encode(text)
+    js = f'window.insertion_result = insertGoNoteGoNote({text_json});'
     try:
       self.utils.execute_script_tag(js)
     except Exception as e:
@@ -135,9 +140,9 @@ class RoamBrowser:
         retries -= 1
 
   def create_child_block(self, parent_uid, block, order=-1):
-    parent_uid_json = json.dumps(parent_uid)
-    block_json = json.dumps(block)
-    js = f'window.insertion_result = createChildBlock(JSON.parse({parent_uid_json}), JSON.parse({block_json}), {order});'
+    parent_uid_json = json_encode(parent_uid)
+    block_json = json_encode(block)
+    js = f'window.insertion_result = createChildBlock({parent_uid_json}, {block_json}, {order});'
     self.utils.execute_script_tag(js)
     time.sleep(0.25)
     return self.get_insertion_result()
