@@ -24,6 +24,7 @@ def flush():
 
 def json_encode(text):
   text = text.replace('"', r'\"')
+  text = text.replace('\\', r'\\')
   return json.dumps(text)
 
 
