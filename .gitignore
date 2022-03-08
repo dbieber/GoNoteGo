@@ -10,3 +10,6 @@ geckodriver.log
 scratch
 env
 tmp-say
+auth_url
+build
+draft
