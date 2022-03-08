@@ -17,6 +17,11 @@ from gonotego.uploader.blob import blob_uploader
 from gonotego.uploader.browser import driver_utils
 
 
+def flush():
+  sys.stdout.flush()
+  sys.stderr.flush()
+
+
 class RoamBrowser:
 
   def __init__(self, driver):
@@ -37,6 +42,7 @@ class RoamBrowser:
     self.sleep_until_astrolabe_gone()
     print('Graph loaded: ' + self.driver.current_url)
     self.screenshot('screenshot-graph.png')
+    flush()
 
   def go_graph(self, graph_name, retries=5):
     while retries > 0:
@@ -79,6 +85,7 @@ class RoamBrowser:
       except Exception as e:
         print(f'Attempt failed with exception: {repr(e)}')
         time.sleep(1)
+      flush()
     print('Failed to sign in. No retries left.')
     return False
 
@@ -172,6 +179,7 @@ class Uploader:
     browser.screenshot('screenshot-post-sign-in.png')
 
     self._browser = browser
+    flush()
     return browser
 
   def new_session(self):
@@ -227,8 +235,7 @@ class Uploader:
           if block_uid:
             browser.create_child_block(block_uid, embed_text)
 
-      sys.stdout.flush()
-      sys.stderr.flush()
+      flush()
 
   def handle_inactivity(self):
     self.end_session()
