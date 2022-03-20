@@ -108,3 +108,16 @@ def ip_address():
 @register_command('internet')
 def check_internet():
   say('yes' if internet.is_internet_available() else 'no')
+
+
+@register_command('wifi {} {}')
+@register_command('wpa {} {}')
+def add_wpa_wifi(ssid, psk):
+  network_string = f"""network={{
+        ssid="{ssid}"
+        psk="{psk}"
+        key_mgmt=WPA-PSK
+}}
+"""
+  with open('/etc/wpa_supplicant/wpa_supplicant.conf', 'a') as f:
+    f.write(network_string)

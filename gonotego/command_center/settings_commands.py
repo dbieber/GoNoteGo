@@ -59,12 +59,9 @@ def clear_setting(key):
 
 
 @register_command('clear')
-def clear_all_settings(key):
-  if key.lower() in SETTING_NAME_MAPPINGS:
-    key = SETTING_NAME_MAPPINGS[key.lower()]
-  if key.lower() in SETTINGS_NAMES:
-    settings.clear_all()
-    say('Cleared.')
+def clear_all_settings():
+  settings.clear_all()
+  say('Cleared.')
 
 
 @register_command('leds {}')
