@@ -113,7 +113,8 @@ def check_internet():
 @register_command('wifi {} {}')
 @register_command('wpa {} {}')
 def add_wpa_wifi(ssid, psk):
-  network_string = f"""network={{
+  network_string = f"""
+network={{
         ssid="{ssid}"
         psk="{psk}"
         key_mgmt=WPA-PSK
