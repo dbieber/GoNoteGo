@@ -34,7 +34,7 @@ pip3 install virtualenv
 /home/pi/.local/bin/virtualenv env -p python3
 ./env/bin/pip install grpcio -U --no-binary=grpcio
 CFLAGS="-fcommon" ./env/bin/pip install adafruit-circuitpython-bmp280 adafruit-circuitpython-dotstar
-./env/bin/pip install -r requirements.txt
+./env/bin/python setup.py develop
 ```
 
 5. Start on boot

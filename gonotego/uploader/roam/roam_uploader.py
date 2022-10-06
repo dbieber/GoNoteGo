@@ -43,9 +43,9 @@ class RoamBrowser:
     else:
       graph_url = f'https://roamresearch.com/#/app/{graph_name}'
     self.driver.get(graph_url)
-    self.sleep_until_astrolabe_gone()
+    self.sleep_until_astrolabe_gone(timeout=90)
     time.sleep(1)
-    self.sleep_until_astrolabe_gone()
+    self.sleep_until_astrolabe_gone(timeout=60)
     print('Graph loaded: ' + self.driver.current_url)
     self.screenshot('screenshot-graph.png')
     flush()
@@ -148,7 +148,7 @@ class RoamBrowser:
     time.sleep(0.25)
     return self.get_insertion_result()
 
-  def sleep_until_astrolabe_gone(self, timeout=30):
+  def sleep_until_astrolabe_gone(self, timeout=90):
     while self.driver.find_elements_by_class_name('loading-astrolabe'):
       print('Astrolabe still there.')
       time.sleep(1)
@@ -167,6 +167,9 @@ class Uploader:
     self.session_uid = None
     self.last_note_uid = None
     self.stack = []
+
+    # In case Roam crashed leaving the browser open, we close it on start.
+    self.close_browser()
 
   def get_browser(self):
     if self._browser is not None:
