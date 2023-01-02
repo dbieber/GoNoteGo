@@ -5,6 +5,8 @@ import openai
 from gonotego.command_center import note_commands
 from gonotego.command_center import registry
 from gonotego.command_center import system_commands
+from gonotego.common import events
+from gonotego.common import interprocess
 from gonotego.settings import settings
 
 register_command = registry.register_command
@@ -77,7 +79,7 @@ def ask_with_context(prompt):
 
   texts.append(prompt)
   extended_prompt = '\n'.join(texts)
-  response = create_completion(prompt)
+  response = create_completion(extended_prompt)
 
   response_text = response['choices'][0].text
   system_commands.say(response_text)
