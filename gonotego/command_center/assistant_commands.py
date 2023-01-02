@@ -45,7 +45,7 @@ def ask(prompt):
   response_text = response['choices'][0].text
   system_commands.say(response_text)
   note_commands.add_note(prompt)
-  note_commands.add_indented_note(f'AI: {response_text}')
+  note_commands.add_indented_note(f'AI: {response_text} #[[AI Response]]')
   return response_text
 
 
@@ -64,6 +64,7 @@ def ask_with_context(prompt=None):
   for note_event in note_events:
     if note_event.action == events.SUBMIT:
       text = note_event.text
+      text = text.replace(' #[[AI Response]]', '')
       if text and indent > 0:
         text = f'{"  " * indent}* {note_event.text}'
       texts.append(text)
@@ -90,5 +91,5 @@ def ask_with_context(prompt=None):
   system_commands.say(response_text)
   if prompt:
     note_commands.add_note(prompt)
-  note_commands.add_indented_note(f'AI: {response_text}')
+  note_commands.add_indented_note(f'AI: {response_text} #[[AI Response]]')
   return response_text
