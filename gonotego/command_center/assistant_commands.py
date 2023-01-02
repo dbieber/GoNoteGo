@@ -49,6 +49,7 @@ def ask(prompt):
   return response_text
 
 
+@register_command('ai')
 @register_command('ai {}')
 def ask_with_context(prompt=None):
   note_events_session_queue = interprocess.get_note_events_session_queue()
