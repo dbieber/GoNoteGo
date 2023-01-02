@@ -23,9 +23,9 @@ def flush():
 
 
 def json_encode(text):
-  text = text.replace('"', r'\"')
+  text = json.dumps(text)
   text = text.replace('\\', r'\\')
-  return json.dumps(text)
+  return text
 
 
 class RoamBrowser:

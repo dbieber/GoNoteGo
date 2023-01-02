@@ -13,6 +13,7 @@ DEPENDENCIES = [
     'libcst==0.3.23',
     'mouse',
     'numpy',
+    'openai',
     'parsedatetime',
     'redis',
     # selenium 4.0 breaks with arm geckodriver.

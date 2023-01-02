@@ -101,7 +101,8 @@ def env():
 @register_command('ip')
 def ip_address():
   hostname_output = subprocess.check_output(['hostname', '-I']).decode('utf-8').strip()
-  say(hostname_output)
+  hostname = hostname_output.split(' ')[0]
+  say(hostname)
 
 
 @register_command('i')
