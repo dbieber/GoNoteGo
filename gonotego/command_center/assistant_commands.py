@@ -66,7 +66,7 @@ def ask_with_context(prompt=None):
       text = note_event.text
       text = text.replace(' #[[AI Response]]', '')
       if text and indent > 0:
-        text = f'{"  " * indent}* {note_event.text}'
+        text = f'{"  " * indent}* {text}'
       texts.append(text)
     elif note_event.action == events.INDENT:
       indent += 1
