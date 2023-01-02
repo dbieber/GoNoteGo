@@ -55,7 +55,7 @@ class InterprocessQueue:
     return self.r.get(f'{self.key}:latest')
 
   def clear(self):
-    self.r.ltrim(self.key, 0, -1)
+    self.r.delete(self.key)
 
 
 def get_audio_events_queue():
