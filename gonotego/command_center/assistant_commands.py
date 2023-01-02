@@ -37,10 +37,50 @@ def create_completion(
 
 
 @register_command('ask {}')
+@register_command('q {}')
 def ask(prompt):
   response = create_completion(prompt)
-  text = response['choices'][0].text
-  system_commands.say(text)
+  response_text = response['choices'][0].text
+  system_commands.say(response_text)
   note_commands.add_note(prompt)
-  note_commands.add_indented_note(text)
-  return text
+  note_commands.add_indented_note(response_text)
+  return response_text
+
+
+@register_command('ai {}')
+def ask_with_context(prompt):
+  note_events_session_queue = interprocess.get_note_events_session_queue()
+  note_event_bytes_list = note_events_session_queue.peek_all()
+  note_events = [
+      events.NoteEvent.from_bytes(note_event_bytes)
+      for note_event_bytes in note_event_bytes_list
+  ]
+
+  indent = 0
+  texts = []
+  for note_event in note_events:
+    if note_event.action == events.SUBMIT:
+      text = note_event.text
+      if text and indent > 0:
+        text = f'{"  " * indent}* {note_event.text}'
+      texts.append(text)
+    elif note_event.action == events.INDENT:
+      indent += 1
+    elif note_event.action == events.UNINDENT:
+      indent = max(0, indent - 1)
+    elif note_event.action == events.CLEAR_EMPTY:
+      indent = 0
+    elif note_event.action == events.ENTER_EMPTY:
+      indent = max(0, indent - 1)
+    else:
+      raise ValueError('Unexpected event action', note_event)
+
+  texts.append(prompt)
+  extended_prompt = '\n'.join(texts)
+  response = create_completion(prompt)
+
+  response_text = response['choices'][0].text
+  system_commands.say(response_text)
+  note_commands.add_note(prompt)
+  note_commands.add_indented_note(response_text)
+  return response_text
