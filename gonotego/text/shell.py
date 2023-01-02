@@ -182,6 +182,13 @@ class Shell:
 
   def handle_inactivity(self):
     self.submit_note()
+
+    note_event = events.NoteEvent(
+        text=None,
+        action=events.END_SESSION,
+        audio_filepath=None,
+        timestamp=get_timestamp())
+    self.note_events_queue.put(bytes(note_event))
     self.note_events_session_queue.clear()
 
   def wait(self):
