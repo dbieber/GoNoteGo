@@ -23,6 +23,9 @@ class InterprocessQueue:
       self.index += 1
     return value
 
+  def peek_all(self):
+    return self.r.lrange(self.key, self.index, -1)
+
   def commit(self, value):
     """Removes the next item in the queue, asserting it matches the provided value.
 
@@ -51,6 +54,9 @@ class InterprocessQueue:
   def latest(self):
     return self.r.get(f'{self.key}:latest')
 
+  def clear(self):
+    self.r.ltrim(self.key, 0, -1)
+
 
 def get_audio_events_queue():
   return InterprocessQueue('audio_events_queue')
@@ -62,3 +68,7 @@ def get_command_events_queue():
 
 def get_note_events_queue():
   return InterprocessQueue('note_events_queue')
+
+
+def get_note_events_session_queue():
+  return InterprocessQueue('note_events_session_queue')

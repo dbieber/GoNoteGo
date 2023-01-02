@@ -65,6 +65,7 @@ class Shell:
   def __init__(self):
     self.command_event_queue = interprocess.get_command_events_queue()
     self.note_events_queue = interprocess.get_note_events_queue()
+    self.note_events_session_queue = interprocess.get_note_events_session_queue()
     self.text = ''
     self.last_press = None
 
@@ -105,6 +106,7 @@ class Shell:
             audio_filepath=None,
             timestamp=get_timestamp())
         self.note_events_queue.put(bytes(note_event))
+        self.note_events_session_queue.put(bytes(note_event))
       else:
         # Tab
         note_event = events.NoteEvent(
@@ -113,6 +115,7 @@ class Shell:
             audio_filepath=None,
             timestamp=get_timestamp())
         self.note_events_queue.put(bytes(note_event))
+        self.note_events_session_queue.put(bytes(note_event))
     elif event.name == 'delete' or event.name == 'backspace':
       if self.text == '':
         note_event = events.NoteEvent(
@@ -121,6 +124,7 @@ class Shell:
             audio_filepath=None,
             timestamp=get_timestamp())
         self.note_events_queue.put(bytes(note_event))
+        self.note_events_session_queue.put(bytes(note_event))
       self.text = self.text[:-1]
       if is_shift_pressed():
         self.text = ''
@@ -137,6 +141,7 @@ class Shell:
             audio_filepath=None,
             timestamp=get_timestamp())
         self.note_events_queue.put(bytes(note_event))
+        self.note_events_session_queue.clear()
       # Write both a text event (for the command center)
       # and a note event (for the uploader).
       if self.text == '':
@@ -146,6 +151,7 @@ class Shell:
             audio_filepath=None,
             timestamp=get_timestamp())
         self.note_events_queue.put(bytes(note_event))
+        self.note_events_session_queue.put(bytes(note_event))
       elif self.text.strip().startswith(':'):
         command_event = events.CommandEvent(command_text=self.text.strip()[1:])
         self.command_event_queue.put(bytes(command_event))
@@ -170,6 +176,7 @@ class Shell:
           audio_filepath=None,
           timestamp=get_timestamp())
       self.note_events_queue.put(bytes(note_event))
+      self.note_events_session_queue.put(bytes(note_event))
       # Reset the text buffer.
       self.text = ''
 

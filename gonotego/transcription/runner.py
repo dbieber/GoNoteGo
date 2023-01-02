@@ -15,6 +15,7 @@ def main():
   audio_events_queue = interprocess.get_audio_events_queue()
   command_events_queue = interprocess.get_command_events_queue()
   note_events_queue = interprocess.get_note_events_queue()
+  note_events_session_queue = interprocess.get_note_events_session_queue()
 
   t = transcriber.Transcriber()
   status.set(Status.TRANSCRIPTION_READY, True)
@@ -36,6 +37,9 @@ def main():
           with open(text_filepath, 'w') as f:
             f.write(transcript)
           print(transcript)
+          # TODO(dbieber): Add the note event for audio when the audio is captured,
+          # rather than waiting until its transcribed. Use a placeholder with an id.
+          # Update that placeholder once the transcription is ready.
           note_event = events.NoteEvent(
               text=transcript,
               action=events.SUBMIT,
@@ -43,6 +47,7 @@ def main():
               timestamp=time.time(),
           )
           note_events_queue.put(bytes(note_event))
+          note_events_session_queue.put(bytes(note_event))
 
           # Audio commands:
           for trigger in ['go go', 'GoGo', 'Go-Go']:

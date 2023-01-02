@@ -15,17 +15,21 @@ def get_timestamp():
 @register_command('note {}')
 def add_note(text):
   note_events_queue = interprocess.get_note_events_queue()
+  note_events_session_queue = interprocess.get_note_events_session_queue()
+
   note_event = events.NoteEvent(
       text=text,
       action=events.SUBMIT,
       audio_filepath=None,
       timestamp=get_timestamp())
   note_events_queue.put(bytes(note_event))
+  note_events_session_queue.put(bytes(note_event))
 
 
 @register_command('subnote {}')
 def add_indented_note(text):
   note_events_queue = interprocess.get_note_events_queue()
+  note_events_session_queue = interprocess.get_note_events_session_queue()
 
   # Indent
   note_event = events.NoteEvent(
@@ -34,6 +38,7 @@ def add_indented_note(text):
       audio_filepath=None,
       timestamp=get_timestamp())
   note_events_queue.put(bytes(note_event))
+  note_events_session_queue.put(bytes(note_event))
 
   # The note
   note_event = events.NoteEvent(
@@ -42,6 +47,7 @@ def add_indented_note(text):
       audio_filepath=None,
       timestamp=get_timestamp())
   note_events_queue.put(bytes(note_event))
+  note_events_session_queue.put(bytes(note_event))
 
   # Dedent
   note_event = events.NoteEvent(
@@ -50,3 +56,4 @@ def add_indented_note(text):
       audio_filepath=None,
       timestamp=get_timestamp())
   note_events_queue.put(bytes(note_event))
+  note_events_session_queue.put(bytes(note_event))
