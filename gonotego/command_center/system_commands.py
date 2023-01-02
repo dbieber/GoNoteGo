@@ -6,6 +6,7 @@ import sys
 
 from gonotego.common import internet
 from gonotego.common import status
+from gonotego.command_center import note_commands
 from gonotego.command_center import registry
 from gonotego.settings import settings
 
@@ -103,6 +104,7 @@ def ip_address():
   hostname_output = subprocess.check_output(['hostname', '-I']).decode('utf-8').strip()
   hostname = hostname_output.split(' ')[0]
   say(hostname)
+  note_commands.add_note(hostname)
 
 
 @register_command('i')
