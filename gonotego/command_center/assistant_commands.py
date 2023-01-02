@@ -50,7 +50,7 @@ def ask(prompt):
 
 
 @register_command('ai {}')
-def ask_with_context(prompt):
+def ask_with_context(prompt=None):
   note_events_session_queue = interprocess.get_note_events_session_queue()
   note_event_bytes_list = note_events_session_queue.peek_all()
   note_events = [
@@ -77,12 +77,14 @@ def ask_with_context(prompt):
     else:
       raise ValueError('Unexpected event action', note_event)
 
-  texts.append(prompt)
+  if prompt:
+    texts.append(prompt)
   extended_prompt = '\n'.join(texts)
   response = create_completion(extended_prompt)
 
   response_text = response['choices'][0].text
   system_commands.say(response_text)
-  note_commands.add_note(prompt)
+  if prompt:
+    note_commands.add_note(prompt)
   note_commands.add_indented_note(response_text)
   return response_text
