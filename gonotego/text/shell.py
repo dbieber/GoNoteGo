@@ -182,6 +182,7 @@ class Shell:
 
   def handle_inactivity(self):
     self.submit_note()
+    self.note_events_session_queue.clear()
 
   def wait(self):
     while True:
