@@ -22,6 +22,8 @@ _Go Note Go is a note-taking system for when you're on the go, with a focus on d
 * [IdeaFlow](https://ideaflow.app/)
 * [Mem](https://mem.ai/)
 * [Notion](https://www.notion.so/)
+* [Twitter](https://www.twitter.com/)
+* [Email](https://en.wikipedia.org/wiki/Email)
 
 Want to contribute a new note-taking system?
 
@@ -44,9 +46,15 @@ Some ideas for commands include:
 
 ## Hardware Parts
 
-* Raspberry Pi 400
-* Voice bonnet from Adafruit
-* 2x20 connector
+Go Note Go is designed to run on a [Raspberry Pi 400](https://www.raspberrypi.com/products/raspberry-pi-400/).
+
+Recommended additional hardware:
+
+* 1 USB speaker
+* 1 USB microphone
+
+Recommended hardware to install Go Note Go in your car, to truly take Go Note Go on the go:
+
 * Velcro
 * 10000 mAh battery
 * 3 ft USB - USB C cable
@@ -60,4 +68,6 @@ See the [installation instructions](installation.md) to get started.
 
 ## History
 
-[Learn about "Shh Shell" here.](https://davidbieber.com/projects/shh-shell/)
+[Learn about Go Note Go's predecessor "Shh Shell" here.](https://davidbieber.com/projects/shh-shell/)
+
+[Hear Go Note Go's origin story here.](https://davidbieber.com/post/2022-12-30-go-note-go-story/)

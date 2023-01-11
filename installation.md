@@ -1,5 +1,9 @@
 ## Installation Instructions
 
+These instructions assume you're starting from a clean install of Raspbian,
+and that your Raspberry Pi is connected to an external monitor.
+Once you are set up, an external monitor will no longer be necessary.
+
 1.  Clone GoNoteGo
 
   ```bash
@@ -16,10 +20,14 @@ cp gonotego/settings/secure_settings_template.py gonotego/settings/secure_settin
 nano gonotego/settings/secure_settings.py  # Configure your settings here.
 ```
 
+It's OK to leave settings that you're not using at their default values.
+
 3. Put Google service key on device
 
-  * `mkdir /home/pi/secrets`  # Run on Raspberry Pi.
-  * `scp path/to/google_credentials.json pi@192.168.0.106:/home/pi/secrets/`  # Run on primary.
+* `mkdir /home/pi/secrets`  # Run on Raspberry Pi.
+* `scp path/to/google_credentials.json pi@192.168.0.106:/home/pi/secrets/`  # Run on primary.
+
+Run `hostname -I` on the Raspberry Pi to determine the IP address to use in the scp command.
 
 4. Install dependencies
 
@@ -57,17 +65,19 @@ sudo mv geckodriver /usr/local/bin
 
 7. Set up Internet
 
-  * Run `sudo nano /etc/wpa_supplicant/wpa_supplicant.conf`
-  * Follow the guide at https://www.raspberrypi.org/documentation/computers/configuration.html to set up your wpa_supplicant.conf file.
+* Run `sudo nano /etc/wpa_supplicant/wpa_supplicant.conf`
+* Follow the guide at https://www.raspberrypi.org/documentation/computers/configuration.html to set up your wpa_supplicant.conf file.
+
+Setting up internet through the operating system's UI may also work.
 
 8. Set up your audio
 
-  * Follow the guide at https://learn.adafruit.com/adafruit-voice-bonnet/raspberry-pi-setup if using an Adafruit Voice Bonnet.
+* Make sure audio is coming out of the desired output device at an acceptable volume.
 
 9. Verify everything's working!
 
-  * Type a text note and press enter; it should appear in your notes.
-  * Press your hotkey and speak an audio note; it too should appear in your notes.
-  * Type ":ok" and press enter; you should hear the machine say "ok".
-  * If you're having any trouble getting set up, open a [new GitHub issue](https://github.com/dbieber/GoNoteGo/issues).
-  * That's it; you're good to go! Happy note-taking!
+* Type a text note and press enter; it should appear in your notes.
+* Press your hotkey and speak an audio note; it too should appear in your notes.
+* Type ":ok" and press enter; you should hear the machine say "ok".
+* If you're having any trouble getting set up, open a [new GitHub issue](https://github.com/dbieber/GoNoteGo/issues).
+* That's it; you're good to go! Happy note-taking!
