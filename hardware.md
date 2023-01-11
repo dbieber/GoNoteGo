@@ -6,7 +6,7 @@ Here is some sample hardware you can use to build your own Go Note Go. Costs mig
 
 Link: https://www.raspberrypi.com/products/raspberry-pi-400-unit/
 
-Details: I use the US keyboard. You can purchase from e.g. PiShop. I recommend ordering the following as a bundle:
+Details: I use the US keyboard. You can purchase from e.g. [PiShop](https://www.pishop.us/product/raspberry-pi-400-complete-kit/). I recommend ordering the following as a bundle:
  - The Raspberry Pi 400 unit ($70)
  - Class 10 microSD Card With Raspbian - 16GB
  - USB-C Power Supply, 5.1V 3.0A, Black, UL Listed
@@ -14,23 +14,20 @@ Details: I use the US keyboard. You can purchase from e.g. PiShop. I recommend o
 
 Cost: $91
 
-### Voice bonnet
+### USB Mic and Speakers
 
-Link: https://www.adafruit.com/product/4757
+Links:
+* Microphone: https://www.adafruit.com/product/3367 ($6)
+* Adafruit Speaker: https://www.adafruit.com/product/3369 ($13)
+* Etsy Speaker: https://www.etsy.com/listing/1056790095/usb-speaker-stick ($30)
 
-Notes: I've actually had some issues with these. The microphone records a high pitched noise and the audio output is quiet and muffled. I will suggest an (untested) alternative speaker and mic below.
+Cost: $19 - $36
 
-Cost: $20
+---
 
-### 2x20 Connector
+## Additional Hardware: Take Go Note Go on the Go
 
-Link: https://www.adafruit.com/product/4079 OR https://www.adafruit.com/product/2223
-
-Recommendation: Get the [long pins one](https://www.adafruit.com/product/2223). The [short pins one](https://www.adafruit.com/product/4079) is sleeker but the long pins might become necessary for connecting the button. TBD.
-
-Notes: Use this to attach the voice bonnet to the Pi.
-
-Cost: $3
+The following parts are optional, but will better allow you to take Go Note Go on the go.
 
 ### 10000 mAh battery
 
@@ -62,20 +59,11 @@ Link: https://www.amazon.com/gp/product/B00T6RCGNC
 
 Cost: $9
 
-### Alternative Mic and Speakers
-
-Links:
-* Microphone: https://www.adafruit.com/product/3367 ($6)
-* Adafruit Speaker: https://www.adafruit.com/product/3369 ($13)
-* Etsy Speaker: https://www.etsy.com/listing/1056790095/usb-speaker-stick ($30)
-
-Notes: I am considering these as an alternative to the Adafruit Voice Bonnet. I really like the LEDs on the voice bonnet though, so TBD.
-
-Cost: $19 - $36
-
 ---
 
-## Other tools:
+## Other tools
+
+These tools aren't Go Note Go specific, but will help you in the setup process.
 
 ### External monitor and a USB Mouse.
 
@@ -85,9 +73,9 @@ These will be useful for configuring and debugging Go Note Go, e.g. setting up W
 
 If you use The Beautiful Red Button you'll need wire and wire strippers. For wire I used 18 gauge lamp wire I got from Home Depot.
 
-Possible link: https://www.lowes.com/pd/Southwire-25-Ft-18-2-Black-Stranded-Lamp-Cord/5001050863
+Possible wire link: https://www.lowes.com/pd/Southwire-25-Ft-18-2-Black-Stranded-Lamp-Cord/5001050863
 
-Wire stripper link: https://www.amazon.com/Mr-Stripper-Stripping-Crimping-Electrical/dp/B086V5M1B4 (Chose this one arbitrarily; I got mine at Home Depot)
+Wire stripper link: https://www.amazon.com/Mr-Stripper-Stripping-Crimping-Electrical/dp/B086V5M1B4 (I chose this link arbitrarily; I got mine at Home Depot).
 
 Notes: I don't know if this is the best choice for wire; a higher gauge might be better.
 
