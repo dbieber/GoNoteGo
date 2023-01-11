@@ -45,7 +45,7 @@ def ask(prompt):
   response_text = response['choices'][0].text
   system_commands.say(response_text)
   note_commands.add_note(prompt)
-  note_commands.add_indented_note(f'AI: {response_text} #[[AI Response]]')
+  note_commands.add_indented_note(f'{response_text} #[[AI Response]]')
   return response_text
 
 
@@ -65,8 +65,6 @@ def ask_with_context(prompt=None):
     if note_event.action == events.SUBMIT:
       text = note_event.text
       text = text.replace(' #[[AI Response]]', '')
-      if text and indent > 0:
-        text = f'{"  " * indent}* {text}'
       texts.append(text)
     elif note_event.action == events.INDENT:
       indent += 1
@@ -78,11 +76,11 @@ def ask_with_context(prompt=None):
       indent = max(0, indent - 1)
     else:
       raise ValueError('Unexpected event action', note_event)
+  del indent  # Unused.
 
   if prompt:
     texts.append(prompt)
-  texts.append(f'{"  " * (indent + 1)}* AI:')
-  extended_prompt = '\n'.join(texts)
+  extended_prompt = '\n'.join(texts) + '\n'
   response = create_completion(extended_prompt)
 
   response_text = response['choices'][0].text
@@ -91,5 +89,5 @@ def ask_with_context(prompt=None):
   system_commands.say(response_text)
   if prompt:
     note_commands.add_note(prompt)
-  note_commands.add_indented_note(f'AI: {response_text} #[[AI Response]]')
+  note_commands.add_indented_note(f'{response_text} #[[AI Response]]')
   return response_text
