@@ -123,5 +123,5 @@ network={{
         key_mgmt=WPA-PSK
 }}
 """
-  with open('/etc/wpa_supplicant/wpa_supplicant.conf', 'a') as f:
-    f.write(network_string)
+  filepath = '/etc/wpa_supplicant/wpa_supplicant.conf'
+  os.system(f"echo '{network_string}' | sudo tee -a {filepath}")
