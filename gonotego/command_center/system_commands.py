@@ -128,6 +128,7 @@ network={{
   reconfigure_wifi()
 
 
+@register_command('reconnect')
 @register_command('wifi refresh')
 @register_command('wifi reconfigure')
 def reconfigure_wifi():
