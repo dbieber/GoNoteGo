@@ -129,5 +129,6 @@ network={{
 
 
 @register_command('wifi refresh')
+@register_command('wifi reconfigure')
 def reconfigure_wifi():
   shell('wpa_cli -i wlan0 reconfigure')
