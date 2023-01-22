@@ -1,6 +1,7 @@
 import time
 
 from gonotego.command_center import registry
+from gonotego.command_center import system_commands
 from gonotego.common import events
 from gonotego.common import interprocess
 
@@ -57,3 +58,11 @@ def add_indented_note(text):
       timestamp=get_timestamp())
   note_events_queue.put(bytes(note_event))
   note_events_session_queue.put(bytes(note_event))
+
+
+@register_command('pending')
+def get_pending_note_count():
+  note_events_queue = interprocess.get_note_events_queue()
+  size = note_events_queue.size()
+  system_commands.say(size)
+  return size
