@@ -125,3 +125,9 @@ network={{
 """
   filepath = '/etc/wpa_supplicant/wpa_supplicant.conf'
   os.system(f"echo '{network_string}' | sudo tee -a {filepath}")
+  reconfigure_wifi()
+
+
+@register_command('wifi refresh')
+def reconfigure_wifi():
+  shell('wpa_cli -i wlan0 reconfigure')
