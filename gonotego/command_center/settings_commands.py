@@ -1,5 +1,7 @@
 # Settings commands. Commands for setting settings.
 
+import subprocess
+
 from dateutil import parser
 
 from gonotego.common import status
