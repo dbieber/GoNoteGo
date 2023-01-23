@@ -38,7 +38,7 @@ def set(key, value):
 
 def set_time(value):
   try:
-    new_time = parser.parse(value)
+    t = parser.parse(value)
   except parser.ParserError:
     say('Time not set.')
     return
