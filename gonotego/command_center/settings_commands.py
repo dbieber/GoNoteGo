@@ -33,7 +33,7 @@ def set(key, value):
   if key.lower() in ('t', 'time'):
     set_time(value)
   if key.lower() in ('tz', 'timezone'):
-    pass
+    set_timezone(value)
 
 
 def set_time(value):
@@ -47,6 +47,11 @@ def set_time(value):
       '{t.hour:02d}:{t.minute:02d}:{t.second:02d}'
   )
   command = f'date -s "{timestring}"'
+  system_commands.shell(command)
+
+
+def set_timezone(value):
+  pass
 
 
 @register_command('ntp on')
