@@ -60,6 +60,12 @@ def add_indented_note(text):
   note_events_session_queue.put(bytes(note_event))
 
 
+@register_command('todo {}')
+def add_todo(text):
+  # TODO(dbieber): This syntax is Roam Research specific.
+  return add_note(f'{{{{[[TODO]]}}}} {text}')
+
+
 @register_command('pending')
 def get_pending_note_count():
   note_events_queue = interprocess.get_note_events_queue()
