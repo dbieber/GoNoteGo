@@ -116,11 +116,30 @@ def check_internet():
 @register_command('wifi {} {}')
 @register_command('wpa {} {}')
 def add_wpa_wifi(ssid, psk):
+  if '"' in ssid or '"' in psk:
+    say('WiFi not set.')
+    return
   network_string = f"""
 network={{
         ssid="{ssid}"
         psk="{psk}"
         key_mgmt=WPA-PSK
+}}
+"""
+  filepath = '/etc/wpa_supplicant/wpa_supplicant.conf'
+  os.system(f"echo '{network_string}' | sudo tee -a {filepath}")
+  reconfigure_wifi()
+
+
+@register_command('wifi {}')
+def add_wifi_no_psk(ssid):
+  if '"' in ssid:
+    say('WiFi not set.')
+    return
+  network_string = f"""
+network={{
+        ssid="{ssid}"
+        key_mgmt=NONE
 }}
 """
   filepath = '/etc/wpa_supplicant/wpa_supplicant.conf'
