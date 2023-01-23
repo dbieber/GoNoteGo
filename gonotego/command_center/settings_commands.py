@@ -42,16 +42,37 @@ def set_time(value):
   except parser.ParserError:
     say('Time not set.')
     return
-  timestring = (
+  time_string = (
       f'{t.year:04d}-{t.month:02d}-{t.day:02d} '
       '{t.hour:02d}:{t.minute:02d}:{t.second:02d}'
   )
-  command = f'date -s "{timestring}"'
+  command = f'date -s "{time_string}"'
   system_commands.shell(command)
 
 
+def list_timezones():
+  output = subprocess.check_output(['timedatectl', 'list-timezones'])
+  timezones_str = output.decode('utf-8')
+  timezones = timezones_str.strip().split('\n')
+  return timezones
+
+
 def set_timezone(value):
-  pass
+  timezone_mapping = {
+      'ET': 'America/New_York',
+      'EST': 'America/New_York',
+      'EDT': 'America/New_York',
+      'PT': 'America/Los_Angeles',
+      'PST': 'America/Los_Angeles',
+      'PDT': 'America/Los_Angeles',
+  }
+  if value in timezone_mapping:
+    value = timezone_mapping[value]
+  if value not in list_timezones():
+    say('Timezone not set.')
+    return
+  command = f'sudo timedatectl set-timezone {value}'
+  system_commands.shell(command)
 
 
 @register_command('ntp on')
