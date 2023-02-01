@@ -165,7 +165,7 @@ class RoamBrowser:
       timeout -= 1
       if timeout <= 0:
         raise RuntimeError('rm-plan still there after timeout.')
-    pritn('rm-plan appeared.')
+    print('rm-plan appeared.')
 
 
 class Uploader:
