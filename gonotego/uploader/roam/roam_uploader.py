@@ -76,6 +76,8 @@ class RoamBrowser:
     password_el.send_keys(Keys.RETURN)
     time.sleep(5.0)
     self.sleep_until_astrolabe_gone()
+    self.sleep_until_plans_appear()
+    self.screenshot('screenshot-signed-in.png')
 
   def sign_in(self, username, password, retries=5):
     """Sign in to Roam Research with retries."""
@@ -156,6 +158,14 @@ class RoamBrowser:
       if timeout <= 0:
         raise RuntimeError('Astrolabe still there after timeout.')
     print('Astrolabe gone.')
+
+  def sleep_until_plans_appear(self, timeout=90):
+    while not self.driver.find_elements_by_class_name('rm-plan'):
+      time.sleep(1)
+      timeout -= 1
+      if timeout <= 0:
+        raise RuntimeError('rm-plan still there after timeout.')
+    pritn('rm-plan appeared.')
 
 
 class Uploader:
