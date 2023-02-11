@@ -30,7 +30,7 @@ def set(key, value):
     settings.set(key, value)
   if key.lower() in ('v', 'volume'):
     set_volume(value)
-  if key.lower() == ('l', 'leds'):
+  if key.lower() in ('l', 'leds'):
     set_leds(value)
   if key.lower() in ('t', 'time'):
     set_time(value)
