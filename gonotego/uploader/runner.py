@@ -1,3 +1,4 @@
+import sys
 import time
 
 from gonotego.common import events
@@ -39,7 +40,11 @@ def main():
   print('Starting uploader.')
   note_events_queue = interprocess.get_note_events_queue()
   note_taking_system = settings.get('NOTE_TAKING_SYSTEM').lower()
-  uploader = make_uploader(note_taking_system)
+  try:
+    uploader = make_uploader(note_taking_system)
+  except ValueError as e:
+    print(e, file=sys.stderr)
+    return
   status.set(Status.UPLOADER_READY, True)
 
   last_upload = None

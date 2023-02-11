@@ -1,5 +1,9 @@
 # Settings commands. Commands for setting settings.
 
+import subprocess
+
+from dateutil import parser
+
 from gonotego.common import status
 from gonotego.command_center import registry
 from gonotego.command_center import system_commands
@@ -26,8 +30,61 @@ def set(key, value):
     settings.set(key, value)
   if key.lower() in ('v', 'volume'):
     set_volume(value)
-  if key.lower() in ('leds'):
+  if key.lower() in ('l', 'leds'):
     set_leds(value)
+  if key.lower() in ('t', 'time'):
+    set_time(value)
+  if key.lower() in ('tz', 'timezone'):
+    set_timezone(value)
+
+
+def set_time(value):
+  try:
+    t = parser.parse(value)
+  except parser.ParserError:
+    say('Time not set.')
+    return
+  time_string = (
+      f'{t.year:04d}-{t.month:02d}-{t.day:02d} '
+      '{t.hour:02d}:{t.minute:02d}:{t.second:02d}'
+  )
+  command = f'date -s "{time_string}"'
+  system_commands.shell(command)
+
+
+def list_timezones():
+  output = subprocess.check_output(['timedatectl', 'list-timezones'])
+  timezones_str = output.decode('utf-8')
+  timezones = timezones_str.strip().split('\n')
+  return timezones
+
+
+def set_timezone(value):
+  timezone_mapping = {
+      'ET': 'America/New_York',
+      'EST': 'America/New_York',
+      'EDT': 'America/New_York',
+      'PT': 'America/Los_Angeles',
+      'PST': 'America/Los_Angeles',
+      'PDT': 'America/Los_Angeles',
+  }
+  if value in timezone_mapping:
+    value = timezone_mapping[value]
+  if value not in list_timezones():
+    say('Timezone not set.')
+    return
+  command = f'sudo timedatectl set-timezone {value}'
+  system_commands.shell(command)
+
+
+@register_command('ntp on')
+def enable_ntp():
+  system_commands.shell('sudo timedatectl set-ntp true')
+
+
+@register_command('ntp off')
+def disable_ntp():
+  system_commands.shell('sudo timedatectl set-ntp false')
 
 
 @register_command('get status {}')
