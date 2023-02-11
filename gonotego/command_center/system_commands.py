@@ -66,6 +66,11 @@ def say(text):
   shell(cmd)
 
 
+@register_command('silence')
+def silence(text):
+  shell(f'pkill {SAY_COMMAND}')
+
+
 @register_command('shell {}')
 def shell(cmd):
   dt = datetime.now().strftime('%k:%M:%S')
