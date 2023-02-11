@@ -127,7 +127,7 @@ network={{
 }}
 """
   filepath = '/etc/wpa_supplicant/wpa_supplicant.conf'
-  os.system(f"echo '{network_string}' | sudo tee -a {filepath}")
+  shell(f"echo '{network_string}' | sudo tee -a {filepath}")
   reconfigure_wifi()
 
 
@@ -143,7 +143,7 @@ network={{
 }}
 """
   filepath = '/etc/wpa_supplicant/wpa_supplicant.conf'
-  os.system(f"echo '{network_string}' | sudo tee -a {filepath}")
+  shell(f"echo '{network_string}' | sudo tee -a {filepath}")
   reconfigure_wifi()
 
 
