@@ -23,4 +23,4 @@ def set(device_path='/dev/input/event2', led_id=NUM_LOCK, state=0):
   now_seconds = int(now)
   now_microseconds = int((now - now_seconds) * 1e6)
   data = struct.pack('@llHHI', now_seconds, now_microseconds, LED_EVENT, led_id, state)
-  os.write(_fd, data)
+  os.write(fd, data)
