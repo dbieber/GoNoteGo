@@ -70,5 +70,6 @@ def add_todo(text):
 def get_pending_note_count():
   note_events_queue = interprocess.get_note_events_queue()
   size = note_events_queue.size()
-  system_commands.say(size)
+  size_str = str(size)
+  system_commands.say(size_str)
   return size
