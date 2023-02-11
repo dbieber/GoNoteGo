@@ -9,7 +9,7 @@ CAPS_LOCK = 0x01
 LED_EVENT = 0x11
 
 
-def set(device_path='/dev/input/event2', led_id=NUM_LOCK, state=0):
+def set(device_path='/dev/input/by-id/usb-_Raspberry_Pi_Internal_Keyboard-event-kbd', led_id=NUM_LOCK, state=0):
   """Sets the specified led (num lock or caps lock) to the specified state (on or off).
 
   Args:
