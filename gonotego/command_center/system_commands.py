@@ -68,7 +68,7 @@ def say(text):
 
 @register_command('silence')
 @register_command('silencio')
-def silence(text):
+def silence():
   shell(f'pkill {SAY_COMMAND}')
 
 
