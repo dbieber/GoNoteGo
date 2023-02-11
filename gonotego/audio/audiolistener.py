@@ -5,6 +5,7 @@ import sounddevice as sd
 import soundfile as sf
 
 from gonotego.common import status
+from gonotego.leds import indicators
 
 Status = status.Status
 
@@ -13,6 +14,19 @@ SILENCE_THRESHOLD = 0.10
 
 def get_max_volume(samples):
   return np.max(np.abs(samples))
+
+
+def set_audio_recording_status(recording):
+  status.set(Status.AUDIO_RECORDING, recording)
+  if recording:
+    indicators.set(state=1)
+    if status.get(Status.VOLUME_SETTING) != 'off':
+      subprocess.call(['aplay', 'gonotego/assets/beep_hi.wav'])
+
+  else:
+    indicators.set(state=0)
+    if status.get(Status.VOLUME_SETTING) != 'off':
+      subprocess.call(['aplay', 'gonotego/assets/beep_lo.wav'])
 
 
 class AudioListener:
@@ -27,9 +41,7 @@ class AudioListener:
 
   def record(self, filepath):
     self.recording = True
-    status.set(Status.AUDIO_RECORDING, self.recording)
-    if status.get(Status.VOLUME_SETTING) != 'off':
-      subprocess.call(['aplay', 'gonotego/assets/beep_hi.wav'])
+    set_audio_recording_status(self.recording)
 
     self.file = sf.SoundFile(
         filepath,
@@ -75,9 +87,7 @@ class AudioListener:
 
   def stop(self):
     self.recording = False
-    status.set(Status.AUDIO_RECORDING, self.recording)
-    if status.get(Status.VOLUME_SETTING) != 'off':
-      subprocess.call(['aplay', 'gonotego/assets/beep_lo.wav'])
+    set_audio_recording_status(self.recording)
     self.stream.stop()
     self.stream.close()
     self.file.flush()
