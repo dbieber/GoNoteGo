@@ -5,7 +5,6 @@ import board
 
 from gonotego.common import status
 from gonotego.leds import colors
-from gonotego.leds import indicators
 
 Status = status.Status
 
