@@ -79,8 +79,13 @@ class AudioListener:
       self.file.write(indata.copy())
 
     assert self.stream is None
-    self.stream = sd.InputStream(callback=record_callback)
-    self.stream.start()
+    try:
+      self.stream = sd.InputStream(callback=record_callback)
+      self.stream.start()
+    except sounddevice.PortAudioError:
+      self.recording = False
+      self.stream = None
+      set_audio_recording_status(self.recording)
 
   def silence_length(self):
     return self.consecutive_quiet_frames / self.samplerate
