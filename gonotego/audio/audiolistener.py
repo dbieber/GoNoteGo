@@ -82,7 +82,7 @@ class AudioListener:
     try:
       self.stream = sd.InputStream(callback=record_callback)
       self.stream.start()
-    except sounddevice.PortAudioError:
+    except sd.PortAudioError:
       self.stream = None
       self.recording = False
       set_audio_recording_status(self.recording)
