@@ -169,16 +169,26 @@ let getRoamDate = dateString => {
   return `${month} ${date}${nthStr}, ${year}`;
 }
 
+
 async function insertGoNoteGoNote(note) {
   // inserts the note into the Go Note Go Notes section of your Daily Notes page.
   // _note_: a string to insert as a new note.
+  return await insertNoteIntoSection(note, '[[Go Note Go Notes]]:')
+}
+
+
+async function insertNoteIntoSection(note, section) {
+  // inserts the note into the specified section of your Daily Notes page.
+  // _note_: a string to insert as a new note.
+  // _section_: the section header at which to insert the note
   let $roam_date = getRoamDate(new Date());
 
   // Add the note to the Daily Notes page.
-  let block_uid = await getOrCreateBlockOnPage($roam_date, '[[Go Note Go Notes]]:', -1);
+  let block_uid = await getOrCreateBlockOnPage($roam_date, section, -1);
   let note_block = await createChildBlock(block_uid, note, -1);
   return note_block
 }
+
 
 window.sleep = sleep;
 window.getPage = getPage;
