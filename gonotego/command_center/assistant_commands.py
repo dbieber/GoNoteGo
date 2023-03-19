@@ -80,13 +80,13 @@ def ask_with_context(prompt=None):
 @register_command('ai3')
 @register_command('ai3 {}')
 def chat_with_context3(prompt=None):
-  return chat_with_context(prompt=prompt, model='gpt-3.5-turbo'):
+  return chat_with_context(prompt=prompt, model='gpt-3.5-turbo')
 
 
 @register_command('ai4')
 @register_command('ai4 {}')
 def chat_with_context3(prompt=None):
-  return chat_with_context(prompt=prompt, model='gpt-4'):
+  return chat_with_context(prompt=prompt, model='gpt-4')
 
 
 def chat_with_context(prompt=None, model='gpt-3.5-turbo'):
