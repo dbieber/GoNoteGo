@@ -38,14 +38,12 @@ def create_completion(
   return response
 
 
-
 def chat_completion(messages, model='gpt-3.5-turbo'):
   response = openai.ChatCompletion.create(
       model=model,
       messages=messages
   )
   return response
-
 
 
 @register_command('ask {}')
