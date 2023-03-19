@@ -38,6 +38,14 @@ def create_completion(
   return response
 
 
+def chat_completion(messages, model='gpt-3.5-turbo'):
+  response = openai.ChatCompletion.create(
+      model=model,
+      messages=messages
+  )
+  return response
+
+
 @register_command('ask {}')
 @register_command('q {}')
 def ask(prompt):
@@ -49,9 +57,52 @@ def ask(prompt):
   return response_text
 
 
+@register_command('aix')
+@register_command('aix {}')
+def ask_with_context(prompt=None):
+  messages = get_messages(prompt=prompt)
+  texts = [message['content'] for message in messages]
+  extended_prompt = '\n'.join(texts) + '\n'
+  response = create_completion(extended_prompt)
+
+  response_text = response['choices'][0].text
+  response_text = response_text.lstrip()
+
+  system_commands.say(response_text)
+  if prompt:
+    note_commands.add_note(prompt)
+  note_commands.add_indented_note(f'{response_text} #[[AI Response]]')
+  return response_text
+
+
 @register_command('ai')
 @register_command('ai {}')
-def ask_with_context(prompt=None):
+@register_command('ai3')
+@register_command('ai3 {}')
+def chat_with_context3(prompt=None):
+  return chat_with_context(prompt=prompt, model='gpt-3.5-turbo')
+
+
+@register_command('ai4')
+@register_command('ai4 {}')
+def chat_with_context4(prompt=None):
+  return chat_with_context(prompt=prompt, model='gpt-4')
+
+
+def chat_with_context(prompt=None, model='gpt-3.5-turbo'):
+  messages = get_messages(prompt=prompt)
+  messages.insert(0, {"role": "system", "content": "You are a helpful assistant."})
+  response = chat_completion(messages)
+  response_text = response['choices'][0]['message']['content']
+
+  system_commands.say(response_text)
+  if prompt:
+    note_commands.add_note(prompt)
+  note_commands.add_indented_note(f'{response_text} #[[AI Response]]')
+  return response_text
+
+
+def get_messages(prompt=None):
   note_events_session_queue = interprocess.get_note_events_session_queue()
   note_event_bytes_list = note_events_session_queue.peek_all()
   note_events = [
@@ -60,12 +111,16 @@ def ask_with_context(prompt=None):
   ]
 
   indent = 0
-  texts = []
+  messages = []
   for note_event in note_events:
     if note_event.action == events.SUBMIT:
       text = note_event.text
-      text = text.replace(' #[[AI Response]]', '')
-      texts.append(text)
+      if ' #[[AI Response]]' in text:
+        role = 'assistant'
+        text = text.replace(' #[[AI Response]]', '')
+      else:
+        role = 'user'
+      messages.append({'role': role, 'content': text})
     elif note_event.action == events.INDENT:
       indent += 1
     elif note_event.action == events.UNINDENT:
@@ -79,15 +134,5 @@ def ask_with_context(prompt=None):
   del indent  # Unused.
 
   if prompt:
-    texts.append(prompt)
-  extended_prompt = '\n'.join(texts) + '\n'
-  response = create_completion(extended_prompt)
-
-  response_text = response['choices'][0].text
-  response_text = response_text.lstrip()
-
-  system_commands.say(response_text)
-  if prompt:
-    note_commands.add_note(prompt)
-  note_commands.add_indented_note(f'{response_text} #[[AI Response]]')
-  return response_text
+    messages.append({'role': 'user', 'content': prompt})
+  return messages
