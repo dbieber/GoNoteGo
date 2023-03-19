@@ -85,7 +85,7 @@ def chat_with_context3(prompt=None):
 
 @register_command('ai4')
 @register_command('ai4 {}')
-def chat_with_context3(prompt=None):
+def chat_with_context4(prompt=None):
   return chat_with_context(prompt=prompt, model='gpt-4')
 
 
