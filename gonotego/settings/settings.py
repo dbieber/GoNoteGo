@@ -4,7 +4,7 @@ Settings set on Go Note Go take precedence.
 Run ":clear all" to clear settings set on Go Note Go, reverting back to those set
 in secure_settings.py.
 Run ":clear KEY" to clear an individual setting on Go Note Go, reverting it back
-to it's value from secure_settings.py.
+to its value from secure_settings.py.
 """
 import ast
 from gonotego.settings import secure_settings
