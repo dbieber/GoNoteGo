@@ -2,7 +2,7 @@ import time
 
 from gonotego.common import events
 from gonotego.common import interprocess
-from gonotego.command_center import commands  # pylint: disable=unused-import
+from gonotego.command_center import commands  # noqa: unused-import
 from gonotego.command_center import scheduler
 from gonotego.command_center import registry
 
