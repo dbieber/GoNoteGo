@@ -1,5 +1,5 @@
 [project]
-name = "Go Note Go"
+name = "GoNoteGo"
 version = "1.0.0"
 description = "Go Note Go: A headless keyboard for taking notes on the go."
 readme = "README.md"
