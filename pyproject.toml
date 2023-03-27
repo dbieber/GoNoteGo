@@ -45,7 +45,10 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = []
-test = []
+test = [
+  'ruff',
+  'pytest',
+]
 
 [project.urls]
 "Homepage" = "https://davidbieber.com/projects/go-note-go/"
