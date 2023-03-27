@@ -1,0 +1,67 @@
+[project]
+name = "Go Note Go"
+version = "1.0.0"
+description = "Go Note Go: A headless keyboard for taking notes on the go."
+readme = "README.md"
+
+requires-python = ">=3.7"
+# license = {file = "LICENSE.txt"}
+keywords = ["raspberry pi", "note taking", "writing", "no screen", "headless keyboard", "pkm", "camping"]
+authors = [
+  {name = "David Bieber", email = "david810@gmail.com"}
+]
+maintainers = [
+  {name = "David Bieber", email = "david810@gmail.com"}
+]
+
+classifiers = [
+  "Programming Language :: Python :: 3",
+]
+
+dependencies = [
+  'absl-py',
+  'adafruit-circuitpython-bmp280',
+  'adafruit-circuitpython-dotstar',
+  'adafruit-circuitpython-motor',
+  'apscheduler',
+  'dropbox',
+  'fire>=0.4.0',
+  'google-cloud-speech',
+  'keyboard',
+  'libcst==0.3.23',
+  'mouse',
+  'numpy',
+  'openai',
+  'parsedatetime',
+  'redis',
+  # selenium 4.0 breaks with arm geckodriver.
+  'selenium==3.141.0',
+  'setuptools-rust',
+  'sounddevice',
+  'soundfile',
+  'supervisor',
+  'twython',
+]
+
+[project.optional-dependencies]
+dev = []
+test = []
+
+[project.urls]
+"Homepage" = "https://davidbieber.com/projects/go-note-go/"
+"Features List" = "https://davidbieber.com/snippets/2023-01-16-go-note-go-features/"
+"Bug Reports" = "https://github.com/dbieber/GoNoteGo/issues"
+"Funding" = "https://donate.stripe.com/4gwg2Y65WevpeWc8ww"
+"Say Thanks!" = "https://saythanks.io/to/dbieber"
+"Learn More" = "https://davidbieber.com/tags/go-note-go/"
+"Source" = "https://github.com/dbieber/GoNoteGo"
+
+[tool.ruff]
+line-length = 180
+ignore = ["E722"]
+show-source = true
+# exclude = ['scratch']
+
+[build-system]
+requires = ["setuptools>=43.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
