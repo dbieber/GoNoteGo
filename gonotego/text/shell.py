@@ -152,6 +152,9 @@ class Shell:
             timestamp=get_timestamp())
         self.note_events_queue.put(bytes(note_event))
         self.note_events_session_queue.put(bytes(note_event))
+      elif self.text.strip().startswith('::'):
+        self.text = self.text.strip()[1:]
+        self.submit_note()
       elif self.text.strip().startswith(':'):
         command_event = events.CommandEvent(command_text=self.text.strip()[1:])
         self.command_event_queue.put(bytes(command_event))
