@@ -14,11 +14,12 @@ class Executor:
     self.resources = resources
 
   def execute(self, text):
-    print(f'Executing: {text}')
     for command in registry.COMMANDS:
+      print(f'Executing: {text}')
       executed = command.execute_if_match(text, self.resources)
       if executed:
-        break
+        return
+    print(f'Did not execute: {text}')
 
 
 def main():
