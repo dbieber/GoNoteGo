@@ -15,9 +15,9 @@ class Executor:
 
   def execute(self, text):
     for command in registry.COMMANDS:
-      print(f'Executing: {text}')
       executed = command.execute_if_match(text, self.resources)
       if executed:
+        print(f'Executed: {text}')
         return
     print(f'Did not execute: {text}')
 
