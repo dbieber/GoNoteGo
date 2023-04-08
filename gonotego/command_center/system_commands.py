@@ -62,7 +62,19 @@ def say(text):
   with open('tmp-say', 'w') as tmp:
     print(f'[{dt}] Writing "{text}" to tmp-say')
     tmp.write(text)
-  cmd = f'cat tmp-say | {SAY_COMMAND} &'
+
+  # Wait for all existing say processes to finish, then execute the new say command.
+  cmd = f'''
+  # Get the PIDs of all running instances of SAY_COMMAND
+  pids=$(pgrep -f "{SAY_COMMAND}")
+  # Wait for each PID to complete
+  for pid in $pids; do
+    wait $pid 2>/dev/null
+  done
+  # Execute the new SAY_COMMAND
+  cat tmp-say | {SAY_COMMAND}
+  '''
+
   shell(cmd)
 
 
