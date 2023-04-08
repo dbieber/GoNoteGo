@@ -1,3 +1,4 @@
+import sys
 import time
 
 from gonotego.common import events
@@ -36,6 +37,8 @@ def main():
       command_event = events.CommandEvent.from_bytes(command_event_bytes)
       command_text = command_event.command_text
       executor.execute(command_text)
+      sys.stdout.flush()
+      sys.stderr.flush()
     time.sleep(1)
 
 
