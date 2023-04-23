@@ -21,6 +21,6 @@ def register_custom_commands(paths):
         print(f"Module '{module_name}' is already imported.")
     else:
       print(f"Path '{path}' is not a valid Python file.")
-
+  sys.stdout.flush()
 
 register_custom_commands(secure_settings.CUSTOM_COMMAND_PATHS)
