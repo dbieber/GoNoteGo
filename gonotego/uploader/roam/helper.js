@@ -158,7 +158,7 @@ let getRoamDate = dateString => {
   // returns the date in the format used by Roam Research page titles.
   // _dateString_: a javascript compatible date string.
   let monthsDateProcessing = [
-      'January', 'February', 'March', 'April', 'May',' June',
+      'January', 'February', 'March', 'April', 'May', 'June',
       'July', 'August', 'September', 'October', 'November', 'December'];
 
   const d = new Date(dateString);
