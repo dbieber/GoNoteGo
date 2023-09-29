@@ -20,15 +20,10 @@ classifiers = [
 
 dependencies = [
   'absl-py',
-  'adafruit-circuitpython-bmp280',
-  'adafruit-circuitpython-dotstar',
-  'adafruit-circuitpython-motor',
   'apscheduler',
   'dropbox',
   'fire>=0.4.0',
-  'google-cloud-speech',
   'keyboard',
-  'libcst==0.3.23',
   'mouse',
   'numpy',
   'openai',
@@ -63,7 +58,7 @@ test = [
 line-length = 180
 ignore = ["E722"]
 show-source = true
-# exclude = ['scratch']
+exclude = ['scratch']
 
 [build-system]
 requires = ["setuptools>=43.0.0", "wheel"]
