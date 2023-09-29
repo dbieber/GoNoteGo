@@ -2,6 +2,9 @@ import io
 
 import fire
 import openai
+from gonotego.settings import settings
+
+openai.api_key = settings.get('OPENAI_API_KEY')
 
 
 class Transcriber:
