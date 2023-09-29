@@ -5,12 +5,12 @@ It also defines some miscellaneous commands itself.
 
 from gonotego.common import events
 from gonotego.common import interprocess
-from gonotego.command_center import assistant_commands  # noqa: unused-import
-from gonotego.command_center import custom_commands  # noqa: unused-import
-from gonotego.command_center import note_commands  # noqa: unused-import
-from gonotego.command_center import settings_commands  # noqa: unused-import
-from gonotego.command_center import system_commands  # noqa: unused-import
-from gonotego.command_center import twitter_commands  # noqa: unused-import
+from gonotego.command_center import assistant_commands  # noqa: F401
+from gonotego.command_center import custom_commands  # noqa: F401
+from gonotego.command_center import note_commands  # noqa: F401
+from gonotego.command_center import settings_commands  # noqa: F401
+from gonotego.command_center import system_commands  # noqa: F401
+from gonotego.command_center import twitter_commands  # noqa: F401
 from gonotego.command_center import registry
 
 register_command = registry.register_command
