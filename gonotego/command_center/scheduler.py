@@ -1,5 +1,5 @@
 from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
-from apscheduler.jobstores.redis import RedisJobStore  # noqa: unused-import
+from apscheduler.jobstores.redis import RedisJobStore  # noqa: F401
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.date import DateTrigger
 
