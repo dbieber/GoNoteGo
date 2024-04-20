@@ -59,9 +59,9 @@ def status_command():
 @register_command('say {}')
 def say(text):
   try:
-    say_traditional(text)
-  except:
     say_with_openai(text)
+  except:
+    say_traditional(text)
 
 
 @register_command('say_trad {}')
