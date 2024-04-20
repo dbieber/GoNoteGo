@@ -11,13 +11,11 @@ from gonotego.settings import settings
 
 register_command = registry.register_command
 
-openai.api_key = settings.get('OPENAI_API_KEY')
-
 
 def create_completion(
     prompt,
     *,
-    model='text-davinci-003',
+    model='gpt-3.5-turbo-instruct',
     temperature=0.7,
     max_tokens=256,
     top_p=1,
@@ -25,7 +23,8 @@ def create_completion(
     presence_penalty=0,
     **kwargs
 ):
-  response = openai.Completion.create(
+  client = openai.OpenAI(api_key=settings.get('OPENAI_API_KEY'))
+  response = client.completions.create(
       model=model,
       prompt=prompt,
       temperature=temperature,
@@ -39,7 +38,8 @@ def create_completion(
 
 
 def chat_completion(messages, model='gpt-3.5-turbo'):
-  response = openai.ChatCompletion.create(
+  client = openai.OpenAI(api_key=settings.get('OPENAI_API_KEY'))
+  response = client.chat.completions.create(
       model=model,
       messages=messages
   )

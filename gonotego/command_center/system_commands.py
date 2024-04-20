@@ -58,12 +58,43 @@ def status_command():
 
 @register_command('say {}')
 def say(text):
+  try:
+    say_traditional(text)
+  except:
+    say_with_openai(text)
+
+
+@register_command('say_trad {}')
+def say_traditional(text):
   dt = datetime.now().strftime('%k:%M:%S')
   with open('tmp-say', 'w') as tmp:
     print(f'[{dt}] Writing "{text}" to tmp-say')
     tmp.write(text)
   cmd = f'cat tmp-say | {SAY_COMMAND} &'
   shell(cmd)
+
+
+@register_command('say_openai {}')
+def say_with_openai(text):
+  import openai
+  client = openai.OpenAI(api_key=settings.get('OPENAI_API_KEY'))
+  response = client.audio.speech.create(
+      model="tts-1",
+      voice="alloy",
+      input=text
+  )
+  response.write_to_file('output.mp3')
+  play_mp3('output.mp3')
+
+
+def play_mp3(path):
+  import pygame
+  import time
+
+  pygame.init()
+  pygame.mixer.init()
+  pygame.mixer.music.load(path)
+  pygame.mixer.music.play()
 
 
 @register_command('silence')
