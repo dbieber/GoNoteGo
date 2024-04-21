@@ -61,6 +61,7 @@ def say(text):
   try:
     say_with_openai(text)
   except:
+    print("Falling back on say_traditional")
     say_traditional(text)
 
 
@@ -88,13 +89,7 @@ def say_with_openai(text):
 
 
 def play_mp3(path):
-  import pygame
-  import time
-
-  pygame.init()
-  pygame.mixer.init()
-  pygame.mixer.music.load(path)
-  pygame.mixer.music.play()
+  shell(f"cvlc {path} --play-and-exit")
 
 
 @register_command('silence')
