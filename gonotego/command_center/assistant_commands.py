@@ -50,7 +50,7 @@ def chat_completion(messages, model='gpt-3.5-turbo'):
 @register_command('q {}')
 def ask(prompt):
   response = create_completion(prompt)
-  response_text = response['choices'][0].text
+  response_text = response.choices[0].text
   system_commands.say(response_text)
   note_commands.add_note(prompt)
   note_commands.add_indented_note(f'{response_text} #[[AI Response]]')
