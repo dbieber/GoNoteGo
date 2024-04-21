@@ -65,7 +65,7 @@ def ask_with_context(prompt=None):
   extended_prompt = '\n'.join(texts) + '\n'
   response = create_completion(extended_prompt)
 
-  response_text = response['choices'][0].text
+  response_text = response.choices[0].text
   response_text = response_text.lstrip()
 
   system_commands.say(response_text)
@@ -93,7 +93,7 @@ def chat_with_context(prompt=None, model='gpt-3.5-turbo'):
   messages = get_messages(prompt=prompt)
   messages.insert(0, {"role": "system", "content": "You are a helpful assistant."})
   response = chat_completion(messages)
-  response_text = response['choices'][0]['message']['content']
+  response_text = response.choices[0].message.content
 
   system_commands.say(response_text)
   if prompt:
