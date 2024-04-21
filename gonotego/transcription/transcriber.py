@@ -4,15 +4,17 @@ import fire
 import openai
 from gonotego.settings import settings
 
-openai.api_key = settings.get('OPENAI_API_KEY')
-
 
 class Transcriber:
 
   def transcribe(self, filepath):
+    client = openai.OpenAI(api_key=settings.get('OPENAI_API_KEY'))
     with io.open(filepath, 'rb') as audio_file:
-      response = openai.Audio.transcribe("whisper-1", audio_file)
-      transcription = response['text']
+      response = client.audio.transcriptions.create(
+          model="whisper-1",
+          file=audio_file
+      )
+      transcription = response.text
       return transcription.strip()
 
 

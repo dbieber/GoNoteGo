@@ -11,13 +11,11 @@ from gonotego.settings import settings
 
 register_command = registry.register_command
 
-openai.api_key = settings.get('OPENAI_API_KEY')
-
 
 def create_completion(
     prompt,
     *,
-    model='text-davinci-003',
+    model='gpt-3.5-turbo-instruct',
     temperature=0.7,
     max_tokens=256,
     top_p=1,
@@ -25,7 +23,8 @@ def create_completion(
     presence_penalty=0,
     **kwargs
 ):
-  response = openai.Completion.create(
+  client = openai.OpenAI(api_key=settings.get('OPENAI_API_KEY'))
+  response = client.completions.create(
       model=model,
       prompt=prompt,
       temperature=temperature,
@@ -39,7 +38,8 @@ def create_completion(
 
 
 def chat_completion(messages, model='gpt-3.5-turbo'):
-  response = openai.ChatCompletion.create(
+  client = openai.OpenAI(api_key=settings.get('OPENAI_API_KEY'))
+  response = client.chat.completions.create(
       model=model,
       messages=messages
   )
@@ -50,7 +50,7 @@ def chat_completion(messages, model='gpt-3.5-turbo'):
 @register_command('q {}')
 def ask(prompt):
   response = create_completion(prompt)
-  response_text = response['choices'][0].text
+  response_text = response.choices[0].text
   system_commands.say(response_text)
   note_commands.add_note(prompt)
   note_commands.add_indented_note(f'{response_text} #[[AI Response]]')
@@ -65,7 +65,7 @@ def ask_with_context(prompt=None):
   extended_prompt = '\n'.join(texts) + '\n'
   response = create_completion(extended_prompt)
 
-  response_text = response['choices'][0].text
+  response_text = response.choices[0].text
   response_text = response_text.lstrip()
 
   system_commands.say(response_text)
@@ -93,7 +93,7 @@ def chat_with_context(prompt=None, model='gpt-3.5-turbo'):
   messages = get_messages(prompt=prompt)
   messages.insert(0, {"role": "system", "content": "You are a helpful assistant."})
   response = chat_completion(messages)
-  response_text = response['choices'][0]['message']['content']
+  response_text = response.choices[0].message.content
 
   system_commands.say(response_text)
   if prompt:

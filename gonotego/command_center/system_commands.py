@@ -58,12 +58,38 @@ def status_command():
 
 @register_command('say {}')
 def say(text):
+  try:
+    say_with_openai(text)
+  except:
+    print("Falling back on say_traditional")
+    say_traditional(text)
+
+
+@register_command('say_trad {}')
+def say_traditional(text):
   dt = datetime.now().strftime('%k:%M:%S')
   with open('tmp-say', 'w') as tmp:
     print(f'[{dt}] Writing "{text}" to tmp-say')
     tmp.write(text)
   cmd = f'cat tmp-say | {SAY_COMMAND} &'
   shell(cmd)
+
+
+@register_command('say_openai {}')
+def say_with_openai(text):
+  import openai
+  client = openai.OpenAI(api_key=settings.get('OPENAI_API_KEY'))
+  response = client.audio.speech.create(
+      model="tts-1",
+      voice="alloy",
+      input=text
+  )
+  response.write_to_file('output.mp3')
+  play_mp3('output.mp3')
+
+
+def play_mp3(path):
+  shell(f"cvlc {path} --play-and-exit")
 
 
 @register_command('silence')
