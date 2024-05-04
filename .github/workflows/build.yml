@@ -35,30 +35,7 @@ jobs:
         with:
           base_image: raspios_lite:2022-04-04
           commands: |
-            sudo apt update && sudo apt upgrade -y
-            sudo apt install -y git firefox-esr xvfb portaudio19-dev libatlas-base-dev redis-server espeak rustc python3-dev
-            mkdir -p /home/pi/code/github/dbieber
-            cd /home/pi/code/github/dbieber
-            git clone https://github.com/dbieber/GoNoteGo.git
-            cd GoNoteGo
-            # Checkout the specific commit
-            git checkout $GITHUB_SHA
-            cp gonotego/settings/secure_settings_template.py gonotego/settings/secure_settings.py
-            echo "Manually edit secure_settings.py to configure your settings."
-            mkdir /home/pi/secrets
-            echo "Manually transfer google_credentials.json to /home/pi/secrets."
-            mkdir out
-            pip3 install virtualenv
-            /home/pi/.local/bin/virtualenv env -p python3
-            ./env/bin/pip install grpcio -U --no-binary=grpcio
-            ./env/bin/pip install -e .
-            echo "Add supervisor start command to /etc/rc.local"
-            wget https://github.com/mozilla/geckodriver/releases/download/v0.23.0/geckodriver-v0.23.0-arm7hf.tar.gz
-            tar -xvf geckodriver-v0.23.0-arm7hf.tar.gz
-            rm geckodriver-v0.23.0-arm7hf.tar.gz
-            sudo mv geckodriver /usr/local/bin
-            echo "Set up your internet configuration and audio settings as needed."
-            echo "Verify everything's working!"
+            echo here
       - name: Compress the release image
         if: github.ref == 'refs/heads/releng' || startsWith(github.ref, 'refs/tags/')
         run: |
