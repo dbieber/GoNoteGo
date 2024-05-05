@@ -51,8 +51,7 @@ jobs:
 
             echo "Setting up Python environment"
             mkdir out
-            pip3 install virtualenv
-            /home/pi/.local/bin/virtualenv env -p python3
+            python3 -m venv env
             ./env/bin/pip install -e .  # Install Python dependencies
 
             echo "Start on boot"
