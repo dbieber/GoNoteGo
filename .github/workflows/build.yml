@@ -36,7 +36,7 @@ jobs:
           image_additional_mb: 4000
           commands: |
             echo "Updating!"
-            sudo apt update && sudo apt upgrade -y
+            sudo apt update
 
             echo "Installing dependencies!"
             sudo apt install -y git firefox-esr xvfb portaudio19-dev libatlas-base-dev redis-server espeak rustc python3-dev
