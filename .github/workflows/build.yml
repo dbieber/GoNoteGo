@@ -1,4 +1,4 @@
-name: Lint and run Python tests
+name: Build image, lint, and run tests
 
 on: [push]
 
@@ -32,29 +32,42 @@ jobs:
       - uses: pguyot/arm-runner-action@v2
         id: build_image
         with:
-          base_image: raspios_lite:2022-04-04
+          base_image: raspi_4_bookworm:20231109
           image_additional_mb: 4000
           commands: |
-            echo "Update!"
+            echo "Updating!"
             sudo apt update && sudo apt upgrade -y
 
-            echo "Install!"
-            sudo apt install -y git firefox-esr xvfb portaudio19-dev
-            sudo apt install -y libatlas-base-dev redis-server espeak
-            sudo apt install -y rustc
-            sudo apt install -y python3-dev
+            echo "Installing dependencies!"
+            sudo apt install -y git firefox-esr xvfb portaudio19-dev libatlas-base-dev redis-server espeak rustc python3-dev
 
-            echo "More setup!"
+            echo "Installing Go Note Go!"
             mkdir -p /home/pi/code/github/dbieber
             cd /home/pi/code/github/dbieber
             git clone https://github.com/dbieber/GoNoteGo.git
             cd GoNoteGo
             # Checkout the specific commit
             git checkout $GITHUB_SHA
+
+            echo "Setting up Python environment"
+            mkdir out
+            pip3 install virtualenv
+            /home/pi/.local/bin/virtualenv env -p python3
+            ./env/bin/pip install -e .  # Install Python dependencies
+
+            echo "Start on boot"
+            sudo cat /etc/rc.local
+            sudo sed '/^exit 0/i \
+                /home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisord -c /home/pi/code/github/dbieber/GoNoteGo/gonotego/supervisord.conf
+                ' /etc/rc.local > ./rc.local.modified && mv ./rc.local.modified /etc/rc.local
+
+            echo "Setting up Go Note Go:"
             cp gonotego/settings/secure_settings_template.py gonotego/settings/secure_settings.py
             echo "Manually edit secure_settings.py to configure your settings."
+
             mkdir /home/pi/secrets
-            echo "Manually transfer google_credentials.json to /home/pi/secrets."
+            echo "Manually transfer secrets to /home/pi/secrets."
+
       - name: Compress the release image
         run: |
           mv ${{ steps.build_image.outputs.image }} my-release-image.img
