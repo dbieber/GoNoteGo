@@ -29,6 +29,11 @@ jobs:
   build_image:
     runs-on: ubuntu-latest
     steps:
+      - name: Check disk space on runner
+        run: |
+          echo "Disk space usage on GitHub Runner:"
+          df -h
+
       - uses: pguyot/arm-runner-action@v2
         id: build_image
         with:
