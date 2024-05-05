@@ -49,29 +49,29 @@ jobs:
             # Checkout the specific commit
             git checkout $GITHUB_SHA
 
-            echo "Setting up Python environment"
-            python3 -m venv env
-            ./env/bin/pip install -e .  # Install Python dependencies
+            # echo "Setting up Python environment"
+            # python3 -m venv env
+            # ./env/bin/pip install -e .  # Install Python dependencies
 
-            echo "Start on boot"
-            sudo cat /etc/rc.local
-            sudo sed '/^exit 0/i \
-                /home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisord -c /home/pi/code/github/dbieber/GoNoteGo/gonotego/supervisord.conf
-                ' /etc/rc.local > ./rc.local.modified && mv ./rc.local.modified /etc/rc.local
+            # echo "Start on boot"
+            # sudo cat /etc/rc.local
+            # sudo sed '/^exit 0/i \
+            #     /home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisord -c /home/pi/code/github/dbieber/GoNoteGo/gonotego/supervisord.conf
+            #     ' /etc/rc.local > ./rc.local.modified && mv ./rc.local.modified /etc/rc.local
 
-            echo "Setting up Go Note Go:"
-            cp gonotego/settings/secure_settings_template.py gonotego/settings/secure_settings.py
-            echo "Manually edit secure_settings.py to configure your settings."
+            # echo "Setting up Go Note Go:"
+            # cp gonotego/settings/secure_settings_template.py gonotego/settings/secure_settings.py
+            # echo "Manually edit secure_settings.py to configure your settings."
 
-            mkdir /home/pi/secrets
-            echo "Manually transfer secrets to /home/pi/secrets."
+            # mkdir /home/pi/secrets
+            # echo "Manually transfer secrets to /home/pi/secrets."
 
-            echo "Install geckodriver to known location"
-            cd
-            wget https://github.com/mozilla/geckodriver/releases/download/v0.23.0/geckodriver-v0.23.0-arm7hf.tar.gz
-            tar -xvf geckodriver-v0.23.0-arm7hf.tar.gz
-            rm geckodriver-v0.23.0-arm7hf.tar.gz
-            sudo mv geckodriver /usr/local/bin
+            # echo "Install geckodriver to known location"
+            # cd
+            # wget https://github.com/mozilla/geckodriver/releases/download/v0.23.0/geckodriver-v0.23.0-arm7hf.tar.gz
+            # tar -xvf geckodriver-v0.23.0-arm7hf.tar.gz
+            # rm geckodriver-v0.23.0-arm7hf.tar.gz
+            # sudo mv geckodriver /usr/local/bin
 
       - name: Compress the release image
         run: |
