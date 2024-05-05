@@ -35,6 +35,9 @@ jobs:
         with:
           base_image: raspios_lite:2022-04-04
           commands: |
+            echo "Update!"
+            sudo apt update
+            echo "Install!"
             sudo apt install -y git firefox-esr xvfb portaudio19-dev libatlas-base-dev redis-server espeak rustc python3-dev
             mkdir -p /home/pi/code/github/dbieber
             cd /home/pi/code/github/dbieber
