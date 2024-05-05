@@ -35,7 +35,8 @@ jobs:
         with:
           base_image: raspios_lite:2022-04-04
           commands: |
-            echo here
+            sudo apt update && sudo apt upgrade -y
+            sudo apt clean
       - name: Compress the release image
         run: |
           mv ${{ steps.build_image.outputs.image }} my-release-image.img
