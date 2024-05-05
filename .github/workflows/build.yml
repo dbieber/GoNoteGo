@@ -68,6 +68,13 @@ jobs:
             mkdir /home/pi/secrets
             echo "Manually transfer secrets to /home/pi/secrets."
 
+            echo "Install geckodriver to known location"
+            cd
+            wget https://github.com/mozilla/geckodriver/releases/download/v0.23.0/geckodriver-v0.23.0-arm7hf.tar.gz
+            tar -xvf geckodriver-v0.23.0-arm7hf.tar.gz
+            rm geckodriver-v0.23.0-arm7hf.tar.gz
+            sudo mv geckodriver /usr/local/bin
+
       - name: Compress the release image
         run: |
           mv ${{ steps.build_image.outputs.image }} my-release-image.img
