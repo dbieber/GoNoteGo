@@ -35,8 +35,17 @@ jobs:
         with:
           base_image: raspios_lite:2022-04-04
           commands: |
-            sudo apt update && sudo apt upgrade -y
-            sudo apt clean
+            sudo apt install -y git firefox-esr xvfb portaudio19-dev libatlas-base-dev redis-server espeak rustc python3-dev
+            mkdir -p /home/pi/code/github/dbieber
+            cd /home/pi/code/github/dbieber
+            git clone https://github.com/dbieber/GoNoteGo.git
+            cd GoNoteGo
+            # Checkout the specific commit
+            git checkout $GITHUB_SHA
+            cp gonotego/settings/secure_settings_template.py gonotego/settings/secure_settings.py
+            echo "Manually edit secure_settings.py to configure your settings."
+            mkdir /home/pi/secrets
+            echo "Manually transfer google_credentials.json to /home/pi/secrets."
       - name: Compress the release image
         run: |
           mv ${{ steps.build_image.outputs.image }} my-release-image.img
