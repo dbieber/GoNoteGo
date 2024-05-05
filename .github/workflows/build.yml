@@ -50,7 +50,6 @@ jobs:
             git checkout $GITHUB_SHA
 
             echo "Setting up Python environment"
-            mkdir out
             python3 -m venv env
             ./env/bin/pip install -e .  # Install Python dependencies
 
