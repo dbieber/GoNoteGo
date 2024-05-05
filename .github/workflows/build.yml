@@ -139,10 +139,10 @@ jobs:
 
       - name: Compress the release image
         run: |
-          mv ${{ steps.build_image.outputs.image }} my-release-image.img
-          xz -0 -T 0 -v my-release-image.img
+          mv ${{ steps.build_image.outputs.image }} go-note-go.img
+          xz -0 -T 0 -v go-note-go.img
       - name: Upload release image
         uses: actions/upload-artifact@v4
         with:
           name: Release image
-          path: my-release-image.img.xz
+          path: go-note-go.img.xz
