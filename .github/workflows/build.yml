@@ -29,30 +29,20 @@ jobs:
   build_image:
     runs-on: ubuntu-latest
     steps:
-      - name: Check disk space on runner
-        run: |
-          echo "Disk space usage on GitHub Runner:"
-          df -h
-
       - uses: pguyot/arm-runner-action@v2
         id: build_image
         with:
           base_image: raspios_lite:2022-04-04
           image_additional_mb: 4000
           commands: |
-            echo "Disk space usage:"
-            df -h
-            echo "Current directory size:"
-            du -sh .
-
             echo "Update!"
-            sudo apt update
+            sudo apt update && sudo apt upgrade -y
 
             echo "Install!"
             sudo apt install -y git firefox-esr xvfb portaudio19-dev
-            sudo apt install libatlas-base-dev redis-server espeak
-            sudo apt install rustc
-            sudo apt install python3-dev
+            sudo apt install -y libatlas-base-dev redis-server espeak
+            sudo apt install -y rustc
+            sudo apt install -y python3-dev
 
             echo "More setup!"
             mkdir -p /home/pi/code/github/dbieber
