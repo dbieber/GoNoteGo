@@ -32,7 +32,7 @@ jobs:
       - uses: pguyot/arm-runner-action@v2
         id: build_image
         with:
-          base_image: raspi_4_bookworm:20231109
+          base_image: https://downloads.raspberrypi.com/raspios_armhf/images/raspios_armhf-2024-03-15/2024-03-15-raspios-bookworm-armhf.img.xz
           image_additional_mb: 4000
           commands: |
             echo "Updating!"
