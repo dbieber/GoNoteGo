@@ -38,6 +38,7 @@ jobs:
         id: build_image
         with:
           base_image: raspios_lite:2022-04-04
+          image_additional_mb: 4000
           commands: |
             echo "Disk space usage:"
             df -h
