@@ -49,29 +49,93 @@ jobs:
             # Checkout the specific commit
             git checkout $GITHUB_SHA
 
-            # echo "Setting up Python environment"
-            # python3 -m venv env
-            # ./env/bin/pip install -e .  # Install Python dependencies
+            echo "Setting up Python environment"
+            python3 -m venv env
+            ./env/bin/pip install -e .  # Install Python dependencies
 
-            # echo "Start on boot"
-            # sudo cat /etc/rc.local
-            # sudo sed '/^exit 0/i \
-            #     /home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisord -c /home/pi/code/github/dbieber/GoNoteGo/gonotego/supervisord.conf
-            #     ' /etc/rc.local > ./rc.local.modified && mv ./rc.local.modified /etc/rc.local
+            echo "Start on boot"
+            sudo cat /etc/rc.local
+            sudo sed '/^exit 0/i \
+                /home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisord -c /home/pi/code/github/dbieber/GoNoteGo/gonotego/supervisord.conf
+                ' /etc/rc.local > ./rc.local.modified && mv ./rc.local.modified /etc/rc.local
 
-            # echo "Setting up Go Note Go:"
-            # cp gonotego/settings/secure_settings_template.py gonotego/settings/secure_settings.py
-            # echo "Manually edit secure_settings.py to configure your settings."
+            echo "Setting up Go Note Go:"
+            cp gonotego/settings/secure_settings_template.py gonotego/settings/secure_settings.py
+            echo "Manually edit secure_settings.py to configure your settings."
 
-            # mkdir /home/pi/secrets
-            # echo "Manually transfer secrets to /home/pi/secrets."
+            mkdir /home/pi/secrets
+            echo "Manually transfer secrets to /home/pi/secrets."
 
-            # echo "Install geckodriver to known location"
-            # cd
-            # wget https://github.com/mozilla/geckodriver/releases/download/v0.23.0/geckodriver-v0.23.0-arm7hf.tar.gz
-            # tar -xvf geckodriver-v0.23.0-arm7hf.tar.gz
-            # rm geckodriver-v0.23.0-arm7hf.tar.gz
-            # sudo mv geckodriver /usr/local/bin
+            echo "Install geckodriver to known location"
+            cd
+            wget https://github.com/mozilla/geckodriver/releases/download/v0.23.0/geckodriver-v0.23.0-arm7hf.tar.gz
+            tar -xvf geckodriver-v0.23.0-arm7hf.tar.gz
+            rm geckodriver-v0.23.0-arm7hf.tar.gz
+            sudo mv geckodriver /usr/local/bin
+
+            echo "Set up a wifi access point"
+            sudo apt install -y rng-tools hostapd dnsmasq 
+
+            cat <<EOF >> /etc/dhcpcd.conf
+            interface uap0
+            static ip_address=192.168.4.1/24
+            nohook wpa_supplicant
+            EOF
+
+            cat <<EOF >> /etc/dnsmasq.conf
+            interface=uap0
+            dhcp-range=192.168.4.2,192.168.4.20,255.255.255.0,24h
+            EOF
+
+            cat <<EOF >> /etc/systemd/system/uap0.service
+            [Unit]
+            Description=Create uap0 interface
+            After=sys-subsystem-net-devices-wlan0.device
+
+            [Service]
+            Type=oneshot
+            RemainAfterExit=true
+            ExecStart=/sbin/iw phy phy0 interface add uap0 type __ap
+            ExecStartPost=/usr/bin/ip link set dev uap0 address 00:11:22:33:44:55
+            ExecStartPost=/sbin/ifconfig uap0 up
+            ExecStop=/sbin/iw dev uap0 del
+
+            [Install]
+            WantedBy=multi-user.target
+            EOF
+
+            sudo systemctl daemon-reload
+            sudo systemctl start uap0.service
+            sudo systemctl enable uap0.service
+
+            cat <<EOF >> /etc/hostapd/hostapd.conf
+            interface=uap0
+            ssid=GoNoteGo-Wifi
+            hw_mode=g
+            channel=4
+            wmm_enabled=0
+            macaddr_acl=0
+            auth_algs=1
+            ignore_broadcast_ssid=0
+            wpa=2
+            wpa_passphrase=swingset
+            wpa_key_mgmt=WPA-PSK
+            wpa_pairwise=TKIP
+            rsn_pairwise=CCMP
+            EOF
+
+            cat <<EOF >> /etc/default/hostapd
+            DAEMON_CONF="/etc/hostapd/hostapd.conf"
+            EOF
+
+            sudo systemctl start hostapd
+            sudo systemctl start dnsmasq
+            sudo systemctl enable hostapd
+            sudo systemctl enable dnsmasq
+
+            cat <<EOF >> /etc/sysctl.conf
+            net.ipv4.ip_forward=1
+            EOF
 
       - name: Compress the release image
         run: |
