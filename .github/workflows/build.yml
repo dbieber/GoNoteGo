@@ -37,7 +37,10 @@ jobs:
             echo "Update!"
             sudo apt update
             echo "Install!"
-            sudo apt install -y git firefox-esr xvfb portaudio19-dev libatlas-base-dev redis-server espeak rustc python3-dev
+            sudo apt install -y git firefox-esr xvfb portaudio19-dev
+            sudo apt install libatlas-base-dev redis-server espeak
+            sudo apt install rustc
+            sudo apt install python3-dev
             mkdir -p /home/pi/code/github/dbieber
             cd /home/pi/code/github/dbieber
             git clone https://github.com/dbieber/GoNoteGo.git
