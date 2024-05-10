@@ -198,9 +198,12 @@ jobs:
       - name: Adjust image configuration
         run: |
           # Find the boot partition
+          echo "fdisk"
           sudo fdisk -l
+          echo "blkid"
           sudo blkid
           boot_partition=$(sudo blkid | grep "TYPE=\"efi\"" | cut -d: -f1)
+          echo "boot_partition"
           echo $boot_partition
 
           # Enable ssh
