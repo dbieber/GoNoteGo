@@ -202,7 +202,7 @@ jobs:
           sudo fdisk -l
           echo "blkid"
           sudo blkid
-          boot_partition=$(sudo blkid | grep "TYPE=\"efi\"" | cut -d: -f1)
+          boot_partition=$(sudo blkid | grep -E 'TYPE="vfat"' | grep -i "UEFI" | cut -d: -f1)
           echo "boot_partition"
           echo $boot_partition
 
