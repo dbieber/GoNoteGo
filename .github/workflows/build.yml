@@ -198,19 +198,14 @@ jobs:
       - name: Adjust image configuration
         run: |
           # Find the boot partition
-          echo "fdisk"
-          sudo fdisk -l
-          echo "blkid"
-          sudo blkid
           boot_partition=$(sudo blkid | grep -E 'TYPE="vfat"' | grep -i "UEFI" | cut -d: -f1)
-          echo "boot_partition"
-          echo $boot_partition
+          echo "boot_partition = $boot_partition"
 
           # Enable ssh
-          # sudo mkdir /mnt/efi
-          # sudo mount ${boot_partition} /mnt/efi
-          # sudo touch /mnt/efi/ssh
-          # sudo umount /mnt/efi
+          sudo mkdir /mnt/efi
+          sudo mount ${boot_partition} /mnt/efi
+          sudo touch /mnt/efi/ssh
+          sudo umount /mnt/efi
 
       - name: Compress the release image
         run: |
