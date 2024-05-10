@@ -198,13 +198,16 @@ jobs:
       - name: Adjust image configuration
         run: |
           # Find the boot partition
+          sudo fdisk -l
+          sudo blkid
           boot_partition=$(sudo blkid | grep "TYPE=\"efi\"" | cut -d: -f1)
+          echo $boot_partition
 
           # Enable ssh
-          sudo mkdir /mnt/efi
-          sudo mount ${boot_partition} /mnt/efi
-          sudo touch /mnt/efi/ssh
-          sudo umount /mnt/efi
+          # sudo mkdir /mnt/efi
+          # sudo mount ${boot_partition} /mnt/efi
+          # sudo touch /mnt/efi/ssh
+          # sudo umount /mnt/efi
 
       - name: Compress the release image
         run: |
