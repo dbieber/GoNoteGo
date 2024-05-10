@@ -213,7 +213,7 @@ jobs:
           sudo touch /mnt/efi/ssh
 
           # Set up the default user
-          sudo echo "pi:$(echo 'raspberry' | openssl passwd -6 -stdin)" > /mnt/efi/userconf.txt
+          echo "pi:$(echo 'raspberry' | openssl passwd -6 -stdin)" | sudo tee /mnt/efi/userconf.txt > /dev/null
 
           # Unmount the boot partition
           sudo umount /mnt/efi
