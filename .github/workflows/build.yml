@@ -195,16 +195,27 @@ jobs:
             net.ipv4.ip_forward=1
             EOF
 
+            systemctl stop userconfig
+            systemctl disable userconfig
+            systemctl mask userconfig
+
       - name: Adjust image configuration
         run: |
           # Find the boot partition
           boot_partition=$(sudo blkid | grep -E 'TYPE="vfat"' | grep -i "UEFI" | cut -d: -f1)
           echo "boot_partition = $boot_partition"
 
-          # Enable ssh
+          # Mount the boot partition
           sudo mkdir /mnt/efi
           sudo mount ${boot_partition} /mnt/efi
+
+          # Enable ssh
           sudo touch /mnt/efi/ssh
+
+          # Set up the default user
+          echo "pi:$(echo 'raspberry' | openssl passwd -6 -stdin)" > /mnt/efi/userconf.txt
+
+          # Unmount the boot partition
           sudo umount /mnt/efi
 
       - name: Compress the release image
