@@ -195,9 +195,15 @@ jobs:
             net.ipv4.ip_forward=1
             EOF
 
-            systemctl stop userconfig
-            systemctl disable userconfig
-            systemctl mask userconfig
+            # Attempt to not run config on first boot
+            sudo rm /etc/xdg/autostart/piwiz.desktop
+            # systemctl stop userconfig
+            # systemctl disable userconfig
+            # systemctl mask userconfig
+
+            # Enable ssh
+            ssh-keygen -A &&
+            update-rc.d ssh enable
 
       - name: Adjust image configuration
         run: |
