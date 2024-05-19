@@ -33,6 +33,8 @@ jobs:
         id: build_image
         with:
           base_image: https://downloads.raspberrypi.com/raspios_armhf/images/raspios_armhf-2024-03-15/2024-03-15-raspios-bookworm-armhf.img.xz
+          bootpartition: 1
+          rootpartition: 2
           image_additional_mb: 4000
           commands: |
             echo "Updating!"
