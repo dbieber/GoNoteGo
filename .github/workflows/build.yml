@@ -22,7 +22,7 @@ jobs:
           python -m uv pip install .[test]
       - name: Lint with ruff
         run: |
-          ruff .
+          python -m ruff .
       - name: Test with pytest
         run: |
           python -m pytest
@@ -51,8 +51,8 @@ jobs:
             git checkout $GITHUB_SHA
 
             echo "Setting up Python environment"
-            python3 -m venv env
             ./env/bin/pip install uv
+            ./env/bin/uv venv
             ./env/bin/uv pip install -e .  # Install Python dependencies
 
             echo "Start on boot"
