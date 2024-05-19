@@ -28,6 +28,7 @@ dependencies = [
   'numpy',
   'openai',
   'parsedatetime',
+  'python-dateutil',
   'redis',
   # selenium 4.0 breaks with arm geckodriver.
   'selenium==3.141.0',
@@ -36,6 +37,7 @@ dependencies = [
   'soundfile',
   'supervisor',
   'twython',
+  "urllib3==1.26.16",  # For compatibility with selenium==3.141.0
 ]
 
 [project.optional-dependencies]

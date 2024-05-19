@@ -36,13 +36,15 @@ jobs:
         id: build_image
         with:
           base_image: https://downloads.raspberrypi.com/raspios_armhf/images/raspios_armhf-2024-03-15/2024-03-15-raspios-bookworm-armhf.img.xz
+          bootpartition: 1
+          rootpartition: 2
           image_additional_mb: 4000
           commands: |
             echo "Updating!"
             sudo apt update
 
             echo "Installing dependencies!"
-            sudo apt install -y git firefox-esr xvfb portaudio19-dev libatlas-base-dev redis-server espeak rustc python3-dev
+            sudo apt install -y git firefox-esr xvfb portaudio19-dev libatlas-base-dev redis-server espeak rustc python3-dev libopenblas-dev
 
             echo "Installing Go Note Go!"
             mkdir -p /home/pi/code/github/dbieber
@@ -59,7 +61,7 @@ jobs:
             echo "Start on boot"
             sudo cat /etc/rc.local
             sudo sed '/^exit 0/i \
-                /home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisord -c /home/pi/code/github/dbieber/GoNoteGo/gonotego/supervisord.conf
+            /home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisord -c /home/pi/code/github/dbieber/GoNoteGo/gonotego/supervisord.conf
                 ' /etc/rc.local > ./rc.local.modified && mv ./rc.local.modified /etc/rc.local
 
             echo "Setting up Go Note Go:"
@@ -199,10 +201,10 @@ jobs:
             EOF
 
             # Attempt to not run config on first boot
-            sudo rm /etc/xdg/autostart/piwiz.desktop
-            # systemctl stop userconfig
-            # systemctl disable userconfig
-            # systemctl mask userconfig
+            sudo apt purge piwiz -y
+            sudo raspi-config nonint do_wifi_country US
+            touch /boot/ssh
+            echo "pi:$(echo 'raspberry' | openssl passwd -6 -stdin)" | sudo tee /boot/userconf > /dev/null
 
             # Enable ssh
             ssh-keygen -A &&
@@ -210,6 +212,7 @@ jobs:
 
             # Add commands to the bash history for debugging purposes
             cat << EOF >> /home/pi/.bash_history
+            sudo reboot now
             sudo systemctl daemon-reload
             sudo systemctl status uap0.service
             sudo systemctl status dnsmasq.service
@@ -225,31 +228,15 @@ jobs:
             cat /etc/sysctl.conf
             cat /etc/dhcpcd.conf
             cat /etc/dnsmasq.conf
-            cat /etc/wpa_supplicant/wpa_supplicant.conf
+            sudo cat /etc/wpa_supplicant/wpa_supplicant.conf
+            sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+            nano /home/pi/code/github/dbieber/GoNoteGo/gonotego/settings/secure_settings.py
             /home/pi/code/github/dbieber/GoNoteGo/env/bin/python
+            /home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisord -c /home/pi/code/github/dbieber/GoNoteGo/gonotego/supervisord.conf
             /home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisorctl -u go -p notego status
             /home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisorctl -u go -p notego restart all
             cd /home/pi/code/github/dbieber/GoNoteGo/
             EOF
-
-      - name: Adjust image configuration
-        run: |
-          # Find the boot partition
-          boot_partition=$(sudo blkid | grep -E 'TYPE="vfat"' | grep -i "UEFI" | cut -d: -f1)
-          echo "boot_partition = $boot_partition"
-
-          # Mount the boot partition
-          sudo mkdir /mnt/efi
-          sudo mount ${boot_partition} /mnt/efi
-
-          # Enable ssh
-          sudo touch /mnt/efi/ssh
-
-          # Set up the default user
-          echo "pi:$(echo 'raspberry' | openssl passwd -6 -stdin)" | sudo tee /mnt/efi/userconf.txt > /dev/null
-
-          # Unmount the boot partition
-          sudo umount /mnt/efi
 
       - name: Compress the release image
         run: |
