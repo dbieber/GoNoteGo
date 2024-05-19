@@ -64,6 +64,7 @@ jobs:
             bash /home/pi/code/github/dbieber/GoNoteGo/scripts/install_settings.sh
             /home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisord -c /home/pi/code/github/dbieber/GoNoteGo/gonotego/supervisord.conf
                 ' /etc/rc.local > ./rc.local.modified && mv ./rc.local.modified /etc/rc.local
+            sudo chmod +x /etc/rc.local
 
             echo "Setting up Go Note Go:"
             cp gonotego/settings/secure_settings_template.py gonotego/settings/secure_settings.py
