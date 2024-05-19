@@ -17,8 +17,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install Python dependencies
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install .[test]
+          python -m pip install uv
+          python -m uv pip install .[test]
       - name: Lint with ruff
         run: |
           ruff .
@@ -51,7 +51,8 @@ jobs:
 
             echo "Setting up Python environment"
             python3 -m venv env
-            ./env/bin/pip install -e .  # Install Python dependencies
+            ./env/bin/pip install uv
+            ./env/bin/uv pip install -e .  # Install Python dependencies
 
             echo "Start on boot"
             sudo cat /etc/rc.local
