@@ -1,5 +1,7 @@
 """Selenium driver utilities."""
 
+import os
+
 
 class DriverUtils:
 
@@ -21,7 +23,8 @@ class DriverUtils:
     return self.driver.find_elements_by_xpath(f"//*[contains(text(),'{text}')]")
 
   def execute_script_tag(self, js):
-    with open('gonotego/uploader/browser/template.js') as f:
+    template_js_path = os.path.join(os.path.dirname(__file__), 'template.js')
+    with open(template_js_path, 'r') as f:
       template = f.read()
     js = js.replace('`', r'\`').replace('${', r'\${')
     js = template.replace('<SOURCE>', js)

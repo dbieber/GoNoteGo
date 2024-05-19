@@ -115,7 +115,8 @@ class RoamBrowser:
     time.sleep(seconds)
 
   def execute_helper_js(self):
-    with open('gonotego/uploader/roam/helper.js', 'r') as f:
+    helper_js_path = os.path.join(os.path.dirname(__file__), 'helper.js')
+    with open(helper_js_path, 'r') as f:
       js = f.read()
     self.utils.execute_script_tag(js)
 
