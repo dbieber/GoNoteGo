@@ -1,5 +1,7 @@
 """Selenium driver utilities."""
 
+import os
+
 
 class DriverUtils:
 
