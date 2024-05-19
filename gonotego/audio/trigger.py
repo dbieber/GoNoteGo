@@ -32,7 +32,9 @@ def is_pressed():
     )
   else:
     button_pressed = False
-  return (
-      keyboard.is_pressed(settings.get("HOTKEY"))
-      or button_pressed
-  )
+  audio_hotkey_pressed = False
+  try:
+    audio_hotkey_pressed = keyboard.is_pressed(settings.get("HOTKEY"))
+  except:
+    pass
+  return audio_hotkey_pressed or button_pressed

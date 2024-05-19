@@ -21,11 +21,13 @@ def set_audio_recording_status(recording):
   if recording:
     indicators.set(state=1)
     if status.get(Status.VOLUME_SETTING) != 'off':
+      # TODO(dbieber): Get absolute path to beeps.
       subprocess.call(['aplay', 'gonotego/assets/beep_hi.wav'])
 
   else:
     indicators.set(state=0)
     if status.get(Status.VOLUME_SETTING) != 'off':
+      # TODO(dbieber): Get absolute path to beeps.
       subprocess.call(['aplay', 'gonotego/assets/beep_lo.wav'])
 
 
