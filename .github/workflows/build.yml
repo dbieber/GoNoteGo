@@ -18,6 +18,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install uv
+          python -m uv venv
           python -m uv pip install .[test]
       - name: Lint with ruff
         run: |
