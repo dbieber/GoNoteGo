@@ -229,6 +229,7 @@ jobs:
             sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
             nano /home/pi/code/github/dbieber/GoNoteGo/gonotego/settings/secure_settings.py
             /home/pi/code/github/dbieber/GoNoteGo/env/bin/python
+            /home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisord -c /home/pi/code/github/dbieber/GoNoteGo/gonotego/supervisord.conf
             /home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisorctl -u go -p notego status
             /home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisorctl -u go -p notego restart all
             cd /home/pi/code/github/dbieber/GoNoteGo/
