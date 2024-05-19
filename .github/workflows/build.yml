@@ -54,8 +54,7 @@ jobs:
 
             echo "Setting up Python environment"
             python3 -m venv env
-            ./env/bin/pip install uv
-            VIRTUAL_ENV=./env ./env/bin/uv pip install -e .  # Install Python dependencies
+            ./env/bin/pip install -e .  # Install Python dependencies
 
             echo "Start on boot"
             sudo cat /etc/rc.local
