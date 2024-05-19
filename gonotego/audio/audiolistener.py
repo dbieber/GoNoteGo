@@ -5,7 +5,6 @@ import sounddevice as sd
 import soundfile as sf
 
 from gonotego.common import status
-from gonotego.leds import indicators
 
 Status = status.Status
 

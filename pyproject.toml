@@ -24,7 +24,6 @@ dependencies = [
   'dropbox',
   'fire>=0.4.0',
   'keyboard',
-  'mouse',
   'numpy',
   'openai',
   'parsedatetime',
