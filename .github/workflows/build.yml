@@ -196,10 +196,9 @@ jobs:
             EOF
 
             # Attempt to not run config on first boot
-            sudo rm /etc/xdg/autostart/piwiz.desktop
-            # systemctl stop userconfig
-            # systemctl disable userconfig
-            # systemctl mask userconfig
+            sudo apt purge piwiz
+            touch /boot/firmware/ssh
+            echo "pi:$(echo 'raspberry' | openssl passwd -6 -stdin)" | sudo tee /boot/firmware/userconf > /dev/null
 
             # Enable ssh
             ssh-keygen -A &&
@@ -228,25 +227,6 @@ jobs:
             /home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisorctl -u go -p notego restart all
             cd /home/pi/code/github/dbieber/GoNoteGo/
             EOF
-
-      - name: Adjust image configuration
-        run: |
-          # Find the boot partition
-          boot_partition=$(sudo blkid | grep -E 'TYPE="vfat"' | grep -i "UEFI" | cut -d: -f1)
-          echo "boot_partition = $boot_partition"
-
-          # Mount the boot partition
-          sudo mkdir /mnt/efi
-          sudo mount ${boot_partition} /mnt/efi
-
-          # Enable ssh
-          sudo touch /mnt/efi/ssh
-
-          # Set up the default user
-          echo "pi:$(echo 'raspberry' | openssl passwd -6 -stdin)" | sudo tee /mnt/efi/userconf.txt > /dev/null
-
-          # Unmount the boot partition
-          sudo umount /mnt/efi
 
       - name: Compress the release image
         run: |
