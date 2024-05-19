@@ -61,6 +61,7 @@ jobs:
             echo "Start on boot"
             sudo cat /etc/rc.local
             sudo sed '/^exit 0/i \
+            bash /home/pi/code/github/dbieber/GoNoteGo/scripts/install_settings.sh
             /home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisord -c /home/pi/code/github/dbieber/GoNoteGo/gonotego/supervisord.conf
                 ' /etc/rc.local > ./rc.local.modified && mv ./rc.local.modified /etc/rc.local
 
