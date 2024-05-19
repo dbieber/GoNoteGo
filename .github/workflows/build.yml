@@ -195,9 +195,39 @@ jobs:
             net.ipv4.ip_forward=1
             EOF
 
-            systemctl stop userconfig
-            systemctl disable userconfig
-            systemctl mask userconfig
+            # Attempt to not run config on first boot
+            sudo rm /etc/xdg/autostart/piwiz.desktop
+            # systemctl stop userconfig
+            # systemctl disable userconfig
+            # systemctl mask userconfig
+
+            # Enable ssh
+            ssh-keygen -A &&
+            update-rc.d ssh enable
+
+            # Add commands to the bash history for debugging purposes
+            cat << EOF >> /home/pi/.bash_history
+            sudo systemctl daemon-reload
+            sudo systemctl status uap0.service
+            sudo systemctl status dnsmasq.service
+            sudo systemctl status hostapd.service
+            sudo journalctl -u uap0.service
+            sudo journalctl -u dnsmasq.service
+            sudo journalctl -u hostapd.service
+            ip addr show uap0
+            cat /etc/rc.local
+            cat /etc/default/hostapd
+            cat /etc/hostapd/hostapd.conf
+            cat /etc/systemd/system/uap0.service
+            cat /etc/sysctl.conf
+            cat /etc/dhcpcd.conf
+            cat /etc/dnsmasq.conf
+            cat /etc/wpa_supplicant/wpa_supplicant.conf
+            /home/pi/code/github/dbieber/GoNoteGo/env/bin/python
+            /home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisorctl -u go -p notego status
+            /home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisorctl -u go -p notego restart all
+            cd /home/pi/code/github/dbieber/GoNoteGo/
+            EOF
 
       - name: Adjust image configuration
         run: |
