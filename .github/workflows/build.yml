@@ -197,6 +197,7 @@ jobs:
 
             # Attempt to not run config on first boot
             sudo apt purge piwiz
+            sudo raspi-config nonint do_wifi_country US
             touch /boot/firmware/ssh
             echo "pi:$(echo 'raspberry' | openssl passwd -6 -stdin)" | sudo tee /boot/firmware/userconf > /dev/null
 
