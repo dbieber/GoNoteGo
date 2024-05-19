@@ -23,7 +23,7 @@ jobs:
       - name: Lint with ruff
         run: |
           source .venv/bin/activate
-          python -m ruff .
+          python -m ruff check .
       - name: Test with pytest
         run: |
           source .venv/bin/activate
@@ -53,9 +53,9 @@ jobs:
             git checkout $GITHUB_SHA
 
             echo "Setting up Python environment"
+            python3 -m venv env
             ./env/bin/pip install uv
-            ./env/bin/uv venv
-            ./env/bin/uv pip install -e .  # Install Python dependencies
+            VIRTUAL_ENV=./env ./env/bin/uv pip install -e .  # Install Python dependencies
 
             echo "Start on boot"
             sudo cat /etc/rc.local

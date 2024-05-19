@@ -56,9 +56,9 @@ test = [
 
 [tool.ruff]
 line-length = 180
-ignore = ["E722"]
-show-source = true
-exclude = ['scratch']
+lint.ignore = ["E722"]
+output-format = "full"
+exclude = ["scratch"]
 
 [build-system]
 requires = ["setuptools>=43.0.0", "wheel"]
