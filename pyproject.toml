@@ -37,6 +37,7 @@ dependencies = [
   'soundfile',
   'supervisor',
   'twython',
+  "urllib3==1.26.16",  # For compatibility with selenium==3.141.0
 ]
 
 [project.optional-dependencies]

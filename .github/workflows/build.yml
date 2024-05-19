@@ -207,6 +207,7 @@ jobs:
 
             # Add commands to the bash history for debugging purposes
             cat << EOF >> /home/pi/.bash_history
+            sudo reboot now
             sudo systemctl daemon-reload
             sudo systemctl status uap0.service
             sudo systemctl status dnsmasq.service
@@ -222,7 +223,9 @@ jobs:
             cat /etc/sysctl.conf
             cat /etc/dhcpcd.conf
             cat /etc/dnsmasq.conf
-            cat /etc/wpa_supplicant/wpa_supplicant.conf
+            sudo cat /etc/wpa_supplicant/wpa_supplicant.conf
+            sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+            nano /home/pi/code/github/dbieber/GoNoteGo/gonotego/settings/secure_settings.py
             /home/pi/code/github/dbieber/GoNoteGo/env/bin/python
             /home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisorctl -u go -p notego status
             /home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisorctl -u go -p notego restart all
