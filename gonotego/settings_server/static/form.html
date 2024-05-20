@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Go Note Go Settings</title>
+    <link rel="stylesheet" type="text/css" href="/static/form.css">
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script type="text/babel" src="/static/form.js"></script>
+</head>
+<body>
+    <h1>Go Note Go Settings</h1>
+    <div id="root"></div>
+    <script type="text/babel">
+        var fields = {{ fields | tojson }};
+        ReactDOM.render(<Form fields={fields} />, document.getElementById('root'));
+    </script>
+</body>
+</html>
