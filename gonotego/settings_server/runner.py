@@ -1,7 +1,7 @@
 import inspect
 import os
 
-from flask import Flask, request, redirect, send_from_directory, render_template
+from flask import Flask, request, redirect, render_template
 
 from gonotego.settings import settings
 
