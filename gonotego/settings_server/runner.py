@@ -8,6 +8,12 @@ from gonotego.settings import settings
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, 'static')
 
+SCRIPTS = [
+    'https://unpkg.com/react@17/umd/react.development.js',
+    'https://unpkg.com/react-dom@17/umd/react-dom.development.js',
+    'https://unpkg.com/@babel/standalone/babel.min.js',
+]
+
 app = Flask(
     __name__,
     static_folder=STATIC_DIR,
@@ -36,7 +42,11 @@ def index():
         'type': 'text',
     }
     fields.append(field)
-  return render_template('form.html', fields=fields)
+  return render_template(
+      'form.html',
+      fields=fields,
+      scripts=SCRIPTS,
+  )
 
 
 @app.route('/submit', methods=['POST'])
@@ -49,4 +59,4 @@ def handle_submit():
 
 
 if __name__ == '__main__':
-  app.run(port=5002)
+  app.run(debug=True, port=5002)

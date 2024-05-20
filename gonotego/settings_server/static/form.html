@@ -3,9 +3,9 @@
 <head>
     <title>Go Note Go Settings</title>
     <link rel="stylesheet" type="text/css" href="/static/form.css">
-    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    {% for script in scripts %}
+    <script src="{{ script }}"></script>
+    {% endfor %}
     <script type="text/babel" src="/static/form.js"></script>
 </head>
 <body>
