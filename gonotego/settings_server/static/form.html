@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Go Note Go Settings</title>
+    <link rel="stylesheet" type="text/css" href="/static/form.css">
+    {% for script in scripts %}
+    <script src="{{ script }}"></script>
+    {% endfor %}
+    <script type="text/babel" src="/static/form.js"></script>
+</head>
+<body>
+    <h1>Go Note Go Settings</h1>
+    <div id="root"></div>
+    <script type="text/babel">
+        var fields = {{ fields | tojson }};
+        ReactDOM.render(<Form fields={fields} />, document.getElementById('root'));
+    </script>
+</body>
+</html>
