@@ -199,3 +199,7 @@ def reconfigure_wifi():
   shell('sudo ip addr add 192.168.4.1/24 dev uap0')
   shell('sudo systemctl start dnsmasq.service')
   shell('sudo systemctl start hostapd.service')
+
+@register_command('server stop')
+def reconfigure_wifi():
+  shell('sudo systemctl stop hostapd.service')
