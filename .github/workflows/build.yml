@@ -44,7 +44,7 @@ jobs:
             sudo apt update
 
             echo "Installing dependencies!"
-            sudo apt install -y git firefox-esr xvfb portaudio19-dev libatlas-base-dev redis-server espeak rustc python3-dev libopenblas-dev
+            sudo apt install -y git firefox-esr xvfb portaudio19-dev libatlas-base-dev redis-server espeak rustc python3-dev libopenblas-dev iptables iptables-persistent
 
             echo "Installing Go Note Go!"
             mkdir -p /home/pi/code/github/dbieber
@@ -223,6 +223,7 @@ jobs:
             sudo journalctl -u dnsmasq.service
             sudo journalctl -u hostapd.service
             ip addr show uap0
+            sudo ip addr add 192.168.4.1/24 dev uap0
             cat /etc/rc.local
             cat /etc/default/hostapd
             cat /etc/hostapd/hostapd.conf
@@ -230,6 +231,9 @@ jobs:
             cat /etc/sysctl.conf
             cat /etc/dhcpcd.conf
             cat /etc/dnsmasq.conf
+            python -m http.server
+            sudo iptables -t nat -A POSTROUTING -o wlan0 -j MASQUERADE
+            sudo iptables -t nat -L
             sudo cat /etc/wpa_supplicant/wpa_supplicant.conf
             sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
             nano /home/pi/code/github/dbieber/GoNoteGo/gonotego/settings/secure_settings.py
