@@ -184,3 +184,18 @@ network={{
 @register_command('wifi reconfigure')
 def reconfigure_wifi():
   shell('wpa_cli -i wlan0 reconfigure')
+
+
+@register_command('server')
+@register_command('settings')
+@register_command('configure')
+def reconfigure_wifi():
+  shell('sudo systemctl stop uap0.service')
+  shell('sudo systemctl stop dnsmasq.service')
+  shell('sudo systemctl stop hostapd.service')
+
+  shell('sudo systemctl start uap0.service')
+  shell('sudo ip addr show uap0')
+  shell('sudo ip addr add 192.168.4.1/24 dev uap0')
+  shell('sudo systemctl start dnsmasq.service')
+  shell('sudo systemctl start hostapd.service')
