@@ -197,6 +197,7 @@ def start_settings_server():
   shell('sudo systemctl start uap0.service')
   shell('sudo ip addr show uap0')
   shell('sudo ip addr add 192.168.4.1/24 dev uap0')
+  shell('sudo iptables -t nat -A POSTROUTING -o wlan0 -j MASQUERADE')
   shell('sudo systemctl start dnsmasq.service')
   shell('sudo systemctl start hostapd.service')
 
