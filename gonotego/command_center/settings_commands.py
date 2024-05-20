@@ -121,12 +121,6 @@ def clear_all_settings():
   say('Cleared.')
 
 
-@register_command('leds {}')
-def set_leds(value):
-  if value in ('off', 'on', 'low'):
-    status.set(Status.LEDS_SETTING, value)
-
-
 @register_command('v {}')
 @register_command('volume {}')
 def set_volume(value):
