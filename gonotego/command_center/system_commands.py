@@ -189,7 +189,7 @@ def reconfigure_wifi():
 @register_command('server')
 @register_command('settings')
 @register_command('configure')
-def reconfigure_wifi():
+def start_settings_server():
   shell('sudo systemctl stop uap0.service')
   shell('sudo systemctl stop dnsmasq.service')
   shell('sudo systemctl stop hostapd.service')
@@ -201,5 +201,5 @@ def reconfigure_wifi():
   shell('sudo systemctl start hostapd.service')
 
 @register_command('server stop')
-def reconfigure_wifi():
+def stop_settings_server():
   shell('sudo systemctl stop hostapd.service')
