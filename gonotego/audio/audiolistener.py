@@ -1,3 +1,4 @@
+import os
 import subprocess
 
 import numpy as np
@@ -17,16 +18,21 @@ def get_max_volume(samples):
 
 
 def set_audio_recording_status(recording):
+  # Navigate up two directories from the current file location
+  base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+  beep_hi_path = os.path.join(base_path, 'assets', 'beep_hi.wav')
+  beep_lo_path = os.path.join(base_path, 'assets', 'beep_lo.wav')
+
   status.set(Status.AUDIO_RECORDING, recording)
   if recording:
     indicators.set(state=1)
     if status.get(Status.VOLUME_SETTING) != 'off':
-      subprocess.call(['aplay', 'gonotego/assets/beep_hi.wav'])
+      subprocess.call(['aplay', beep_hi_path])
 
   else:
     indicators.set(state=0)
     if status.get(Status.VOLUME_SETTING) != 'off':
-      subprocess.call(['aplay', 'gonotego/assets/beep_lo.wav'])
+      subprocess.call(['aplay', beep_lo_path])
 
 
 class AudioListener:

@@ -30,8 +30,6 @@ def set(key, value):
     settings.set(key, value)
   if key.lower() in ('v', 'volume'):
     set_volume(value)
-  if key.lower() in ('l', 'leds'):
-    set_leds(value)
   if key.lower() in ('t', 'time'):
     set_time(value)
   if key.lower() in ('tz', 'timezone'):
@@ -119,12 +117,6 @@ def clear_setting(key):
 def clear_all_settings():
   settings.clear_all()
   say('Cleared.')
-
-
-@register_command('leds {}')
-def set_leds(value):
-  if value in ('off', 'on', 'low'):
-    status.set(Status.LEDS_SETTING, value)
 
 
 @register_command('v {}')

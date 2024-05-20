@@ -16,15 +16,12 @@ class Status(enum.Enum):
   AUDIO_RECORDING = enum.auto()
   TEXT_READY = enum.auto()
   TEXT_LAST_KEYPRESS = enum.auto()
-  MOUSE_LAST_MOVE = enum.auto()
   TRANSCRIPTION_READY = enum.auto()
   TRANSCRIPTION_ACTIVE = enum.auto()
   UPLOADER_READY = enum.auto()
   UPLOADER_ACTIVE = enum.auto()
   INTERNET_AVAILABLE = enum.auto()
-  LEDS_SETTING = enum.auto()
   VOLUME_SETTING = enum.auto()
-  PAUSED = enum.auto()
 
 
 def get_redis_key(key):

@@ -45,11 +45,6 @@ def main():
 
   print('Starting audio trigger loop.')
   while True:
-
-    paused = status.get(Status.PAUSED)
-    if paused:
-      time.sleep(1)
-
     pressed = trigger.is_pressed()
     newly_pressed = pressed and not last_pressed
     still_pressed = pressed and last_pressed
