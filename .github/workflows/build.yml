@@ -27,7 +27,7 @@ jobs:
       - name: Test with pytest
         run: |
           source .venv/bin/activate
-          python -m pytest
+          pytest
 
   build_image:
     runs-on: ubuntu-latest
