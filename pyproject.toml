@@ -23,6 +23,7 @@ dependencies = [
   'apscheduler',
   'dropbox',
   'fire>=0.4.0',
+  'flask',
   'keyboard',
   'numpy',
   'openai',
