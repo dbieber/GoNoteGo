@@ -59,7 +59,6 @@ test = [
 [tool.ruff]
 line-length = 180
 lint.ignore = ["E722"]
-output-format = "text"
 exclude = ["scratch"]
 
 [build-system]

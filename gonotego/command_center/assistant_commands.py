@@ -51,7 +51,7 @@ def chat_completion(messages, model='gpt-3.5-turbo'):
 def ask(prompt):
   response = create_completion(prompt)
   response_text = response.choices[0].text
-  system_commands.say(response_text)
+  system_commands.speak(response_text)
   note_commands.add_note(prompt)
   note_commands.add_indented_note(f'{response_text} #[[AI Response]]')
   return response_text
@@ -68,7 +68,7 @@ def ask_with_context(prompt=None):
   response_text = response.choices[0].text
   response_text = response_text.lstrip()
 
-  system_commands.say(response_text)
+  system_commands.speak(response_text)
   if prompt:
     note_commands.add_note(prompt)
   note_commands.add_indented_note(f'{response_text} #[[AI Response]]')
@@ -95,7 +95,7 @@ def chat_with_context(prompt=None, model='gpt-3.5-turbo'):
   response = chat_completion(messages)
   response_text = response.choices[0].message.content
 
-  system_commands.say(response_text)
+  system_commands.speak(response_text)
   if prompt:
     note_commands.add_note(prompt)
   note_commands.add_indented_note(f'{response_text} #[[AI Response]]')
