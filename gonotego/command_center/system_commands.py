@@ -56,17 +56,17 @@ def status_command():
   say('ok')
 
 
-@register_command('say {}')
-def say(text):
+@register_command('speak {}')
+def speak(text):
   try:
     say_with_openai(text)
   except:
-    print("Falling back on say_traditional")
-    say_traditional(text)
+    print("Falling back on traditional say")
+    say(text)
 
 
-@register_command('say_trad {}')
-def say_traditional(text):
+@register_command('say {}')
+def say(text):
   dt = datetime.now().strftime('%k:%M:%S')
   with open('tmp-say', 'w') as tmp:
     print(f'[{dt}] Writing "{text}" to tmp-say')
