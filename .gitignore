@@ -9,6 +9,7 @@ screenshot-*.png
 geckodriver.log
 scratch
 env
+.venv
 tmp-say
 auth_url
 build

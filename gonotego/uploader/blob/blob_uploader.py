@@ -20,5 +20,9 @@ def upload_blob(filepath, client):
   dropbox_path = f'/{filepath}'
   with open(filepath, 'rb') as f:
     unused_file_metadata = client.files_upload(f.read(), dropbox_path)  # noqa
-    link_metadata = client.sharing_create_shared_link(dropbox_path)
+    try:
+      link_metadata = client.sharing_create_shared_link(dropbox_path)
+    except dropbox.exceptions.ApiError as e:
+      print(e)
+      return None
   return link_metadata.url.replace('www.', 'dl.').replace('?dl=0', '')

@@ -118,7 +118,7 @@ def update():
 
 @register_command('restart')
 def restart():
-  shell('./env/bin/supervisorctl -u go -p notego restart all')
+  shell('./.venv/bin/supervisorctl -u go -p notego restart all')
 
 
 @register_command('reboot')

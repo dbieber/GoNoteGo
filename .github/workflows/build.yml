@@ -58,15 +58,16 @@ jobs:
             git checkout $GITHUB_SHA
 
             echo "Setting up Python environment"
-            python3 -m venv env
-            ./env/bin/pip install -e .  # Install Python dependencies
+            python3 -m pip install uv
+            python3 -m uv venv
+            python3 -m uv pip install -e .  # Install Python dependencies
 
             echo "Start on boot"
             sudo cat /etc/rc.local
             sudo sed '/^exit 0/i \
             sudo -u pi mkdir -p /home/pi/out \
             bash /home/pi/code/github/dbieber/GoNoteGo/scripts/install_settings.sh \
-            /home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisord -c /home/pi/code/github/dbieber/GoNoteGo/gonotego/supervisord.conf \
+            /home/pi/code/github/dbieber/GoNoteGo/.venv/bin/supervisord -c /home/pi/code/github/dbieber/GoNoteGo/gonotego/supervisord.conf \
                 ' /etc/rc.local > ./rc.local.modified && sudo mv ./rc.local.modified /etc/rc.local
             sudo chmod +x /etc/rc.local
 
@@ -236,15 +237,16 @@ jobs:
             cat /etc/dhcpcd.conf
             cat /etc/dnsmasq.conf
             python -m http.server
+            python3 -m http.server
             sudo iptables -t nat -A POSTROUTING -o wlan0 -j MASQUERADE
             sudo iptables -t nat -L
             sudo cat /etc/wpa_supplicant/wpa_supplicant.conf
             sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
             nano /home/pi/code/github/dbieber/GoNoteGo/gonotego/settings/secure_settings.py
-            /home/pi/code/github/dbieber/GoNoteGo/env/bin/python
-            /home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisord -c /home/pi/code/github/dbieber/GoNoteGo/gonotego/supervisord.conf
-            /home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisorctl -u go -p notego status
-            /home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisorctl -u go -p notego restart all
+            /home/pi/code/github/dbieber/GoNoteGo/.venv/bin/python
+            /home/pi/code/github/dbieber/GoNoteGo/.venv/bin/supervisord -c /home/pi/code/github/dbieber/GoNoteGo/gonotego/supervisord.conf
+            /home/pi/code/github/dbieber/GoNoteGo/.venv/bin/supervisorctl -u go -p notego status
+            /home/pi/code/github/dbieber/GoNoteGo/.venv/bin/supervisorctl -u go -p notego restart all
             cd /home/pi/code/github/dbieber/GoNoteGo/
             EOF
 

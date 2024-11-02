@@ -4,6 +4,8 @@ These instructions assume you're starting from a clean install of Raspbian,
 and that your Raspberry Pi is connected to an external monitor.
 Once you are set up, an external monitor will no longer be necessary.
 
+Update 2024: Newer, better instructions are in the works. Stay tuned!
+
 1.  Clone GoNoteGo
 
   ```bash
@@ -39,9 +41,9 @@ sudo apt install firefox-esr xvfb portaudio19-dev libatlas-base-dev redis-server
 cd /home/pi/code/github/dbieber/GoNoteGo
 mkdir out
 pip3 install virtualenv
-/home/pi/.local/bin/virtualenv env -p python3
-./env/bin/pip install grpcio -U --no-binary=grpcio
-./env/bin/pip install -e .
+/home/pi/.local/bin/virtualenv .venv -p python3
+./.venv/bin/pip install grpcio -U --no-binary=grpcio
+./.venv/bin/pip install -e .
 ```
 
 5. Start on boot
@@ -50,7 +52,7 @@ pip3 install virtualenv
 sudo nano /etc/rc.local
 ```
   Add this line to rc.local:
-  `/home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisord -c /home/pi/code/github/dbieber/GoNoteGo/gonotego/supervisord.conf`
+  `/home/pi/code/github/dbieber/GoNoteGo/.venv/bin/supervisord -c /home/pi/code/github/dbieber/GoNoteGo/gonotego/supervisord.conf`
 
 6. Install geckodriver to /usr/local/bin
 
