@@ -27,6 +27,7 @@ dependencies = [
   'keyboard<=0.13.5',
   'numpy<=2.1.3',
   'openai<=1.52.2',
+  'jiter<=0.6.1',  # for openai on arm (not directly required)
   'parsedatetime<=2.6',
   'python-dateutil<=2.8.2',
   'redis<=4.3.4',
