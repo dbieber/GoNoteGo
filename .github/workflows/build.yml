@@ -52,7 +52,6 @@ jobs:
             rustc --version
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
             rustc --version
-            rustup update -y
 
             echo "Installing Go Note Go!"
             mkdir -p /home/pi/code/github/dbieber
