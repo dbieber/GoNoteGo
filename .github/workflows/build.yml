@@ -48,8 +48,7 @@ jobs:
 
             echo "Installing dependencies!"
             sudo apt install -y git firefox-esr xvfb portaudio19-dev libatlas-base-dev redis-server \
-              espeak rustc python3-dev libopenblas-dev iptables iptables-persistent \
-              build-essential cargo
+              espeak rustc python3-dev libopenblas-dev iptables iptables-persistent
 
             echo "Installing Go Note Go!"
             mkdir -p /home/pi/code/github/dbieber
@@ -64,7 +63,7 @@ jobs:
             ./.venv/bin/pip install uv
             ./.venv/bin/python3 -m uv pip install openai --no-deps
             ./.venv/bin/python3 -m uv pip install anyio distro httpx sniffio tqdm typing_extensions  # openai deps, less jiter.
-            ./.venv/bin/python3 -m uv pip install --no-binary=:all: pydantic  # openai deps, less jiter.
+            ./.venv/bin/python3 -m uv pip install --no-binary=:all: pydantic --no-deps # openai deps, less jiter.
             ./.venv/bin/python3 -m uv pip install -e .  # Install Python dependencies
 
             echo "Start on boot"
