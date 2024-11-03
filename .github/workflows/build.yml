@@ -60,6 +60,8 @@ jobs:
             echo "Setting up Python environment"
             python3 -m venv .venv
             ./.venv/bin/pip install uv
+            ./.venv/bin/python3 -m uv pip install openai --no-deps
+            ./.venv/bin/python3 -m uv pip install anyio distro httpx pydantic sniffio tqdm typing_extensions  # openai deps, less jiter.
             ./.venv/bin/python3 -m uv pip install -e .  # Install Python dependencies
 
             echo "Start on boot"
