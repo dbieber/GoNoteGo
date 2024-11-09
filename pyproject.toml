@@ -19,24 +19,24 @@ classifiers = [
 ]
 
 dependencies = [
-  'absl-py',
-  'apscheduler',
-  'dropbox',
-  'fire>=0.4.0',
-  'flask',
-  'keyboard',
-  'numpy',
-  # 'openai',
-  'parsedatetime',
-  'python-dateutil',
-  'redis',
+  'absl-py<=2.1.0',
+  'apscheduler<=3.10.4',
+  'dropbox<=12.0.2',
+  'fire<=0.7.0',
+  'flask<=3.0.3',
+  'keyboard<=0.13.5',
+  'numpy<=2.1.3',
+  # 'openai<=1.52.2',
+  'parsedatetime<=2.6',
+  'python-dateutil<=2.8.2',
+  'redis<=4.3.4',
   # selenium 4.0 breaks with arm geckodriver.
   'selenium==3.141.0',
-  'setuptools-rust',
-  'sounddevice',
+  'setuptools-rust<=1.5.2',
+  'sounddevice<=0.4.5',
   'soundfile',
-  'supervisor',
-  'twython',
+  'supervisor<=4.2.4',
+  'twython<=3.9.1',
   "urllib3==1.26.19",  # For compatibility with selenium==3.141.0
 ]
 
