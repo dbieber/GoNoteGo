@@ -49,9 +49,6 @@ jobs:
             echo "Installing dependencies!"
             sudo apt install -y git firefox-esr xvfb portaudio19-dev libatlas-base-dev redis-server \
               espeak rustc python3-dev libopenblas-dev iptables iptables-persistent
-            rustc --version
-            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-            rustc --version
 
             echo "Installing Go Note Go!"
             mkdir -p /home/pi/code/github/dbieber
