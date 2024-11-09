@@ -62,5 +62,5 @@ lint.ignore = ["E722"]
 exclude = ["scratch"]
 
 [build-system]
-requires = ["setuptools>=43.0.0", "wheel"]
+requires = ["setuptools>=43.0.0", "setuptools-rust", "wheel"]
 build-backend = "setuptools.build_meta"
