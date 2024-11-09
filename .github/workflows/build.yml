@@ -32,6 +32,32 @@ jobs:
           source .venv/bin/activate
           pytest
 
+  build_tmp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: pguyot/arm-runner-action@v2
+        id: build_image
+        with:
+          base_image: https://downloads.raspberrypi.com/raspios_armhf/images/raspios_armhf-2024-03-15/2024-03-15-raspios-bookworm-armhf.img.xz
+          bootpartition: 1
+          rootpartition: 2
+          image_additional_mb: 4000
+          commands: |
+            ls
+
+      - name: Compress the release image
+        run: |
+          sudo fdisk -l
+          sudo ls /etc/xdg/autostart/
+          mv ${{ steps.build_image.outputs.image }} go-note-go.img
+          xz -0 -T 0 -v go-note-go.img
+      - name: Upload release image
+        uses: actions/upload-artifact@v4
+        with:
+          name: Release image
+          path: go-note-go.img.xz
+
+
   build_image:
     runs-on: ubuntu-latest
     steps:
@@ -61,9 +87,6 @@ jobs:
             echo "Setting up Python environment"
             python3 -m venv .venv
             ./.venv/bin/pip install uv
-            ./.venv/bin/python3 -m uv pip install openai --no-deps
-            ./.venv/bin/python3 -m uv pip install anyio distro httpx sniffio tqdm typing_extensions  # openai deps, less jiter.
-            ./.venv/bin/python3 -m uv pip install --no-binary=:all: pydantic --no-deps # openai deps, less jiter.
             ./.venv/bin/python3 -m uv pip install -e .  # Install Python dependencies
 
             echo "Start on boot"
