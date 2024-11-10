@@ -55,10 +55,10 @@ jobs:
             git checkout $GITHUB_SHA
 
             echo "Setting up settings-server"
-            pushd gonotego/settings-server
+            cd gonotego/settings-server
             npm install
             npm run build
-            popd
+            cd ../..
 
             echo "Setting up Python environment"
             python3 -m venv env
