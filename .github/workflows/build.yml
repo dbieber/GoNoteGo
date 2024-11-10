@@ -31,7 +31,7 @@ jobs:
 
       - name: Build web app
         run: |
-          cd GoNoteGo/gonotego/settings-server
+          cd gonotego/settings-server
           npm install
           npm run build
           cd ../..
@@ -40,7 +40,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: web-app-dist
-          path: GoNoteGo/gonotego/settings-server/dist
+          path: gonotego/settings-server/dist
 
   build_image:
     runs-on: ubuntu-latest
