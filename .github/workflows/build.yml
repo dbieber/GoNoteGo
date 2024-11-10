@@ -76,7 +76,7 @@ jobs:
             git checkout $GITHUB_SHA
 
             echo "Including web app"
-            cp -r /github/workspace/web-app-dist/dist /home/pi/code/github/dbieber/GoNoteGo/gonotego/settings-server/dist
+            cp -r /home/runner/work/GoNoteGo/GoNoteGo/web-app-dist /home/pi/code/github/dbieber/GoNoteGo/gonotego/settings-server/dist
 
             echo "Setting up Python environment"
             python3 -m venv env
