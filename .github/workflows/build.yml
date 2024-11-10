@@ -50,9 +50,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: web-app-dist
-          path: web-app-dist  # This will download `dist` into `web-app-dist/dist`
+          path: web-app-dist
 
-    steps:
       - uses: pguyot/arm-runner-action@v2
         id: build_image
         with:
