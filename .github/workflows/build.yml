@@ -54,6 +54,12 @@ jobs:
             # Checkout the specific commit
             git checkout $GITHUB_SHA
 
+            echo "Setting up settings-server"
+            pushd gonotego/settings-server
+            npm install
+            npm run build
+            popd
+
             echo "Setting up Python environment"
             python3 -m venv env
             ./env/bin/pip install -e .  # Install Python dependencies
