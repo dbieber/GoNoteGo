@@ -44,7 +44,8 @@ jobs:
             sudo apt update
 
             echo "Installing dependencies!"
-            sudo apt install -y git firefox-esr xvfb portaudio19-dev libatlas-base-dev redis-server espeak rustc python3-dev libopenblas-dev iptables iptables-persistent
+            sudo apt install -y git firefox-esr xvfb portaudio19-dev libatlas-base-dev redis-server espeak \
+                rustc python3-dev libopenblas-dev iptables iptables-persistent nodejs npm
 
             echo "Installing Go Note Go!"
             mkdir -p /home/pi/code/github/dbieber
@@ -54,10 +55,8 @@ jobs:
             # Checkout the specific commit
             git checkout $GITHUB_SHA
 
-            echo "Setting up settings-server"
+            echo "Building web app"
             cd gonotego/settings-server
-            curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
-            sudo apt install -y nodejs
             npm install
             npm run build
             cd ../..
