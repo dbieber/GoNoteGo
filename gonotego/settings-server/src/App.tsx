@@ -168,7 +168,7 @@ const SettingsUI = () => {
 
   return (
     <div className="w-full max-w-4xl mx-auto p-6 space-y-6">
-      <h1 className="text-3xl font-bold mb-8">Settings Configuration</h1>
+      <h1 className="text-3xl font-bold mb-8">Go Note Go Settings</h1>
 
       <Card className="mb-6">
         <CardHeader>
