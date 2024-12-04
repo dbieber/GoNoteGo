@@ -52,15 +52,13 @@ jobs:
           name: web-app-dist
           path: web-app-dist
 
-      - uses: pguyot/arm-runner-action@v2
+      - uses: dbieber/arm-runner-action@v2
         id: build_image
         with:
           base_image: https://downloads.raspberrypi.com/raspios_armhf/images/raspios_armhf-2024-03-15/2024-03-15-raspios-bookworm-armhf.img.xz
           bootpartition: 1
           rootpartition: 2
           image_additional_mb: 4000
-          bind: |
-            ${{ github.workspace }}/web-app-dist:/mnt/web-app-dist
           commands: |
             echo "Updating!"
             sudo apt update
