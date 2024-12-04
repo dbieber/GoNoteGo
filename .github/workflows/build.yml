@@ -61,8 +61,10 @@ jobs:
           image_additional_mb: 4000
           non_image_commands: |
             echo "Running!"
+            ls web-app-dist
             echo "cp -Rp web-app-dist /home/actions/temp/arm-runner/mnt/"
             sudo cp -Rp web-app-dist /home/actions/temp/arm-runner/mnt/web-app-dist
+            ls /home/actions/temp/arm-runner/mnt/web-app-dist
           commands: |
             echo "Updating!"
             sudo apt update
