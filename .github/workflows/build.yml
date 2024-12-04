@@ -61,6 +61,8 @@ jobs:
           image_additional_mb: 4000
           non_image_commands: |
             echo "Running!"
+            echo "cp -Rp web-app-dist ${{ steps.mount_image.outputs.mount }}web-app-dist"
+            sudo cp -Rp web-app-dist ${{ steps.mount_image.outputs.mount }}web-app-dist
           commands: |
             echo "Updating!"
             sudo apt update
