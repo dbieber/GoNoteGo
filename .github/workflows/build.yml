@@ -35,7 +35,7 @@ jobs:
           npm install
           npm run build
           cd ../..
-          
+
       - name: Archive web app build
         uses: actions/upload-artifact@v4
         with:
