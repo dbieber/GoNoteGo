@@ -65,7 +65,7 @@ jobs:
             ls web-app-dist
             pwd
             ls /home/runner/work/GoNoteGo/GoNoteGo/web-app-dist
-            echo "cp -r web-app-dist /home/actions/temp/arm-runner/mnt/"
+            echo "Here"
             sudo cp -r web-app-dist /home/actions/temp/arm-runner/mnt/web-app-dist
             ls /home/actions/temp/arm-runner/mnt/web-app-dist
           commands: |
