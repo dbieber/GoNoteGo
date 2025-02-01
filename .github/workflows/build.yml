@@ -60,14 +60,16 @@ jobs:
           bootpartition: 1
           rootpartition: 2
           image_additional_mb: 4000
-          non_image_commands: |
-            echo "Running!"
-            ls web-app-dist
-            pwd
-            ls /home/runner/work/GoNoteGo/GoNoteGo/web-app-dist
-            echo "Here"
-            sudo cp -r web-app-dist /home/actions/temp/arm-runner/mnt/web-app-dist
-            ls /home/actions/temp/arm-runner/mnt/web-app-dist
+          extra_files_path: /home/runner/work/GoNoteGo/GoNoteGo/web-app-dist
+          extra_files_mnt_path: web-app-dist
+          # non_image_commands: |
+          #   echo "Running!"
+          #   ls web-app-dist
+          #   pwd
+          #   ls /home/runner/work/GoNoteGo/GoNoteGo/web-app-dist
+          #   echo "Here"
+          #   sudo cp -r web-app-dist /home/actions/temp/arm-runner/mnt/web-app-dist
+          #   ls /home/actions/temp/arm-runner/mnt/web-app-dist
           commands: |
             echo "Updating!"
             sudo apt update
