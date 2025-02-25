@@ -62,22 +62,28 @@ jobs:
             exit 1
           fi
 
-      - uses: dbieber/arm-runner-action@v1.0.7
+      - uses: dbieber/arm-runner-action@v1.0.8
         id: build_image
         with:
           base_image: https://downloads.raspberrypi.com/raspios_armhf/images/raspios_armhf-2024-03-15/2024-03-15-raspios-bookworm-armhf.img.xz
           bootpartition: 1
           rootpartition: 2
-          image_additional_mb: 4000
+          image_additional_mb: 6000
           extra_files_path: /home/runner/work/GoNoteGo/GoNoteGo/web-app-dist
           extra_files_mnt_path: web-app-dist
           commands: |
-            echo "Updating!"
-            sudo apt update
+            echo "Updating package lists..."
+            sudo apt-get update
+            
+            # Clean up apt cache to free up space
+            sudo apt-get clean
 
             echo "Installing dependencies!"
             sudo apt install -y git firefox-esr xvfb portaudio19-dev libatlas-base-dev redis-server espeak \
                 rustc python3-dev libopenblas-dev iptables iptables-persistent nodejs npm
+                
+            # Clean up after installation
+            sudo apt-get clean
 
             echo "Installing Go Note Go!"
             mkdir -p /home/pi/code/github/dbieber
