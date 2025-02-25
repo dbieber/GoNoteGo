@@ -94,14 +94,14 @@ jobs:
             git checkout $GITHUB_SHA
 
             echo "Including web app"
-            echo "Checking contents of /mnt/web-app-dist:"
-            ls -la /mnt/web-app-dist
+            echo "Checking web app files at /web-app-dist:"
+            ls -la /web-app-dist
             
             echo "Creating settings-server directory:"
             mkdir -p /home/pi/code/github/dbieber/GoNoteGo/gonotego/settings-server/
             
             echo "Copying web app files:"
-            cp -r /mnt/web-app-dist /home/pi/code/github/dbieber/GoNoteGo/gonotego/settings-server/dist
+            cp -r /web-app-dist /home/pi/code/github/dbieber/GoNoteGo/gonotego/settings-server/dist
             
             echo "Verifying copied web app files:"
             ls -la /home/pi/code/github/dbieber/GoNoteGo/gonotego/settings-server/dist
