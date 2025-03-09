@@ -62,14 +62,13 @@ jobs:
             exit 1
           fi
 
-      - uses: dbieber/arm-runner-action@v1.0.8
+      - uses: dbieber/arm-runner-action@v1.0.9
         id: build_image
         with:
           base_image: https://downloads.raspberrypi.com/raspios_armhf/images/raspios_armhf-2024-03-15/2024-03-15-raspios-bookworm-armhf.img.xz
           bootpartition: 1
           rootpartition: 2
           image_additional_mb: 6000
-          bind_mount_repository: yes
           extra_files_path: /home/runner/work/GoNoteGo/GoNoteGo/web-app-dist
           extra_files_mnt_path: web-app-dist
           commands: |
