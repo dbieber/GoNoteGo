@@ -16,6 +16,19 @@ from gonotego.uploader.twitter import twitter_uploader
 
 Status = status.Status
 
+# List of supported note taking systems
+SUPPORTED_SYSTEMS = ['email', 'ideaflow', 'remnote', 'roam', 'mem', 'notion', 'twitter']
+
+def print_configuration_help():
+    """Print helpful message when NOTE_TAKING_SYSTEM is not configured."""
+    print("NOTE_TAKING_SYSTEM is not configured. Please set it using ':set NOTE_TAKING_SYSTEM [system]'")
+    print(f"Supported systems: {', '.join(SUPPORTED_SYSTEMS)}")
+    print("Example: ':set NOTE_TAKING_SYSTEM roam'")
+
+
+def is_unconfigured(note_taking_system):
+  """Check if the note taking system is unconfigured."""
+  return note_taking_system == '<note_taking_system>' or note_taking_system == ''
 
 def make_uploader(note_taking_system):
   if note_taking_system == 'email':
@@ -42,10 +55,8 @@ def main():
   note_taking_system = settings.get('NOTE_TAKING_SYSTEM').lower()
   
   # Check if note taking system is still using the default unconfigured value
-  if note_taking_system == '<note_taking_system>' or note_taking_system == '':
-    print("NOTE_TAKING_SYSTEM is not configured. Please set it using ':set NOTE_TAKING_SYSTEM [system]'")
-    print("Supported systems: email, ideaflow, remnote, roam, mem, notion, twitter")
-    print("Example: ':set NOTE_TAKING_SYSTEM roam'")
+  if is_unconfigured(note_taking_system):
+    print_configuration_help()
     return
     
   try:
@@ -66,10 +77,8 @@ def main():
       note_taking_system = note_taking_system_setting
       
       # Check if note taking system is using the default unconfigured value after a change
-      if note_taking_system == '<note_taking_system>' or note_taking_system == '':
-        print("NOTE_TAKING_SYSTEM is not configured. Please set it using ':set NOTE_TAKING_SYSTEM [system]'")
-        print("Supported systems: email, ideaflow, remnote, roam, mem, notion, twitter")
-        print("Example: ':set NOTE_TAKING_SYSTEM roam'")
+      if is_unconfigured(note_taking_system):
+        print_configuration_help()
         continue
         
       uploader = make_uploader(note_taking_system)
