@@ -17,6 +17,17 @@ from gonotego.uploader.twitter import twitter_uploader
 Status = status.Status
 
 
+def print_configuration_help():
+  """Print helpful message when NOTE_TAKING_SYSTEM is not configured."""
+  print("NOTE_TAKING_SYSTEM is not configured. Please set it using ':set NOTE_TAKING_SYSTEM [system]'")
+  print("Example: ':set NOTE_TAKING_SYSTEM roam'")
+
+
+def is_unconfigured(note_taking_system):
+  """Check if the note taking system is unconfigured."""
+  return note_taking_system == '<note_taking_system>' or note_taking_system == ''
+
+
 def make_uploader(note_taking_system):
   if note_taking_system == 'email':
     return email_uploader.Uploader()
@@ -40,6 +51,12 @@ def main():
   print('Starting uploader.')
   note_events_queue = interprocess.get_note_events_queue()
   note_taking_system = settings.get('NOTE_TAKING_SYSTEM').lower()
+  
+  # Check if note taking system is still using the default unconfigured value
+  if is_unconfigured(note_taking_system):
+    print_configuration_help()
+    return
+    
   try:
     uploader = make_uploader(note_taking_system)
   except ValueError as e:
@@ -56,6 +73,12 @@ def main():
     note_taking_system_setting = settings.get('NOTE_TAKING_SYSTEM').lower()
     if note_taking_system_setting != note_taking_system:
       note_taking_system = note_taking_system_setting
+      
+      # Check if note taking system is using the default unconfigured value after a change
+      if is_unconfigured(note_taking_system):
+        print_configuration_help()
+        continue
+        
       uploader = make_uploader(note_taking_system)
 
     note_event_bytes_list = []
