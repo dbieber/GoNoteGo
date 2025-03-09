@@ -28,7 +28,7 @@ dependencies = [
   'numpy<=2.1.3',
   'openai<=1.52.2',
   'parsedatetime<=2.6',
-  'python-dateutil<=2.8.2',
+  'python-dateutil<=2.9.0',
   'redis<=4.3.4',
   # selenium 4.0 breaks with arm geckodriver.
   'selenium==3.141.0',
