@@ -26,6 +26,8 @@ const SettingsUI = () => {
     HOTKEY: '',
     NOTE_TAKING_SYSTEM: '',
     BLOB_STORAGE_SYSTEM: '',
+    WIFI_SSID: '',
+    WIFI_PASSWORD: '',
     ROAM_GRAPH: '',
     ROAM_USER: '',
     ROAM_PASSWORD: '',
@@ -68,13 +70,51 @@ const SettingsUI = () => {
     }));
   };
 
-  const handleSave = () => {
+  // Load settings on mount
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  const fetchSettings = async () => {
+    try {
+      const response = await fetch('http://localhost:8001/api/settings');
+      if (response.ok) {
+        const data = await response.json();
+        setSettings(prevSettings => ({
+          ...prevSettings,
+          ...data
+        }));
+      } else {
+        console.error('Failed to fetch settings');
+      }
+    } catch (error) {
+      console.error('Error fetching settings:', error);
+    }
+  };
+
+  const handleSave = async () => {
     setSaveStatus('saving');
-    // Simulated save operation
-    setTimeout(() => {
-      setSaveStatus('saved');
+    try {
+      const response = await fetch('http://localhost:8001/api/settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(settings),
+      });
+      
+      if (response.ok) {
+        setSaveStatus('saved');
+        setTimeout(() => setSaveStatus(null), 2000);
+      } else {
+        setSaveStatus('error');
+        setTimeout(() => setSaveStatus(null), 2000);
+      }
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      setSaveStatus('error');
       setTimeout(() => setSaveStatus(null), 2000);
-    }, 1000);
+    }
   };
 
   const addCustomPath = () => {
@@ -228,6 +268,57 @@ const SettingsUI = () => {
               value={settings.BLOB_STORAGE_SYSTEM}
               onChange={(e) => handleChange('BLOB_STORAGE_SYSTEM', e.target.value)}
             />
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card className="mb-6">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <CardTitle className="text-xl">WiFi Configuration</CardTitle>
+            <HoverCard>
+              <HoverCardTrigger>
+                <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors cursor-help" />
+              </HoverCardTrigger>
+              <HoverCardContent className="w-80">
+                <div className="space-y-2">
+                  <p>Configure the WiFi network settings.</p>
+                  <p className="text-muted-foreground text-xs">A device restart may be required after changing these settings.</p>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
+          </div>
+          <CardDescription>Configure your WiFi network connection</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4">
+          <div className="grid gap-2">
+            <label className="text-sm font-medium">WiFi SSID (Network Name)</label>
+            <Input
+              value={settings.WIFI_SSID}
+              onChange={(e) => handleChange('WIFI_SSID', e.target.value)}
+              placeholder="Your WiFi network name"
+            />
+          </div>
+          <div className="grid gap-2">
+            <label className="text-sm font-medium">WiFi Password</label>
+            <div className="relative">
+              <Input
+                type={showPasswords.WIFI_PASSWORD ? 'text' : 'password'}
+                value={settings.WIFI_PASSWORD}
+                onChange={(e) => handleChange('WIFI_PASSWORD', e.target.value)}
+                placeholder="Your WiFi password"
+                className="pr-10"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                onClick={() => togglePasswordVisibility('WIFI_PASSWORD')}
+              >
+                {showPasswords.WIFI_PASSWORD ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -488,6 +579,11 @@ const SettingsUI = () => {
           {saveStatus === 'saved' && (
             <Alert className="w-72">
               <AlertDescription>Settings saved successfully!</AlertDescription>
+            </Alert>
+          )}
+          {saveStatus === 'error' && (
+            <Alert className="w-72 bg-red-100 border-red-200 text-red-700">
+              <AlertDescription>Failed to save settings. Please try again.</AlertDescription>
             </Alert>
           )}
           <Button

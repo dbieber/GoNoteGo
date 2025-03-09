@@ -5,6 +5,7 @@ import subprocess
 from dateutil import parser
 
 from gonotego.common import status
+from gonotego.common import wifi
 from gonotego.command_center import registry
 from gonotego.command_center import system_commands
 from gonotego.settings import settings
@@ -124,3 +125,24 @@ def clear_all_settings():
 def set_volume(value):
   if value in ('off', 'on'):
     status.set(Status.VOLUME_SETTING, value)
+
+
+@register_command('wifi connect')
+def connect_wifi():
+  """Apply WiFi settings from configuration and attempt to connect."""
+  say('Connecting to WiFi...')
+  result = wifi.apply_wifi_settings()
+  if result:
+    say('Successfully connected to WiFi network.')
+  else:
+    say('Failed to connect to WiFi network. Please check your settings.')
+
+
+@register_command('wifi status')
+def wifi_status():
+  """Get the current WiFi connection status."""
+  status = wifi.get_wifi_status()
+  if status['connected']:
+    say(f"Connected to {status['ssid']} with signal strength {status['signal_strength']}. IP address: {status['ip_address']}")
+  else:
+    say('Not connected to any WiFi network.')
