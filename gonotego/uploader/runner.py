@@ -40,6 +40,14 @@ def main():
   print('Starting uploader.')
   note_events_queue = interprocess.get_note_events_queue()
   note_taking_system = settings.get('NOTE_TAKING_SYSTEM').lower()
+  
+  # Check if note taking system is still using the default unconfigured value
+  if note_taking_system == '<note_taking_system>' or note_taking_system == '':
+    print("NOTE_TAKING_SYSTEM is not configured. Please set it using ':set NOTE_TAKING_SYSTEM [system]'")
+    print("Supported systems: email, ideaflow, remnote, roam, mem, notion, twitter")
+    print("Example: ':set NOTE_TAKING_SYSTEM roam'")
+    return
+    
   try:
     uploader = make_uploader(note_taking_system)
   except ValueError as e:
@@ -56,6 +64,14 @@ def main():
     note_taking_system_setting = settings.get('NOTE_TAKING_SYSTEM').lower()
     if note_taking_system_setting != note_taking_system:
       note_taking_system = note_taking_system_setting
+      
+      # Check if note taking system is using the default unconfigured value after a change
+      if note_taking_system == '<note_taking_system>' or note_taking_system == '':
+        print("NOTE_TAKING_SYSTEM is not configured. Please set it using ':set NOTE_TAKING_SYSTEM [system]'")
+        print("Supported systems: email, ideaflow, remnote, roam, mem, notion, twitter")
+        print("Example: ':set NOTE_TAKING_SYSTEM roam'")
+        continue
+        
       uploader = make_uploader(note_taking_system)
 
     note_event_bytes_list = []
