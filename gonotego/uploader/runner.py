@@ -16,13 +16,9 @@ from gonotego.uploader.twitter import twitter_uploader
 
 Status = status.Status
 
-# List of supported note taking systems
-SUPPORTED_SYSTEMS = ['email', 'ideaflow', 'remnote', 'roam', 'mem', 'notion', 'twitter']
-
 def print_configuration_help():
     """Print helpful message when NOTE_TAKING_SYSTEM is not configured."""
     print("NOTE_TAKING_SYSTEM is not configured. Please set it using ':set NOTE_TAKING_SYSTEM [system]'")
-    print(f"Supported systems: {', '.join(SUPPORTED_SYSTEMS)}")
     print("Example: ':set NOTE_TAKING_SYSTEM roam'")
 
 
