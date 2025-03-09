@@ -179,6 +179,12 @@ network={{
   reconfigure_wifi()
 
 
+@register_command('wifi scan')
+def scan_wifi_networks():
+  """Scan for available WiFi networks."""
+  shell('sudo iwlist wlan0 scan | grep ESSID | cut -d":" -f2')
+
+
 @register_command('reconnect')
 @register_command('wifi refresh')
 @register_command('wifi reconfigure')
@@ -200,6 +206,54 @@ def start_settings_server():
   shell('sudo iptables -t nat -A POSTROUTING -o wlan0 -j MASQUERADE')
   shell('sudo systemctl start dnsmasq.service')
   shell('sudo systemctl start hostapd.service')
+  
+  # Load existing WiFi networks from wpa_supplicant
+  load_wifi_networks_from_wpa_supplicant()
+
+
+def load_wifi_networks_from_wpa_supplicant():
+  """Load WiFi networks from wpa_supplicant.conf into settings."""
+  from gonotego.settings import settings
+  import re
+  
+  try:
+    # Read current wpa_supplicant.conf
+    wpa_path = '/etc/wpa_supplicant/wpa_supplicant.conf'
+    with open(wpa_path, 'r') as f:
+      content = f.read()
+    
+    # Extract networks with regex
+    network_blocks = re.findall(r'network=\{([^}]+)\}', content, re.DOTALL)
+    wifi_networks = []
+    
+    for block in network_blocks:
+      network = {}
+      
+      # Extract SSID
+      ssid_match = re.search(r'ssid="([^"]+)"', block)
+      if ssid_match:
+        network['ssid'] = ssid_match.group(1)
+      else:
+        continue  # Skip networks without SSID
+      
+      # Extract key management
+      key_mgmt_match = re.search(r'key_mgmt=([^\s]+)', block)
+      network['key_mgmt'] = key_mgmt_match.group(1) if key_mgmt_match else 'NONE'
+      
+      # Extract PSK if present
+      psk_match = re.search(r'psk="([^"]+)"', block)
+      if psk_match:
+        network['psk'] = psk_match.group(1)
+      
+      wifi_networks.append(network)
+    
+    # Save to settings
+    if wifi_networks:
+      settings.set('WIFI_NETWORKS', wifi_networks)
+      print(f"Loaded {len(wifi_networks)} WiFi networks from wpa_supplicant.conf")
+  
+  except Exception as e:
+    print(f"Error loading WiFi networks from wpa_supplicant.conf: {str(e)}")
 
 @register_command('server stop')
 def stop_settings_server():

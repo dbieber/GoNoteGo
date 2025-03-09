@@ -1,5 +1,6 @@
 # Settings commands. Commands for setting settings.
 
+import json
 import subprocess
 
 from dateutil import parser
@@ -124,3 +125,81 @@ def clear_all_settings():
 def set_volume(value):
   if value in ('off', 'on'):
     status.set(Status.VOLUME_SETTING, value)
+
+
+@register_command('wifi add')
+def add_wifi_network_from_settings(json_network_data=None):
+  """Add a WiFi network from the settings UI.
+  
+  Accepts a JSON string containing 'ssid' and optionally 'psk'.
+  """
+  if not json_network_data:
+    say('WiFi network not added: missing network data')
+    return
+  
+  try:
+    network_data = json.loads(json_network_data)
+    ssid = network_data.get('ssid')
+    psk = network_data.get('psk')
+    
+    if not ssid:
+      say('WiFi network not added: missing SSID')
+      return
+      
+    # Get current WiFi networks
+    networks = settings.get('WIFI_NETWORKS') or []
+    
+    # Create new network entry
+    new_network = {'ssid': ssid}
+    
+    # If password provided, it's a WPA network
+    if psk:
+      new_network['psk'] = psk
+      new_network['key_mgmt'] = 'WPA-PSK'
+      # Also update wpa_supplicant.conf
+      system_commands.add_wpa_wifi(ssid, psk)
+    else:
+      new_network['key_mgmt'] = 'NONE'
+      # Also update wpa_supplicant.conf
+      system_commands.add_wifi_no_psk(ssid)
+    
+    # Add to settings (avoid duplicates by removing any networks with same SSID)
+    networks = [net for net in networks if net.get('ssid') != ssid]
+    networks.append(new_network)
+    
+    # Save updated networks list
+    settings.set('WIFI_NETWORKS', networks)
+    say(f'Added WiFi network {ssid}')
+    
+  except json.JSONDecodeError:
+    say('WiFi network not added: invalid JSON format')
+  except Exception as e:
+    say(f'WiFi network not added: {str(e)}')
+
+
+@register_command('wifi list')
+def list_wifi_networks():
+  """List all configured WiFi networks."""
+  networks = settings.get('WIFI_NETWORKS') or []
+  if not networks:
+    say('No WiFi networks configured')
+    return
+    
+  network_names = [net.get('ssid', 'Unknown') for net in networks]
+  say(f'Configured networks: {", ".join(network_names)}')
+
+
+@register_command('wifi remove {}')
+def remove_wifi_network(ssid):
+  """Remove a WiFi network by SSID."""
+  if not ssid:
+    say('WiFi network not removed: missing SSID')
+    return
+    
+  networks = settings.get('WIFI_NETWORKS') or []
+  networks = [net for net in networks if net.get('ssid') != ssid]
+  settings.set('WIFI_NETWORKS', networks)
+  
+  # We can't easily remove from wpa_supplicant.conf without rewriting the whole file
+  # For now, just notify that a manual reconfiguration might be needed
+  say(f'Removed WiFi network {ssid} from settings. You may need to edit wpa_supplicant.conf manually to remove it completely.')
