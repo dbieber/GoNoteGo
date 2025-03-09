@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Eye, EyeOff, Save, Plus, Trash2, Info } from 'lucide-react';
+import { Eye, EyeOff, Save, Plus, Trash2, Info, Wifi } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
@@ -10,6 +10,12 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import { 
+  saveWifiNetwork, 
+  removeWifiNetwork as apiRemoveWifiNetwork, 
+  saveAllSettings, 
+  getAllSettings 
+} from '@/lib/api/settings';
 
 const SettingsUI = () => {
   const NOTE_TAKING_SYSTEMS = [
@@ -26,6 +32,7 @@ const SettingsUI = () => {
     HOTKEY: '',
     NOTE_TAKING_SYSTEM: '',
     BLOB_STORAGE_SYSTEM: '',
+    WIFI_NETWORKS: [],
     ROAM_GRAPH: '',
     ROAM_USER: '',
     ROAM_PASSWORD: '',
@@ -53,6 +60,26 @@ const SettingsUI = () => {
   const [showPasswords, setShowPasswords] = useState({});
   const [saveStatus, setSaveStatus] = useState(null);
   const [customPath, setCustomPath] = useState('');
+  const [newWifiNetwork, setNewWifiNetwork] = useState({ ssid: '', psk: '' });
+  
+  // Load settings on component mount
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const loadedSettings = await getAllSettings();
+        if (loadedSettings && Object.keys(loadedSettings).length > 0) {
+          setSettings(prev => ({
+            ...prev,
+            ...loadedSettings
+          }));
+        }
+      } catch (error) {
+        console.error('Error loading settings:', error);
+      }
+    };
+    
+    loadSettings();
+  }, []);
 
   const handleChange = (key, value) => {
     setSettings(prev => ({
@@ -68,13 +95,29 @@ const SettingsUI = () => {
     }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setSaveStatus('saving');
-    // Simulated save operation
-    setTimeout(() => {
+    
+    try {
+      // Save all settings
+      await saveAllSettings(settings);
+      
+      // Save WiFi networks through the wifi command
+      if (settings.WIFI_NETWORKS && settings.WIFI_NETWORKS.length > 0) {
+        // Save each network
+        const savePromises = settings.WIFI_NETWORKS.map(network => 
+          saveWifiNetwork({ ssid: network.ssid, psk: network.psk })
+        );
+        await Promise.all(savePromises);
+      }
+      
       setSaveStatus('saved');
       setTimeout(() => setSaveStatus(null), 2000);
-    }, 1000);
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus(null), 2000);
+    }
   };
 
   const addCustomPath = () => {
@@ -92,6 +135,64 @@ const SettingsUI = () => {
       ...prev,
       CUSTOM_COMMAND_PATHS: prev.CUSTOM_COMMAND_PATHS.filter((_, i) => i !== index)
     }));
+  };
+  
+  const handleWifiNetworkChange = (field, value) => {
+    setNewWifiNetwork(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+  
+  const addWifiNetwork = async () => {
+    if (newWifiNetwork.ssid.trim()) {
+      try {
+        // Create a network object
+        const network = {
+          ssid: newWifiNetwork.ssid.trim(),
+          psk: newWifiNetwork.psk.trim(),
+          key_mgmt: newWifiNetwork.psk.trim() ? 'WPA-PSK' : 'NONE'
+        };
+        
+        // Call API to save the network
+        await saveWifiNetwork({ 
+          ssid: network.ssid, 
+          psk: network.psk 
+        });
+        
+        // Add to settings state
+        setSettings(prev => {
+          // Remove any networks with the same SSID to avoid duplicates
+          const updatedNetworks = prev.WIFI_NETWORKS.filter(
+            net => net.ssid !== network.ssid
+          );
+          return {
+            ...prev,
+            WIFI_NETWORKS: [...updatedNetworks, network]
+          };
+        });
+        
+        // Reset form
+        setNewWifiNetwork({ ssid: '', psk: '' });
+      } catch (error) {
+        console.error('Error adding WiFi network:', error);
+      }
+    }
+  };
+  
+  const removeWifiNetwork = async (ssid) => {
+    try {
+      // Call API to remove the network
+      await apiRemoveWifiNetwork(ssid);
+      
+      // Update settings state
+      setSettings(prev => ({
+        ...prev,
+        WIFI_NETWORKS: prev.WIFI_NETWORKS.filter(network => network.ssid !== ssid)
+      }));
+    } catch (error) {
+      console.error('Error removing WiFi network:', error);
+    }
   };
 
   const renderSettingGroup = (title, description, fields, visible = true) => {
@@ -228,6 +329,95 @@ const SettingsUI = () => {
               value={settings.BLOB_STORAGE_SYSTEM}
               onChange={(e) => handleChange('BLOB_STORAGE_SYSTEM', e.target.value)}
             />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* WiFi Configuration */}
+      <Card className="mb-6">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <CardTitle className="text-xl">WiFi Configuration</CardTitle>
+            <HoverCard>
+              <HoverCardTrigger>
+                <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors cursor-help" />
+              </HoverCardTrigger>
+              <HoverCardContent className="w-80">
+                <div className="space-y-3">
+                  <p>Configure WiFi networks for the device to connect to.</p>
+                  <p className="text-sm text-muted-foreground">Leave the password field empty for open networks.</p>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
+          </div>
+          <CardDescription>Connect to WiFi networks</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Add new network form */}
+          <div className="grid grid-cols-1 gap-4">
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">Network Name (SSID)</label>
+              <Input
+                value={newWifiNetwork.ssid}
+                onChange={(e) => handleWifiNetworkChange('ssid', e.target.value)}
+                placeholder="Enter WiFi network name"
+              />
+            </div>
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">Password (leave empty for open networks)</label>
+              <div className="relative">
+                <Input
+                  type={showPasswords.wifiPassword ? 'text' : 'password'}
+                  value={newWifiNetwork.psk}
+                  onChange={(e) => handleWifiNetworkChange('psk', e.target.value)}
+                  placeholder="Enter WiFi password"
+                  className="pr-10"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                  onClick={() => togglePasswordVisibility('wifiPassword')}
+                >
+                  {showPasswords.wifiPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </Button>
+              </div>
+            </div>
+            <Button onClick={addWifiNetwork} className="w-full sm:w-auto">
+              <Wifi className="h-4 w-4 mr-2" />
+              Add Network
+            </Button>
+          </div>
+
+          {/* List of configured networks */}
+          <div className="mt-4">
+            <h3 className="text-sm font-medium mb-2">Configured Networks</h3>
+            <div className="space-y-2">
+              {settings.WIFI_NETWORKS && settings.WIFI_NETWORKS.length > 0 ? (
+                settings.WIFI_NETWORKS.map((network, index) => (
+                  <div key={index} className="flex items-center justify-between bg-secondary/20 p-2 rounded">
+                    <div className="flex items-center">
+                      <Wifi className="h-4 w-4 mr-2 text-muted-foreground" />
+                      <span className="text-sm">{network.ssid}</span>
+                      <span className="ml-2 text-xs text-muted-foreground">
+                        {network.key_mgmt === 'NONE' ? '(Open)' : '(Secured)'}
+                      </span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeWifiNetwork(network.ssid)}
+                      className="h-8 w-8"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))
+              ) : (
+                <div className="text-sm text-muted-foreground">No networks configured</div>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -488,6 +678,11 @@ const SettingsUI = () => {
           {saveStatus === 'saved' && (
             <Alert className="w-72">
               <AlertDescription>Settings saved successfully!</AlertDescription>
+            </Alert>
+          )}
+          {saveStatus === 'error' && (
+            <Alert className="w-72 bg-red-50 border-red-200 text-red-800">
+              <AlertDescription>Error saving settings. Please try again.</AlertDescription>
             </Alert>
           )}
           <Button
