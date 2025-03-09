@@ -16,15 +16,17 @@ from gonotego.uploader.twitter import twitter_uploader
 
 Status = status.Status
 
+
 def print_configuration_help():
-    """Print helpful message when NOTE_TAKING_SYSTEM is not configured."""
-    print("NOTE_TAKING_SYSTEM is not configured. Please set it using ':set NOTE_TAKING_SYSTEM [system]'")
-    print("Example: ':set NOTE_TAKING_SYSTEM roam'")
+  """Print helpful message when NOTE_TAKING_SYSTEM is not configured."""
+  print("NOTE_TAKING_SYSTEM is not configured. Please set it using ':set NOTE_TAKING_SYSTEM [system]'")
+  print("Example: ':set NOTE_TAKING_SYSTEM roam'")
 
 
 def is_unconfigured(note_taking_system):
   """Check if the note taking system is unconfigured."""
   return note_taking_system == '<note_taking_system>' or note_taking_system == ''
+
 
 def make_uploader(note_taking_system):
   if note_taking_system == 'email':
