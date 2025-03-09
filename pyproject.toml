@@ -31,13 +31,13 @@ dependencies = [
   'python-dateutil<=2.8.2',
   'redis<=4.3.4',
   # selenium 4.0 breaks with arm geckodriver.
-  'selenium==3.141.0',
+  'selenium==4.29.0',
   'setuptools-rust<=1.5.2',
   'sounddevice<=0.4.5',
   'soundfile',
   'supervisor<=4.2.4',
   'twython<=3.9.1',
-  "urllib3==1.26.19",  # For compatibility with selenium==3.141.0
+  "urllib3==1.26.19",  # For compatibility with selenium==4.29.0
 ]
 
 [project.optional-dependencies]
