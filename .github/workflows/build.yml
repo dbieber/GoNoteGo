@@ -69,6 +69,7 @@ jobs:
           bootpartition: 1
           rootpartition: 2
           image_additional_mb: 6000
+          bind_mount_repository: yes
           extra_files_path: /home/runner/work/GoNoteGo/GoNoteGo/web-app-dist
           extra_files_mnt_path: web-app-dist
           commands: |
