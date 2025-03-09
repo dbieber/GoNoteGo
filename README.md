@@ -66,6 +66,10 @@ See the [hardware guide](hardware.md) to know exactly what to buy.
 
 See the [installation instructions](installation.md) to get started.
 
+## CI/CD
+
+The GitHub Action workflow caches the Raspberry Pi image to save build time.
+
 ## History
 
 [Learn about Go Note Go's predecessor "Shh Shell" here.](https://davidbieber.com/projects/shh-shell/)
