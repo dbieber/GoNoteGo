@@ -33,7 +33,7 @@ dependencies = [
   # selenium 4.0 breaks with arm geckodriver.
   'selenium==3.141.0',
   'setuptools-rust<=1.5.2',
-  'sounddevice<=0.4.5',
+  'sounddevice<=0.5.1',
   'soundfile',
   'supervisor<=4.2.4',
   'twython<=3.9.1',
