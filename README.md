@@ -68,7 +68,7 @@ See the [installation instructions](installation.md) to get started.
 
 ## CI/CD
 
-The GitHub Action workflow caches the Raspberry Pi image to save build time.
+The GitHub Action workflow caches the Raspberry Pi image to save build time. However, these images are large and can cause "No space left on device" errors in the GitHub Actions environment. If you encounter these errors, consider clearing the cache or optimizing the image storage strategy.
 
 ## History
 
