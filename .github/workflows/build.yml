@@ -29,22 +29,61 @@ jobs:
           source .venv/bin/activate
           pytest
 
+      - name: Build web app
+        run: |
+          cd gonotego/settings-server
+          npm install
+          npm run build
+          cd ../..
+
+      - name: Archive web app build
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-app-dist
+          path: gonotego/settings-server/dist
+
   build_image:
     runs-on: ubuntu-latest
+    needs: build
     steps:
-      - uses: pguyot/arm-runner-action@v2
+      - name: Download web app build
+        uses: actions/download-artifact@v4
+        with:
+          name: web-app-dist
+          path: web-app-dist
+          # /home/runner/work/GoNoteGo/GoNoteGo/web-app-dist
+      
+      - name: Verify web app download
+        run: |
+          echo "Checking contents of web-app-dist:"
+          ls -la web-app-dist
+          if [ ! -f "web-app-dist/index.html" ]; then
+            echo "ERROR: web-app-dist directory does not contain expected files!"
+            exit 1
+          fi
+
+      - uses: dbieber/arm-runner-action@v1.0.8
         id: build_image
         with:
           base_image: https://downloads.raspberrypi.com/raspios_armhf/images/raspios_armhf-2024-03-15/2024-03-15-raspios-bookworm-armhf.img.xz
           bootpartition: 1
           rootpartition: 2
-          image_additional_mb: 4000
+          image_additional_mb: 6000
+          extra_files_path: /home/runner/work/GoNoteGo/GoNoteGo/web-app-dist
+          extra_files_mnt_path: web-app-dist
           commands: |
-            echo "Updating!"
-            sudo apt update
+            echo "Updating package lists..."
+            sudo apt-get update
+            
+            # Clean up apt cache to free up space
+            sudo apt-get clean
 
             echo "Installing dependencies!"
-            sudo apt install -y git firefox-esr xvfb portaudio19-dev libatlas-base-dev redis-server espeak rustc python3-dev libopenblas-dev iptables iptables-persistent
+            sudo apt install -y git firefox-esr xvfb portaudio19-dev libatlas-base-dev redis-server espeak \
+                rustc python3-dev libopenblas-dev iptables iptables-persistent nodejs npm
+                
+            # Clean up after installation
+            sudo apt-get clean
 
             echo "Installing Go Note Go!"
             mkdir -p /home/pi/code/github/dbieber
@@ -53,6 +92,19 @@ jobs:
             cd GoNoteGo
             # Checkout the specific commit
             git checkout $GITHUB_SHA
+
+            echo "Including web app"
+            echo "Checking web app files at /web-app-dist:"
+            ls -la /web-app-dist
+            
+            echo "Creating settings-server directory:"
+            mkdir -p /home/pi/code/github/dbieber/GoNoteGo/gonotego/settings-server/
+            
+            echo "Copying web app files:"
+            cp -r /web-app-dist /home/pi/code/github/dbieber/GoNoteGo/gonotego/settings-server/dist
+            
+            echo "Verifying copied web app files:"
+            ls -la /home/pi/code/github/dbieber/GoNoteGo/gonotego/settings-server/dist
 
             echo "Setting up Python environment"
             python3 -m venv env
