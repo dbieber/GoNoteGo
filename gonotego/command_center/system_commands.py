@@ -145,45 +145,45 @@ def check_internet():
   say('yes' if internet.is_internet_available() else 'no')
 
 
+from gonotego.common import wifi as wifi_utils
+from gonotego.settings import settings
+
+
 @register_command('wifi {} {}')
 @register_command('wpa {} {}')
 def add_wpa_wifi(ssid, psk):
-  if '"' in ssid or '"' in psk:
+  if wifi_utils.add_wpa_network(ssid, psk):
+    say('WiFi network added.')
+  else:
     say('WiFi not set.')
-    return
-  network_string = f"""
-network={{
-        ssid="{ssid}"
-        psk="{psk}"
-        key_mgmt=WPA-PSK
-}}
-"""
-  filepath = '/etc/wpa_supplicant/wpa_supplicant.conf'
-  shell(f"echo '{network_string}' | sudo tee -a {filepath}")
-  reconfigure_wifi()
+  
+  # Update settings
+  networks = settings.get('WIFI_NETWORKS')
+  networks.append({'ssid': ssid, 'psk': psk})
+  settings.set('WIFI_NETWORKS', networks)
 
 
 @register_command('wifi {}')
 def add_wifi_no_psk(ssid):
-  if '"' in ssid:
+  if wifi_utils.add_open_network(ssid):
+    say('WiFi network added.')
+  else:
     say('WiFi not set.')
-    return
-  network_string = f"""
-network={{
-        ssid="{ssid}"
-        key_mgmt=NONE
-}}
-"""
-  filepath = '/etc/wpa_supplicant/wpa_supplicant.conf'
-  shell(f"echo '{network_string}' | sudo tee -a {filepath}")
-  reconfigure_wifi()
+  
+  # Update settings
+  networks = settings.get('WIFI_NETWORKS')
+  networks.append({'ssid': ssid, 'psk': ''})
+  settings.set('WIFI_NETWORKS', networks)
 
 
 @register_command('reconnect')
 @register_command('wifi refresh')
 @register_command('wifi reconfigure')
 def reconfigure_wifi():
-  shell('wpa_cli -i wlan0 reconfigure')
+  if wifi_utils.reconfigure_wifi():
+    say('WiFi reconfigured.')
+  else:
+    say('WiFi reconfiguration failed.')
 
 
 @register_command('server')

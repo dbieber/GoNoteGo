@@ -22,7 +22,13 @@ def get(key):
   value_bytes = r.get(get_redis_key(key))
   if value_bytes is None:
     # If the setting isn't set in redis, fall back to the value from secure_settings.
-    return getattr(secure_settings, key)
+    try:
+      return getattr(secure_settings, key)
+    except AttributeError:
+      # If the key doesn't exist in secure_settings, provide some defaults
+      if key == 'WIFI_NETWORKS':
+        return []
+      raise
   value_repr = value_bytes.decode('utf-8')
   value = ast.literal_eval(value_repr)
   return value
