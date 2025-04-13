@@ -157,7 +157,11 @@ def add_wpa_wifi(ssid, psk):
     say('WiFi not set.')
   
   # Update settings
-  networks = settings.get('WIFI_NETWORKS')
+  try:
+    networks = settings.get('WIFI_NETWORKS')
+  except AttributeError:
+    # WIFI_NETWORKS setting doesn't exist yet, create a new list
+    networks = []
   networks.append({'ssid': ssid, 'psk': psk})
   settings.set('WIFI_NETWORKS', networks)
 
@@ -170,7 +174,11 @@ def add_wifi_no_psk(ssid):
     say('WiFi not set.')
   
   # Update settings
-  networks = settings.get('WIFI_NETWORKS')
+  try:
+    networks = settings.get('WIFI_NETWORKS')
+  except AttributeError:
+    # WIFI_NETWORKS setting doesn't exist yet, create a new list
+    networks = []
   networks.append({'ssid': ssid, 'psk': ''})
   settings.set('WIFI_NETWORKS', networks)
 
