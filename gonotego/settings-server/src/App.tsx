@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Eye, EyeOff, Save, Plus, Trash2, Info } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { 
+import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
@@ -55,22 +55,22 @@ const SettingsUI = () => {
   const [loadingSettings, setLoadingSettings] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [customPath, setCustomPath] = useState('');
-  
+
   // Fetch settings when component mounts
   useEffect(() => {
     const fetchSettings = async () => {
       try {
         setLoadingSettings(true);
         setLoadError(false);
-        
+
         const response = await fetch('/api/settings');
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch settings');
         }
-        
+
         const data = await response.json();
-        
+
         // Process the received settings
         const validSettings = Object.entries(data).reduce((acc, [key, value]) => {
           // Always include the value, even if it's empty
@@ -78,7 +78,7 @@ const SettingsUI = () => {
           acc[key] = value;
           return acc;
         }, {});
-        
+
         // Update settings state with fetched data
         setSettings(prev => ({
           ...prev,
@@ -91,7 +91,7 @@ const SettingsUI = () => {
         setLoadingSettings(false);
       }
     };
-    
+
     fetchSettings();
   }, []);
 
@@ -119,11 +119,11 @@ const SettingsUI = () => {
         },
         body: JSON.stringify(settings),
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to save settings');
       }
-      
+
       setSaveStatus('saved');
       setTimeout(() => setSaveStatus(null), 2000);
     } catch (error) {
@@ -152,7 +152,7 @@ const SettingsUI = () => {
 
   const renderSettingGroup = (title, description, fields, visible = true) => {
     if (!visible) return null;
-    
+
     return (
       <Card className="mb-6">
         <CardHeader>
@@ -225,20 +225,20 @@ const SettingsUI = () => {
   return (
     <div className="w-full max-w-4xl mx-auto p-6 space-y-6">
       <h1 className="text-3xl font-bold mb-8">Go Note Go Settings</h1>
-      
+
       {loadingSettings && (
         <div className="text-center py-8">
           <p className="text-gray-500">Loading settings...</p>
         </div>
       )}
-      
+
       {loadError && (
         <Alert className="mb-6 bg-red-100 text-red-800 border-red-200">
           <AlertDescription>
             Error loading settings. The settings API server might not be running.
             <div className="mt-2">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="text-red-800 border-red-300 hover:bg-red-50"
                 onClick={() => window.location.reload()}
               >
@@ -248,7 +248,7 @@ const SettingsUI = () => {
           </AlertDescription>
         </Alert>
       )}
-      
+
       {!loadingSettings && !loadError && (
       <>
       <Card className="mb-6">
@@ -259,8 +259,8 @@ const SettingsUI = () => {
         <CardContent className="grid gap-4">
           <div className="grid gap-2">
             <label className="text-sm font-medium">Note Taking System</label>
-            <Select 
-              value={settings.NOTE_TAKING_SYSTEM} 
+            <Select
+              value={settings.NOTE_TAKING_SYSTEM}
               onValueChange={(value) => handleChange('NOTE_TAKING_SYSTEM', value)}
             >
               <SelectTrigger>
@@ -314,9 +314,9 @@ const SettingsUI = () => {
       </Card>
 
       {renderSettingGroup('Essential Integrations', 'Required API keys and configurations', [
-        { 
-          key: 'OPENAI_API_KEY', 
-          label: 'OpenAI API Key', 
+        {
+          key: 'OPENAI_API_KEY',
+          label: 'OpenAI API Key',
           type: 'password',
           tooltip: (
             <div className="space-y-2">
@@ -324,9 +324,9 @@ const SettingsUI = () => {
               <p>
                 Get your API key at:{' '}
               </p>
-              <a 
-                href="https://platform.openai.com/api-keys" 
-                target="_blank" 
+              <a
+                href="https://platform.openai.com/api-keys"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-500 underline hover:text-blue-700"
               >
@@ -335,9 +335,9 @@ const SettingsUI = () => {
             </div>
           )
         },
-        { 
-          key: 'DROPBOX_ACCESS_TOKEN', 
-          label: 'Dropbox Access Token', 
+        {
+          key: 'DROPBOX_ACCESS_TOKEN',
+          label: 'Dropbox Access Token',
           type: 'password',
           tooltip: (
             <div className="space-y-2">
@@ -345,9 +345,9 @@ const SettingsUI = () => {
               <p>
                 Get your access token at:{' '}
               </p>
-              <a 
-                href="https://www.dropbox.com/developers/apps" 
-                target="_blank" 
+              <a
+                href="https://www.dropbox.com/developers/apps"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-500 underline hover:text-blue-700"
               >
