@@ -86,7 +86,20 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
         path = parsed_path.path
         
         # Handle API requests
-        if path == "/api/settings":
+        if path == "/api/reset":
+            # Simple endpoint to reset test settings
+            try:
+                # Clear the CUSTOM_COMMAND_PATHS setting
+                settings.clear("CUSTOM_COMMAND_PATHS")
+                # You could clear other test settings here
+                
+                self._set_response_headers(content_type="application/json")
+                self.wfile.write(json.dumps({"success": True, "message": "Settings reset"}).encode("utf-8"))
+            except Exception as e:
+                print(f"Error resetting settings: {e}")
+                self._set_response_headers(status_code=500, content_type="application/json")
+                self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
+        elif path == "/api/settings":
             try:
                 # Get all available settings from secure_settings and mask sensitive values
                 all_settings = {}
