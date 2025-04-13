@@ -73,12 +73,11 @@ const SettingsUI = () => {
         
         console.log("Received settings:", data);
         
-        // Ensure settings are not overwritten with undefined or empty values
+        // Process the received settings
         const validSettings = Object.entries(data).reduce((acc, [key, value]) => {
-          // Only include the value if it's not undefined, null, or empty string
-          if (value !== undefined && value !== null && value !== '') {
-            acc[key] = value;
-          }
+          // Always include the value, even if it's empty
+          // This ensures we show empty strings and other falsy values correctly
+          acc[key] = value;
           return acc;
         }, {});
         

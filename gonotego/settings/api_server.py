@@ -99,36 +99,37 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
                 all_settings = {}
                 print("Fetching settings...")
                 
-                # Get all available settings from secure_settings
-                for key in dir(secure_settings):
-                    if key.isupper() and not key.startswith("__"):
-                        try:
-                            # Try to get value using the settings.get method which handles 
-                            # both Redis values and fallback to secure_settings
-                            value = settings.get(key)
-                            
-                            # Check if it's a template placeholder value like '<KEY>'
-                            is_template_value = isinstance(value, str) and value.startswith('<') and value.endswith('>')
-                            
-                            # Skip template values or empty values
-                            if is_template_value or value is None or value == '':
-                                continue
-                                
-                            # Debug info (mask sensitive values in logs)
+                # Get all settings keys available in secure_settings
+                available_keys = [key for key in dir(secure_settings) if key.isupper() and not key.startswith("__")]
+                
+                # Process all available settings
+                for key in available_keys:
+                    try:
+                        # Get the value using settings.get method (handles Redis + fallback)
+                        value = settings.get(key)
+                        
+                        # Debug output (masked for sensitive data)
+                        if key in SENSITIVE_KEYS and value:
+                            print(f"Setting {key} = [MASKED]")
+                        else:
+                            print(f"Setting {key} = {value}")
+                        
+                        # Check if it's a template placeholder like '<KEY>'
+                        is_template = (isinstance(value, str) and 
+                                     value.startswith('<') and 
+                                     value.endswith('>') and 
+                                     value[1:-1].strip() == key)
+                        
+                        # Add to response if not a template placeholder
+                        if not is_template:
+                            # For sensitive values, mask them
                             if key in SENSITIVE_KEYS and value:
-                                print(f"Setting {key} = [MASKED]")
-                            else:
-                                print(f"Setting {key} = {value}")
-                            
-                            # Mask sensitive information in response
-                            if key in SENSITIVE_KEYS and value:
-                                # Indicate that a value exists but don't send the actual value
-                                all_settings[key] = "●●●●●●●●"
+                                all_settings[key] = "●●●●●●●●" 
+                            # For non-sensitive or empty values, return as is
                             else:
                                 all_settings[key] = value
-                                
-                        except Exception as e:
-                            print(f"Error getting setting {key}: {e}")
+                    except Exception as e:
+                        print(f"Error getting setting {key}: {e}")
                 
                 self._set_response_headers(content_type="application/json")
                 self.wfile.write(json.dumps(all_settings).encode("utf-8"))
