@@ -7,8 +7,6 @@ import json
 import os
 import sys
 import mimetypes
-import importlib
-import inspect
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import parse_qs, urlparse
 
@@ -16,11 +14,6 @@ from urllib.parse import parse_qs, urlparse
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from gonotego.settings import settings, secure_settings
 from gonotego.common import interprocess
-
-# Print information about imported modules for debugging
-secure_settings_path = inspect.getfile(secure_settings)
-print(f"Loaded secure_settings from: {secure_settings_path}")
-print(f"Available settings: {[attr for attr in dir(secure_settings) if attr.isupper()]}")
 
 # Define server port - use port 8000 (the original settings-server port)
 PORT = 8000
@@ -93,30 +86,10 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
         path = parsed_path.path
         
         # Handle API requests
-        if path == "/api/debug":
-            # Simple debug endpoint to test the settings API directly
-            try:
-                # Get sample settings directly
-                sample = {
-                    "HOTKEY": settings.get("HOTKEY"),
-                    "NOTE_TAKING_SYSTEM": settings.get("NOTE_TAKING_SYSTEM"),
-                    "settings_module": str(settings),
-                    "secure_settings_path": inspect.getfile(secure_settings),
-                    "available_keys": [key for key in dir(secure_settings) if key.isupper()]
-                }
-                
-                self._set_response_headers(content_type="application/json")
-                self.wfile.write(json.dumps(sample).encode("utf-8"))
-            except Exception as e:
-                print(f"Error in debug endpoint: {e}")
-                self._set_response_headers(status_code=500, content_type="application/json")
-                self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
-        elif path == "/api/settings":
+        if path == "/api/settings":
             try:
                 # Get all available settings from secure_settings and mask sensitive values
                 all_settings = {}
-                print("Fetching settings...")
-                
                 # Get all settings keys available in secure_settings
                 available_keys = [key for key in dir(secure_settings) if key.isupper() and not key.startswith("__")]
                 
@@ -126,34 +99,23 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
                         # Get the value using settings.get method (handles Redis + fallback)
                         value = settings.get(key)
                         
-                        # Debug output (masked for sensitive data)
-                        if key in SENSITIVE_KEYS and value:
-                            print(f"Setting {key} = [MASKED]")
-                        else:
-                            print(f"Setting {key} = {value}")
-                        
                         # Check if it's a template placeholder like '<KEY>'
                         is_template = (isinstance(value, str) and 
                                      value.startswith('<') and 
                                      value.endswith('>') and 
                                      value[1:-1].strip() == key)
                         
-                        print(f"Is {key}='{value}' a template? {is_template}")
-                        
                         # Always add to response, marking template values clearly
                         if is_template:
                             # For template values, send an empty string to clear the field
                             all_settings[key] = ""
-                            print(f"Setting template value {key} to empty string")
                         else:
                             # For sensitive values, mask them
                             if key in SENSITIVE_KEYS and value:
                                 all_settings[key] = "●●●●●●●●"
-                                print(f"Masking sensitive value for {key}")
                             # For non-sensitive or empty values, return as is
                             else:
                                 all_settings[key] = value
-                                print(f"Setting normal value for {key} = {value}")
                     except Exception as e:
                         print(f"Error getting setting {key}: {e}")
                 
@@ -214,17 +176,6 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
             self._set_response_headers(status_code=404, content_type="application/json")
             self.wfile.write(json.dumps({"error": "Not found"}).encode("utf-8"))
 
-def add_test_setting():
-    """Add a test setting to Redis for debugging."""
-    try:
-        print("Adding test setting to Redis...")
-        # Add a basic HOTKEY setting
-        settings.set("HOTKEY", "Escape")
-        settings.set("NOTE_TAKING_SYSTEM", "Roam Research")
-        print("Test settings added successfully.")
-    except Exception as e:
-        print(f"Error adding test setting: {e}")
-
 def run_server():
     """Run the combined settings server."""
     # Make sure the static files directory exists
@@ -232,9 +183,6 @@ def run_server():
         print(f"Error: Static files directory {STATIC_FILES_DIR} does not exist.")
         print("Make sure to build the React app before running the server.")
         sys.exit(1)
-        
-    # Add a test setting for debugging
-    add_test_setting()
         
     server_address = ("", PORT)
     httpd = HTTPServer(server_address, SettingsCombinedHandler)
