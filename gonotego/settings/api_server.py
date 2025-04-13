@@ -7,12 +7,20 @@ import json
 import os
 import sys
 import mimetypes
+import importlib
+import inspect
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import parse_qs, urlparse
 
 # Add the parent directory to sys.path to be able to import the main module
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from gonotego.settings import settings, secure_settings
+from gonotego.common import interprocess
+
+# Print information about imported modules for debugging
+secure_settings_path = inspect.getfile(secure_settings)
+print(f"Loaded secure_settings from: {secure_settings_path}")
+print(f"Available settings: {[attr for attr in dir(secure_settings) if attr.isupper()]}")
 
 # Define server port - use port 8000 (the original settings-server port)
 PORT = 8000
@@ -89,18 +97,28 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
             try:
                 # Get all available settings from secure_settings and mask sensitive values
                 all_settings = {}
+                print("Fetching settings...")
+                
+                # Get all available settings from secure_settings
                 for key in dir(secure_settings):
                     if key.isupper() and not key.startswith("__"):
                         try:
-                            # Try to get value from Redis first (user-set values)
+                            # Try to get value using the settings.get method which handles 
+                            # both Redis values and fallback to secure_settings
                             value = settings.get(key)
                             
+                            # For debugging
+                            masked_value = "[MASKED]" if key in SENSITIVE_KEYS and value else value
+                            print(f"Setting {key} = {masked_value}")
+                            
                             # Mask sensitive information
-                            if key in SENSITIVE_KEYS and value:
+                            if key in SENSITIVE_KEYS and value and value != f"<{key}>":
                                 # Indicate that a value exists but don't send the actual value
                                 value = "●●●●●●●●"
                             
-                            all_settings[key] = value
+                            # Only return real values, not template placeholders
+                            if value != f"<{key}>":
+                                all_settings[key] = value
                         except Exception as e:
                             print(f"Error getting setting {key}: {e}")
                 
@@ -161,6 +179,30 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
             self._set_response_headers(status_code=404, content_type="application/json")
             self.wfile.write(json.dumps({"error": "Not found"}).encode("utf-8"))
 
+def initialize_demo_settings():
+    """Initialize some demo settings if none exist."""
+    try:
+        # Create some demo settings for testing if they don't exist
+        r = interprocess.get_redis_client()
+        if not r.keys(settings.get_redis_key('*')):
+            print("No settings found in Redis, initializing demo settings...")
+            
+            # Set some non-sensitive demo settings
+            settings.set('HOTKEY', 'Esc')
+            settings.set('NOTE_TAKING_SYSTEM', 'Roam Research')
+            settings.set('BLOB_STORAGE_SYSTEM', 'Dropbox')
+            settings.set('CUSTOM_COMMAND_PATHS', ['/usr/local/bin', '/opt/custom/scripts'])
+            
+            # Set placeholder values for sensitive settings
+            for key in SENSITIVE_KEYS:
+                if hasattr(secure_settings, key):
+                    # Only set it if it has a template placeholder
+                    settings.set(key, '[DEMO_ONLY]')
+                    
+            print("Demo settings initialized successfully")
+    except Exception as e:
+        print(f"Error initializing demo settings: {e}")
+
 def run_server():
     """Run the combined settings server."""
     # Make sure the static files directory exists
@@ -168,6 +210,9 @@ def run_server():
         print(f"Error: Static files directory {STATIC_FILES_DIR} does not exist.")
         print("Make sure to build the React app before running the server.")
         sys.exit(1)
+    
+    # Initialize demo settings
+    initialize_demo_settings()
         
     server_address = ("", PORT)
     httpd = HTTPServer(server_address, SettingsCombinedHandler)

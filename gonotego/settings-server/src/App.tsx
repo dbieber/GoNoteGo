@@ -71,10 +71,23 @@ const SettingsUI = () => {
         
         const data = await response.json();
         
+        console.log("Received settings:", data);
+        
+        // Ensure settings are not overwritten with undefined or empty values
+        const validSettings = Object.entries(data).reduce((acc, [key, value]) => {
+          // Only include the value if it's not undefined, null, or empty string
+          if (value !== undefined && value !== null && value !== '') {
+            acc[key] = value;
+          }
+          return acc;
+        }, {});
+        
+        console.log("Valid settings to apply:", validSettings);
+        
         // Update settings state with fetched data
         setSettings(prev => ({
           ...prev,
-          ...data
+          ...validSettings
         }));
       } catch (error) {
         console.error('Error fetching settings:', error);
