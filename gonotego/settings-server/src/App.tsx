@@ -52,7 +52,40 @@ const SettingsUI = () => {
 
   const [showPasswords, setShowPasswords] = useState({});
   const [saveStatus, setSaveStatus] = useState(null);
+  const [loadingSettings, setLoadingSettings] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [customPath, setCustomPath] = useState('');
+  
+  // Fetch settings when component mounts
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        setLoadingSettings(true);
+        setLoadError(false);
+        
+        const response = await fetch('http://localhost:8001/api/settings');
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch settings');
+        }
+        
+        const data = await response.json();
+        
+        // Update settings state with fetched data
+        setSettings(prev => ({
+          ...prev,
+          ...data
+        }));
+      } catch (error) {
+        console.error('Error fetching settings:', error);
+        setLoadError(true);
+      } finally {
+        setLoadingSettings(false);
+      }
+    };
+    
+    fetchSettings();
+  }, []);
 
   const handleChange = (key, value) => {
     setSettings(prev => ({
@@ -68,13 +101,28 @@ const SettingsUI = () => {
     }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setSaveStatus('saving');
-    // Simulated save operation
-    setTimeout(() => {
+    try {
+      const response = await fetch('http://localhost:8001/api/settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(settings),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to save settings');
+      }
+      
       setSaveStatus('saved');
       setTimeout(() => setSaveStatus(null), 2000);
-    }, 1000);
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus(null), 2000);
+    }
   };
 
   const addCustomPath = () => {
@@ -169,7 +217,32 @@ const SettingsUI = () => {
   return (
     <div className="w-full max-w-4xl mx-auto p-6 space-y-6">
       <h1 className="text-3xl font-bold mb-8">Go Note Go Settings</h1>
-
+      
+      {loadingSettings && (
+        <div className="text-center py-8">
+          <p className="text-gray-500">Loading settings...</p>
+        </div>
+      )}
+      
+      {loadError && (
+        <Alert className="mb-6 bg-red-100 text-red-800 border-red-200">
+          <AlertDescription>
+            Error loading settings. The settings API server might not be running.
+            <div className="mt-2">
+              <Button 
+                variant="outline" 
+                className="text-red-800 border-red-300 hover:bg-red-50"
+                onClick={() => window.location.reload()}
+              >
+                Retry
+              </Button>
+            </div>
+          </AlertDescription>
+        </Alert>
+      )}
+      
+      {!loadingSettings && !loadError && (
+      <>
       <Card className="mb-6">
         <CardHeader>
           <CardTitle className="text-xl">Core Settings</CardTitle>
@@ -232,7 +305,6 @@ const SettingsUI = () => {
         </CardContent>
       </Card>
 
-      {/* Required Settings */}
       {renderSettingGroup('Essential Integrations', 'Required API keys and configurations', [
         { 
           key: 'OPENAI_API_KEY', 
@@ -490,6 +562,11 @@ const SettingsUI = () => {
               <AlertDescription>Settings saved successfully!</AlertDescription>
             </Alert>
           )}
+          {saveStatus === 'error' && (
+            <Alert className="w-72 bg-red-100 text-red-800 border-red-200">
+              <AlertDescription>Error saving settings. Please try again.</AlertDescription>
+            </Alert>
+          )}
           <Button
             onClick={handleSave}
             className="w-32"
@@ -506,6 +583,8 @@ const SettingsUI = () => {
           </Button>
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 };
