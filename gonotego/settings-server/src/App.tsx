@@ -26,6 +26,7 @@ const SettingsUI = () => {
     HOTKEY: '',
     NOTE_TAKING_SYSTEM: '',
     BLOB_STORAGE_SYSTEM: '',
+    WIFI_NETWORKS: [],
     ROAM_GRAPH: '',
     ROAM_USER: '',
     ROAM_PASSWORD: '',
@@ -55,6 +56,9 @@ const SettingsUI = () => {
   const [loadingSettings, setLoadingSettings] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [customPath, setCustomPath] = useState('');
+  const [newWifiNetwork, setNewWifiNetwork] = useState({ ssid: '', psk: '' });
+  const [isOpenNetwork, setIsOpenNetwork] = useState(false);
+  const [wifiConfigStatus, setWifiConfigStatus] = useState({ configured: false, error: null });
 
   // Fetch settings when component mounts
   useEffect(() => {
@@ -111,6 +115,8 @@ const SettingsUI = () => {
 
   const handleSave = async () => {
     setSaveStatus('saving');
+    setWifiConfigStatus({ configured: false, error: null });
+    
     try {
       const response = await fetch('/api/settings', {
         method: 'POST',
@@ -119,11 +125,20 @@ const SettingsUI = () => {
         },
         body: JSON.stringify(settings),
       });
-
+      
       if (!response.ok) {
         throw new Error('Failed to save settings');
       }
-
+      
+      const result = await response.json();
+      
+      if (result.wifi_configured !== undefined) {
+        setWifiConfigStatus({
+          configured: result.wifi_configured,
+          error: result.wifi_error || null
+        });
+      }
+      
       setSaveStatus('saved');
       setTimeout(() => setSaveStatus(null), 2000);
     } catch (error) {
@@ -147,6 +162,30 @@ const SettingsUI = () => {
     setSettings(prev => ({
       ...prev,
       CUSTOM_COMMAND_PATHS: prev.CUSTOM_COMMAND_PATHS.filter((_, i) => i !== index)
+    }));
+  };
+  
+  const addWifiNetwork = () => {
+    if (newWifiNetwork.ssid.trim()) {
+      const network = {
+        ssid: newWifiNetwork.ssid.trim(),
+        psk: isOpenNetwork ? '' : newWifiNetwork.psk
+      };
+      
+      setSettings(prev => ({
+        ...prev,
+        WIFI_NETWORKS: [...prev.WIFI_NETWORKS, network]
+      }));
+      
+      setNewWifiNetwork({ ssid: '', psk: '' });
+      setIsOpenNetwork(false);
+    }
+  };
+  
+  const removeWifiNetwork = (index) => {
+    setSettings(prev => ({
+      ...prev,
+      WIFI_NETWORKS: prev.WIFI_NETWORKS.filter((_, i) => i !== index)
     }));
   };
 
@@ -309,6 +348,125 @@ const SettingsUI = () => {
               value={settings.BLOB_STORAGE_SYSTEM}
               onChange={(e) => handleChange('BLOB_STORAGE_SYSTEM', e.target.value)}
             />
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card className="mb-6">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <CardTitle className="text-xl">WiFi Settings</CardTitle>
+            <HoverCard>
+              <HoverCardTrigger>
+                <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors cursor-help" />
+              </HoverCardTrigger>
+              <HoverCardContent className="w-80">
+                <div className="space-y-3">
+                  <p className="text-sm">
+                    Configure WiFi networks for your Go Note Go device. Changes will be applied upon saving.
+                  </p>
+                  <p className="text-sm">
+                    For networks without a password, check the "Open Network" box.
+                  </p>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
+          </div>
+          <CardDescription>Add and manage WiFi networks</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-4">
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">Network Name (SSID)</label>
+              <Input
+                value={newWifiNetwork.ssid}
+                onChange={(e) => setNewWifiNetwork(prev => ({ ...prev, ssid: e.target.value }))}
+                placeholder="Enter WiFi network name"
+              />
+            </div>
+            
+            <div className="flex items-center gap-2 mb-2">
+              <input 
+                type="checkbox" 
+                id="openNetwork" 
+                checked={isOpenNetwork}
+                onChange={(e) => setIsOpenNetwork(e.target.checked)}
+                className="h-4 w-4"
+              />
+              <label htmlFor="openNetwork" className="text-sm font-medium">Open Network (No Password)</label>
+            </div>
+            
+            {!isOpenNetwork && (
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Password</label>
+                <div className="relative">
+                  <Input
+                    type={showPasswords.wifiPassword ? 'text' : 'password'}
+                    value={newWifiNetwork.psk}
+                    onChange={(e) => setNewWifiNetwork(prev => ({ ...prev, psk: e.target.value }))}
+                    placeholder="Enter WiFi password"
+                    className="pr-10"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                    onClick={() => togglePasswordVisibility('wifiPassword')}
+                  >
+                    {showPasswords.wifiPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
+              </div>
+            )}
+            
+            <Button onClick={addWifiNetwork} className="w-full">
+              <Plus className="h-4 w-4 mr-2" />
+              Add WiFi Network
+            </Button>
+          </div>
+          
+          <div className="space-y-2 mt-4">
+            <label className="text-sm font-medium">Saved Networks</label>
+            
+            {wifiConfigStatus.configured && (
+              <Alert className="mb-4 bg-green-100 text-green-800 border-green-200">
+                <AlertDescription>
+                  WiFi networks configured successfully!
+                </AlertDescription>
+              </Alert>
+            )}
+            
+            {wifiConfigStatus.error && (
+              <Alert className="mb-4 bg-red-100 text-red-800 border-red-200">
+                <AlertDescription>
+                  Error configuring WiFi: {wifiConfigStatus.error}
+                </AlertDescription>
+              </Alert>
+            )}
+            
+            {settings.WIFI_NETWORKS.length === 0 && (
+              <div className="text-sm text-muted-foreground py-2">No WiFi networks configured.</div>
+            )}
+            
+            {settings.WIFI_NETWORKS.map((network, index) => (
+              <div key={index} className="flex items-center justify-between bg-secondary/20 p-3 rounded">
+                <div>
+                  <div className="font-medium">{network.ssid}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {network.psk ? 'Secured Network' : 'Open Network'}
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => removeWifiNetwork(index)}
+                  className="h-8 w-8"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>

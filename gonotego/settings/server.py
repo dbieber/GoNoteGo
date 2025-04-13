@@ -12,6 +12,7 @@ from urllib.parse import urlparse
 
 # Import required modules
 from gonotego.settings import settings, secure_settings
+from gonotego.common import wifi
 
 # Define server port - use port 8000 (the original settings-server port)
 PORT = 8000
@@ -158,6 +159,8 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
         settings_data = json.loads(post_data)
 
         # Update settings
+        wifi_networks_updated = False
+        
         for key, value in settings_data.items():
           # Skip masked values - we don't want to overwrite with placeholder text
           if key in SENSITIVE_KEYS and value == "●●●●●●●●":
@@ -168,17 +171,36 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
             continue
 
           try:
+            # Special handling for WIFI_NETWORKS
+            if key == 'WIFI_NETWORKS':
+              wifi_networks_updated = True
+              settings.set(key, value)
             # Special handling for CUSTOM_COMMAND_PATHS which is a list
-            if isinstance(value, list):
+            elif isinstance(value, list):
               settings.set(key, value)
             # Handle other values
             else:
               settings.set(key, value)
           except Exception as e:
             print(f"Error setting {key}: {e}")
-
+        
+        # If WiFi networks were updated, apply the new configuration
+        response_data = {"success": True}
+        if wifi_networks_updated:
+          try:
+            wifi_networks = settings_data.get('WIFI_NETWORKS', [])
+            if wifi.configure_from_settings(wifi_networks):
+              response_data["wifi_configured"] = True
+            else:
+              response_data["wifi_configured"] = False
+              response_data["wifi_error"] = "Failed to apply WiFi configuration"
+          except Exception as e:
+            print(f"Error configuring WiFi: {e}")
+            response_data["wifi_configured"] = False
+            response_data["wifi_error"] = str(e)
+        
         self._set_response_headers(content_type="application/json")
-        self.wfile.write(json.dumps({"success": True}).encode("utf-8"))
+        self.wfile.write(json.dumps(response_data).encode("utf-8"))
       except Exception as e:
         print(f"Error handling POST request: {e}")
         self._set_response_headers(status_code=500, content_type="application/json")
