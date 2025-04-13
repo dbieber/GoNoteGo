@@ -63,7 +63,7 @@ const SettingsUI = () => {
         setLoadingSettings(true);
         setLoadError(false);
         
-        const response = await fetch('http://localhost:8001/api/settings');
+        const response = await fetch('/api/settings');
         
         if (!response.ok) {
           throw new Error('Failed to fetch settings');
@@ -104,7 +104,7 @@ const SettingsUI = () => {
   const handleSave = async () => {
     setSaveStatus('saving');
     try {
-      const response = await fetch('http://localhost:8001/api/settings', {
+      const response = await fetch('/api/settings', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
