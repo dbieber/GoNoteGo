@@ -203,20 +203,20 @@ const SettingsUI = () => {
   };
 
   const shouldShowSection = (section) => {
-    const system = settings.NOTE_TAKING_SYSTEM;
+    const system = settings.NOTE_TAKING_SYSTEM?.toLowerCase();
     switch (section) {
       case 'roam':
-        return system === 'Roam Research';
+        return system === 'roam research' || system === 'roam';
       case 'remnote':
-        return system === 'RemNote';
+        return system === 'remnote';
       case 'ideaflow':
-        return system === 'IdeaFlow';
+        return system === 'ideaflow';
       case 'mem':
-        return system === 'Mem';
+        return system === 'mem';
       case 'notion':
-        return system === 'Notion';
+        return system === 'notion';
       case 'twitter':
-        return system === 'Twitter';
+        return system === 'twitter';
       default:
         return true;
     }

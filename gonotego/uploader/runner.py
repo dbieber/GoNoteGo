@@ -29,20 +29,27 @@ def is_unconfigured(note_taking_system):
 
 
 def make_uploader(note_taking_system):
-  if note_taking_system == 'email':
+  # Normalize the input to handle both formats (e.g., "Roam Research" and "roam")
+  normalized_system = note_taking_system.lower()
+  
+  if normalized_system == 'email':
     return email_uploader.Uploader()
-  elif note_taking_system == 'ideaflow':
+  elif normalized_system == 'ideaflow':
     return ideaflow_uploader.Uploader()
-  elif note_taking_system == 'remnote':
+  elif normalized_system == 'remnote':
     return remnote_uploader.Uploader()
-  elif note_taking_system == 'roam':
+  elif normalized_system == 'roam' or normalized_system == 'roam research':
     return roam_uploader.Uploader()
-  elif note_taking_system == 'mem':
+  elif normalized_system == 'mem':
     return mem_uploader.Uploader()
-  elif note_taking_system == 'notion':
+  elif normalized_system == 'notion':
     return notion_uploader.Uploader()
-  elif note_taking_system == 'twitter':
+  elif normalized_system == 'twitter':
     return twitter_uploader.Uploader()
+  elif normalized_system == 'dropbox':
+    # Handle Dropbox case sensitivity
+    from gonotego.uploader.blob import blob_uploader
+    return blob_uploader.Uploader()
   else:
     raise ValueError('Unexpected NOTE_TAKING_SYSTEM in settings', note_taking_system)
 

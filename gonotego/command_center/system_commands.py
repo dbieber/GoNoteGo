@@ -22,20 +22,25 @@ SAY_COMMAND = 'say' if platform.system() == 'Darwin' else 'espeak'
 @register_command('who am i')
 def whoami():
   note_taking_system = settings.get('NOTE_TAKING_SYSTEM')
-  if note_taking_system == 'email':
+  # Normalize the system name for consistent handling
+  normalized_system = note_taking_system.lower()
+  
+  if normalized_system == 'email':
     user = settings.get('EMAIL')
-  elif note_taking_system == 'ideaflow':
+  elif normalized_system == 'ideaflow':
     user = settings.get('IDEAFLOW_USER')
-  elif note_taking_system == 'remnote':
+  elif normalized_system == 'remnote':
     user = settings.get('REMNOTE_USER_ID')[:6]
-  elif note_taking_system == 'roam':
+  elif normalized_system == 'roam' or normalized_system == 'roam research':
     user = f'{settings.get("ROAM_GRAPH")} {settings.get("ROAM_USER")}'
-  elif note_taking_system == 'mem':
+  elif normalized_system == 'mem':
     user = settings.get('MEM_API_KEY')[:6]
-  elif note_taking_system == 'notion':
+  elif normalized_system == 'notion':
     user = settings.get('NOTION_DATABASE_ID')[:6]
-  elif note_taking_system == 'twitter':
+  elif normalized_system == 'twitter':
     user = settings.get('twitter.screen_name')
+  elif normalized_system == 'dropbox':
+    user = settings.get('DROPBOX_ACCESS_TOKEN')[:6] if settings.get('DROPBOX_ACCESS_TOKEN') else 'unknown'
   say(f'uploader {note_taking_system} ; user {user}')
 
 
