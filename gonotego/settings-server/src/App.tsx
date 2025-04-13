@@ -71,23 +71,29 @@ const SettingsUI = () => {
         
         const data = await response.json();
         
-        console.log("Received settings:", data);
+        console.log("Received raw settings from API:", data);
+        console.log("Current state before update:", settings);
         
         // Process the received settings
         const validSettings = Object.entries(data).reduce((acc, [key, value]) => {
           // Always include the value, even if it's empty
           // This ensures we show empty strings and other falsy values correctly
           acc[key] = value;
+          console.log(`Processing setting: ${key} = ${typeof value === 'string' ? value : JSON.stringify(value)}`);
           return acc;
         }, {});
         
         console.log("Valid settings to apply:", validSettings);
         
-        // Update settings state with fetched data
-        setSettings(prev => ({
-          ...prev,
-          ...validSettings
-        }));
+        // Update settings state with fetched data and log the result
+        setSettings(prev => {
+          const newState = {
+            ...prev,
+            ...validSettings
+          };
+          console.log("Updated settings state:", newState);
+          return newState;
+        });
       } catch (error) {
         console.error('Error fetching settings:', error);
         setLoadError(true);
@@ -235,6 +241,15 @@ const SettingsUI = () => {
           <p className="text-gray-500">Loading settings...</p>
         </div>
       )}
+      
+      {/* Hidden debug element */}
+      <div style={{ display: 'none' }}>
+        <pre>{JSON.stringify({
+          loadingState: loadingSettings,
+          errorState: loadError,
+          settings: settings
+        }, null, 2)}</pre>
+      </div>
       
       {loadError && (
         <Alert className="mb-6 bg-red-100 text-red-800 border-red-200">

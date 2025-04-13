@@ -93,7 +93,25 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
         path = parsed_path.path
         
         # Handle API requests
-        if path == "/api/settings":
+        if path == "/api/debug":
+            # Simple debug endpoint to test the settings API directly
+            try:
+                # Get sample settings directly
+                sample = {
+                    "HOTKEY": settings.get("HOTKEY"),
+                    "NOTE_TAKING_SYSTEM": settings.get("NOTE_TAKING_SYSTEM"),
+                    "settings_module": str(settings),
+                    "secure_settings_path": inspect.getfile(secure_settings),
+                    "available_keys": [key for key in dir(secure_settings) if key.isupper()]
+                }
+                
+                self._set_response_headers(content_type="application/json")
+                self.wfile.write(json.dumps(sample).encode("utf-8"))
+            except Exception as e:
+                print(f"Error in debug endpoint: {e}")
+                self._set_response_headers(status_code=500, content_type="application/json")
+                self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
+        elif path == "/api/settings":
             try:
                 # Get all available settings from secure_settings and mask sensitive values
                 all_settings = {}
@@ -120,14 +138,22 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
                                      value.endswith('>') and 
                                      value[1:-1].strip() == key)
                         
-                        # Add to response if not a template placeholder
-                        if not is_template:
+                        print(f"Is {key}='{value}' a template? {is_template}")
+                        
+                        # Always add to response, marking template values clearly
+                        if is_template:
+                            # For template values, send an empty string to clear the field
+                            all_settings[key] = ""
+                            print(f"Setting template value {key} to empty string")
+                        else:
                             # For sensitive values, mask them
                             if key in SENSITIVE_KEYS and value:
-                                all_settings[key] = "●●●●●●●●" 
+                                all_settings[key] = "●●●●●●●●"
+                                print(f"Masking sensitive value for {key}")
                             # For non-sensitive or empty values, return as is
                             else:
                                 all_settings[key] = value
+                                print(f"Setting normal value for {key} = {value}")
                     except Exception as e:
                         print(f"Error getting setting {key}: {e}")
                 
@@ -188,6 +214,17 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
             self._set_response_headers(status_code=404, content_type="application/json")
             self.wfile.write(json.dumps({"error": "Not found"}).encode("utf-8"))
 
+def add_test_setting():
+    """Add a test setting to Redis for debugging."""
+    try:
+        print("Adding test setting to Redis...")
+        # Add a basic HOTKEY setting
+        settings.set("HOTKEY", "Escape")
+        settings.set("NOTE_TAKING_SYSTEM", "Roam Research")
+        print("Test settings added successfully.")
+    except Exception as e:
+        print(f"Error adding test setting: {e}")
+
 def run_server():
     """Run the combined settings server."""
     # Make sure the static files directory exists
@@ -195,6 +232,9 @@ def run_server():
         print(f"Error: Static files directory {STATIC_FILES_DIR} does not exist.")
         print("Make sure to build the React app before running the server.")
         sys.exit(1)
+        
+    # Add a test setting for debugging
+    add_test_setting()
         
     server_address = ("", PORT)
     httpd = HTTPServer(server_address, SettingsCombinedHandler)
