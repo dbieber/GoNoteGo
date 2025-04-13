@@ -34,6 +34,7 @@ SENSITIVE_KEYS = [
     'EMAIL_PASSWORD',
     'DROPBOX_ACCESS_TOKEN',
     'OPENAI_API_KEY',
+    'WIFI_PASSWORD',
 ]
 
 class SettingsCombinedHandler(BaseHTTPRequestHandler):
@@ -95,6 +96,21 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
         self.wfile.write(json.dumps({"success": True, "message": "Settings reset"}).encode("utf-8"))
       except Exception as e:
         print(f"Error resetting settings: {e}")
+        self._set_response_headers(status_code=500, content_type="application/json")
+        self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
+    elif path == "/api/configure-wifi":
+      try:
+        # Import here to avoid circular import issues
+        from gonotego.command_center.system_commands import configure_wifi_from_settings
+        success = configure_wifi_from_settings()
+        
+        self._set_response_headers(content_type="application/json")
+        if success:
+          self.wfile.write(json.dumps({"success": True, "message": "WiFi configured successfully"}).encode("utf-8"))
+        else:
+          self.wfile.write(json.dumps({"success": False, "message": "Failed to configure WiFi. Please check settings."}).encode("utf-8"))
+      except Exception as e:
+        print(f"Error configuring WiFi: {e}")
         self._set_response_headers(status_code=500, content_type="application/json")
         self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
     elif path == "/api/settings":

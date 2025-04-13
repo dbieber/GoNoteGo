@@ -26,6 +26,9 @@ const SettingsUI = () => {
     HOTKEY: '',
     NOTE_TAKING_SYSTEM: '',
     BLOB_STORAGE_SYSTEM: '',
+    WIFI_SSID: '',
+    WIFI_PASSWORD: '',
+    WIFI_COUNTRY: '',
     ROAM_GRAPH: '',
     ROAM_USER: '',
     ROAM_PASSWORD: '',
@@ -309,6 +312,115 @@ const SettingsUI = () => {
               value={settings.BLOB_STORAGE_SYSTEM}
               onChange={(e) => handleChange('BLOB_STORAGE_SYSTEM', e.target.value)}
             />
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card className="mb-6">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <CardTitle className="text-xl">WiFi Configuration</CardTitle>
+            <HoverCard>
+              <HoverCardTrigger>
+                <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors cursor-help" />
+              </HoverCardTrigger>
+              <HoverCardContent className="w-80">
+                <div className="space-y-2">
+                  <p>Configure your WiFi network connection settings.</p>
+                  <p>After saving your settings, click "Apply WiFi Settings" to connect to the network.</p>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
+          </div>
+          <CardDescription>Connect to a wireless network</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-2">
+            <label className="text-sm font-medium">WiFi SSID (Network Name)</label>
+            <Input
+              value={settings.WIFI_SSID}
+              onChange={(e) => handleChange('WIFI_SSID', e.target.value)}
+              placeholder="Enter network name"
+            />
+          </div>
+          <div className="grid gap-2">
+            <label className="text-sm font-medium">WiFi Password</label>
+            <div className="relative">
+              <Input
+                type={showPasswords.WIFI_PASSWORD ? 'text' : 'password'}
+                value={settings.WIFI_PASSWORD}
+                onChange={(e) => handleChange('WIFI_PASSWORD', e.target.value)}
+                placeholder="Enter network password"
+                className="pr-10"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                onClick={() => togglePasswordVisibility('WIFI_PASSWORD')}
+              >
+                {showPasswords.WIFI_PASSWORD ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </Button>
+            </div>
+          </div>
+          <div className="grid gap-2">
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium">WiFi Country Code</label>
+              <HoverCard>
+                <HoverCardTrigger>
+                  <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors cursor-help" />
+                </HoverCardTrigger>
+                <HoverCardContent className="w-80">
+                  <div className="space-y-2">
+                    <p>Use the two-letter ISO country code for your current location.</p>
+                    <p>Examples: US (United States), GB (United Kingdom), DE (Germany), JP (Japan), AU (Australia)</p>
+                    <p className="text-muted-foreground text-xs">Required in some regions for regulatory compliance.</p>
+                  </div>
+                </HoverCardContent>
+              </HoverCard>
+            </div>
+            <Input
+              value={settings.WIFI_COUNTRY}
+              onChange={(e) => handleChange('WIFI_COUNTRY', e.target.value)}
+              placeholder="e.g., US"
+            />
+          </div>
+          <div className="pt-2">
+            <Button 
+              onClick={async () => {
+                try {
+                  setSaveStatus('saving');
+                  // First save the settings
+                  await fetch('/api/settings', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(settings),
+                  });
+                  
+                  // Then apply WiFi configuration
+                  const response = await fetch('/api/configure-wifi');
+                  const data = await response.json();
+                  
+                  if (data.success) {
+                    setSaveStatus('saved');
+                    setTimeout(() => setSaveStatus(null), 2000);
+                  } else {
+                    setSaveStatus('error');
+                    setTimeout(() => setSaveStatus(null), 2000);
+                  }
+                } catch (error) {
+                  console.error('Error applying WiFi settings:', error);
+                  setSaveStatus('error');
+                  setTimeout(() => setSaveStatus(null), 2000);
+                }
+              }}
+              className="w-full"
+            >
+              Apply WiFi Settings
+            </Button>
           </div>
         </CardContent>
       </Card>

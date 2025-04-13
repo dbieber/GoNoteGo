@@ -186,6 +186,46 @@ def reconfigure_wifi():
   shell('wpa_cli -i wlan0 reconfigure')
 
 
+def configure_wifi_from_settings():
+  """Configure wifi based on settings from the settings API."""
+  ssid = settings.get('WIFI_SSID')
+  password = settings.get('WIFI_PASSWORD')
+  country = settings.get('WIFI_COUNTRY')
+  
+  if not ssid:
+    return False
+    
+  if '"' in ssid or (password and '"' in password):
+    return False
+    
+  # Create wpa_supplicant.conf with country code if provided
+  wpa_header = "ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev\nupdate_config=1\n"
+  if country:
+    wpa_header += f"country={country}\n"
+    
+  shell(f"echo '{wpa_header}' | sudo tee /etc/wpa_supplicant/wpa_supplicant.conf")
+  
+  # Add network configuration
+  if password:
+    network_string = f"""
+network={{
+        ssid="{ssid}"
+        psk="{password}"
+        key_mgmt=WPA-PSK
+}}
+"""
+  else:
+    network_string = f"""
+network={{
+        ssid="{ssid}"
+        key_mgmt=NONE
+}}
+"""
+  shell(f"echo '{network_string}' | sudo tee -a /etc/wpa_supplicant/wpa_supplicant.conf")
+  reconfigure_wifi()
+  return True
+
+
 @register_command('server')
 @register_command('settings')
 @register_command('configure')
