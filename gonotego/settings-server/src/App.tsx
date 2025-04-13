@@ -202,24 +202,28 @@ const SettingsUI = () => {
     );
   };
 
+  // Simple helper to normalize system names on the frontend
+  const normalizeSystem = (system) => {
+    if (!system) return '';
+    
+    const systemMap = {
+      'roam research': 'roam',
+      'roam': 'roam',
+      'remnote': 'remnote',
+      'ideaflow': 'ideaflow',
+      'mem': 'mem',
+      'notion': 'notion', 
+      'twitter': 'twitter',
+      'email': 'email',
+      'dropbox': 'dropbox'
+    };
+    
+    return systemMap[system.toLowerCase()] || system.toLowerCase();
+  };
+  
   const shouldShowSection = (section) => {
-    const system = settings.NOTE_TAKING_SYSTEM?.toLowerCase();
-    switch (section) {
-      case 'roam':
-        return system === 'roam research' || system === 'roam';
-      case 'remnote':
-        return system === 'remnote';
-      case 'ideaflow':
-        return system === 'ideaflow';
-      case 'mem':
-        return system === 'mem';
-      case 'notion':
-        return system === 'notion';
-      case 'twitter':
-        return system === 'twitter';
-      default:
-        return true;
-    }
+    const normalizedSystem = normalizeSystem(settings.NOTE_TAKING_SYSTEM);
+    return section === normalizedSystem || section === 'default';
   };
 
   return (

@@ -6,8 +6,8 @@ from gonotego.settings import settings
 
 
 def make_client():
-  # Handle case sensitivity for blob storage system
-  blob_system = settings.get('BLOB_STORAGE_SYSTEM').lower() if settings.get('BLOB_STORAGE_SYSTEM') else ''
+  # Use centralized normalization function
+  blob_system = settings.normalize_system_name(settings.get('BLOB_STORAGE_SYSTEM'))
   if blob_system == 'dropbox':
     return dropbox.Dropbox(settings.get('DROPBOX_ACCESS_TOKEN'))
 

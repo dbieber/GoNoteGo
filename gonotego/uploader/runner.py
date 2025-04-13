@@ -29,8 +29,8 @@ def is_unconfigured(note_taking_system):
 
 
 def make_uploader(note_taking_system):
-  # Normalize the input to handle both formats (e.g., "Roam Research" and "roam")
-  normalized_system = note_taking_system.lower()
+  # Use centralized normalization function
+  normalized_system = settings.normalize_system_name(note_taking_system)
   
   if normalized_system == 'email':
     return email_uploader.Uploader()
@@ -38,7 +38,7 @@ def make_uploader(note_taking_system):
     return ideaflow_uploader.Uploader()
   elif normalized_system == 'remnote':
     return remnote_uploader.Uploader()
-  elif normalized_system == 'roam' or normalized_system == 'roam research':
+  elif normalized_system == 'roam':
     return roam_uploader.Uploader()
   elif normalized_system == 'mem':
     return mem_uploader.Uploader()
@@ -47,7 +47,6 @@ def make_uploader(note_taking_system):
   elif normalized_system == 'twitter':
     return twitter_uploader.Uploader()
   elif normalized_system == 'dropbox':
-    # Handle Dropbox case sensitivity
     from gonotego.uploader.blob import blob_uploader
     return blob_uploader.Uploader()
   else:
@@ -57,15 +56,16 @@ def make_uploader(note_taking_system):
 def main():
   print('Starting uploader.')
   note_events_queue = interprocess.get_note_events_queue()
-  note_taking_system = settings.get('NOTE_TAKING_SYSTEM').lower()
+  note_taking_system = settings.get('NOTE_TAKING_SYSTEM')
+  normalized_system = settings.normalize_system_name(note_taking_system)
 
   # Check if note taking system is still using the default unconfigured value
-  if is_unconfigured(note_taking_system):
+  if is_unconfigured(normalized_system):
     print_configuration_help()
     return
 
   try:
-    uploader = make_uploader(note_taking_system)
+    uploader = make_uploader(normalized_system)
   except ValueError as e:
     print(e, file=sys.stderr)
     return
@@ -77,16 +77,17 @@ def main():
     # Don't even try uploading notes if we don't have a connection.
     internet.wait_for_internet(on_disconnect=uploader.handle_disconnect)
 
-    note_taking_system_setting = settings.get('NOTE_TAKING_SYSTEM').lower()
-    if note_taking_system_setting != note_taking_system:
-      note_taking_system = note_taking_system_setting
+    current_note_system = settings.get('NOTE_TAKING_SYSTEM')
+    current_normalized = settings.normalize_system_name(current_note_system)
+    if current_normalized != normalized_system:
+      normalized_system = current_normalized
 
       # Check if note taking system is using the default unconfigured value after a change
-      if is_unconfigured(note_taking_system):
+      if is_unconfigured(normalized_system):
         print_configuration_help()
         continue
 
-      uploader = make_uploader(note_taking_system)
+      uploader = make_uploader(normalized_system)
 
     note_event_bytes_list = []
     note_events = []

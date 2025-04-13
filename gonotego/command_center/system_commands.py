@@ -22,8 +22,8 @@ SAY_COMMAND = 'say' if platform.system() == 'Darwin' else 'espeak'
 @register_command('who am i')
 def whoami():
   note_taking_system = settings.get('NOTE_TAKING_SYSTEM')
-  # Normalize the system name for consistent handling
-  normalized_system = note_taking_system.lower()
+  # Use centralized normalization function
+  normalized_system = settings.normalize_system_name(note_taking_system)
   
   if normalized_system == 'email':
     user = settings.get('EMAIL')
@@ -31,7 +31,7 @@ def whoami():
     user = settings.get('IDEAFLOW_USER')
   elif normalized_system == 'remnote':
     user = settings.get('REMNOTE_USER_ID')[:6]
-  elif normalized_system == 'roam' or normalized_system == 'roam research':
+  elif normalized_system == 'roam':
     user = f'{settings.get("ROAM_GRAPH")} {settings.get("ROAM_USER")}'
   elif normalized_system == 'mem':
     user = settings.get('MEM_API_KEY')[:6]
@@ -41,7 +41,10 @@ def whoami():
     user = settings.get('twitter.screen_name')
   elif normalized_system == 'dropbox':
     user = settings.get('DROPBOX_ACCESS_TOKEN')[:6] if settings.get('DROPBOX_ACCESS_TOKEN') else 'unknown'
-  say(f'uploader {note_taking_system} ; user {user}')
+  
+  # Use original value for display
+  display_name = settings.get_display_name(normalized_system)
+  say(f'uploader {display_name} ; user {user}')
 
 
 @register_command('t')
