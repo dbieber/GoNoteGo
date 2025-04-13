@@ -8,11 +8,10 @@ import os
 import sys
 import mimetypes
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import urlparse
 
 # Import required modules
 from gonotego.settings import settings, secure_settings
-from gonotego.common import interprocess
 
 # Define server port - use port 8000 (the original settings-server port)
 PORT = 8000
