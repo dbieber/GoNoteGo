@@ -78,9 +78,13 @@ jobs:
             # Clean up apt cache to free up space
             sudo apt-get clean
 
+            echo "Installing Node.js 18.x"
+            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+            sudo apt install -y nodejs
+
             echo "Installing dependencies!"
             sudo apt install -y git firefox-esr xvfb portaudio19-dev libatlas-base-dev redis-server espeak \
-                rustc python3-dev libopenblas-dev iptables iptables-persistent nodejs npm
+                rustc python3-dev libopenblas-dev iptables iptables-persistent
                 
             # Clean up after installation
             sudo apt-get clean
