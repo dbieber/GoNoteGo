@@ -51,12 +51,12 @@ def main():
   print('Starting uploader.')
   note_events_queue = interprocess.get_note_events_queue()
   note_taking_system = settings.get('NOTE_TAKING_SYSTEM').lower()
-  
+
   # Check if note taking system is still using the default unconfigured value
   if is_unconfigured(note_taking_system):
     print_configuration_help()
     return
-    
+
   try:
     uploader = make_uploader(note_taking_system)
   except ValueError as e:
@@ -73,12 +73,12 @@ def main():
     note_taking_system_setting = settings.get('NOTE_TAKING_SYSTEM').lower()
     if note_taking_system_setting != note_taking_system:
       note_taking_system = note_taking_system_setting
-      
+
       # Check if note taking system is using the default unconfigured value after a change
       if is_unconfigured(note_taking_system):
         print_configuration_help()
         continue
-        
+
       uploader = make_uploader(note_taking_system)
 
     note_event_bytes_list = []

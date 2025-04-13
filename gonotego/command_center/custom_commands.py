@@ -9,7 +9,7 @@ def register_custom_commands(paths):
   for path in paths:
     if os.path.exists(path) and path.endswith('.py'):
       module_name = os.path.splitext(os.path.basename(path))[0]
-  
+
       spec = importlib.util.spec_from_file_location(module_name, path)
       module = importlib.util.module_from_spec(spec)
 
