@@ -2,7 +2,6 @@ HOTKEY = '<HOTKEY>'
 NOTE_TAKING_SYSTEM = '<NOTE_TAKING_SYSTEM>'
 BLOB_STORAGE_SYSTEM = '<BLOB_STORAGE_SYSTEM>'
 
-# WiFi Settings
 WIFI_NETWORKS = []  # List of dictionaries with 'ssid' and 'psk' keys
 
 ROAM_GRAPH = '<ROAM_GRAPH>'
