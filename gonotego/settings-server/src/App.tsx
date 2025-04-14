@@ -143,12 +143,29 @@ const SettingsUI = () => {
   const handleSave = async () => {
     setSaveStatus('saving');
     try {
+      // Create an object with only the changed settings
+      const changedSettings = {};
+      
+      // Compare each setting with its original value
+      for (const [key, value] of Object.entries(settings)) {
+        // Get the original value
+        const originalValue = originalSettings[key];
+        
+        // Check if this setting has changed using string comparison
+        // This handles all types of settings including arrays (via JSON.stringify)
+        if (JSON.stringify(value) !== JSON.stringify(originalValue)) {
+          changedSettings[key] = value;
+        }
+      }
+      
+      console.log('Sending only changed settings:', changedSettings);
+      
       const response = await fetch('/api/settings', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(settings),
+        body: JSON.stringify(changedSettings),
       });
 
       if (!response.ok) {
