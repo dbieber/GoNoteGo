@@ -48,10 +48,10 @@ def configure_network_connections():
       # Create new connection
       if network.get('psk'):
         # WPA secured network
-        add_wpa_connection(ssid, network['psk'])
+        add_wifi_connection(ssid, network['psk'])
       else:
         # Open network
-        add_open_connection(ssid)
+        add_wifi_connection(ssid)
     
     return True
   except Exception as e:
@@ -85,34 +85,20 @@ def get_gonotego_managed_connections():
     return []
 
 
-def add_wpa_connection(ssid, password):
-  """Add a new WPA secured WiFi connection."""
+def add_wifi_connection(ssid, password=None):
+  """Add a new WiFi connection (secure or open).
+  
+  Args:
+    ssid: The SSID of the network to add
+    password: If provided, adds a WPA secured network. If None, adds an open network.
+  
+  Returns:
+    True on success, False on error
+  """
   try:
     conn_name = ssid
     
-    cmd = [
-        "sudo", "nmcli", "connection", "add",
-        "type", "wifi",
-        "con-name", conn_name,
-        "ifname", "wlan0",
-        "ssid", ssid,
-        "wifi-sec.key-mgmt", "wpa-psk",
-        "wifi-sec.psk", password
-    ]
-    
-    subprocess.run(cmd, check=True, capture_output=True)
-    return True
-  except subprocess.CalledProcessError as e:
-    print(f"Error adding WPA connection for {ssid}: {e}")
-    print(f"Error output: {e.stderr}")
-    return False
-
-
-def add_open_connection(ssid):
-  """Add a new open (unsecured) WiFi connection."""
-  try:
-    conn_name = ssid
-    
+    # Base command for both connection types
     cmd = [
         "sudo", "nmcli", "connection", "add",
         "type", "wifi",
@@ -121,10 +107,18 @@ def add_open_connection(ssid):
         "ssid", ssid
     ]
     
+    # Add security parameters if password is provided
+    if password:
+      cmd.extend([
+          "wifi-sec.key-mgmt", "wpa-psk",
+          "wifi-sec.psk", password
+      ])
+    
     subprocess.run(cmd, check=True, capture_output=True)
     return True
   except subprocess.CalledProcessError as e:
-    print(f"Error adding open connection for {ssid}: {e}")
+    conn_type = "WPA" if password else "open"
+    print(f"Error adding {conn_type} connection for {ssid}: {e}")
     print(f"Error output: {e.stderr}")
     return False
 
