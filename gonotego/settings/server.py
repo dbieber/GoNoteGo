@@ -155,11 +155,6 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
   def do_POST(self):
     """Handle POST requests."""
     parsed_path = urlparse(self.path)
-
-    # Early debug log to see if we're getting to this point
-    with open('/tmp/wifi_debug_start.log', 'a') as f:
-      f.write(f"POST request received to {parsed_path.path}\n")
-
     if parsed_path.path == "/api/settings":
       try:
         # Read the request body
@@ -167,13 +162,6 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
         post_data = self.rfile.read(content_length).decode("utf-8")
         settings_data = json.loads(post_data)
 
-        # Write all settings being processed to debug file
-        with open('/tmp/wifi_debug.log', 'a') as f:
-          f.write("===== SETTINGS UPDATE =====\n")
-          for k, v in settings_data.items():
-            f.write(f"Key: {k}, Value type: {type(v)}, Value: {v}\n")
-          f.write("========================\n")
-            
         # Update settings
         for key, value in settings_data.items():
           # Skip masked values - we don't want to overwrite with placeholder text
@@ -189,9 +177,6 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
             # If we're updating WiFi networks, save networks and update the wpa_supplicant.conf file
             if key == 'WIFI_NETWORKS':
               try:
-                # Write debug info to a file that can be checked later
-                with open('/tmp/wifi_debug.log', 'a') as f:
-                  f.write(f"WIFI_NETWORKS value type: {type(value)}, value: {value}\n")
                 # Parse the value to ensure it's in the correct format
                 if isinstance(value, str):
                   networks = json.loads(value)

@@ -55,6 +55,9 @@ const SettingsUI = () => {
     CUSTOM_COMMAND_PATHS: [],
   });
   
+  // Keep track of the original settings to detect changes
+  const [originalSettings, setOriginalSettings] = useState({});
+  
   const [newWifiNetwork, setNewWifiNetwork] = useState({
     ssid: '',
     psk: ''
@@ -90,10 +93,14 @@ const SettingsUI = () => {
         }, {});
 
         // Update settings state with fetched data
-        setSettings(prev => ({
-          ...prev,
+        const updatedSettings = {
+          ...settings,
           ...validSettings
-        }));
+        };
+        setSettings(updatedSettings);
+        
+        // Store the original settings to detect changes
+        setOriginalSettings(JSON.parse(JSON.stringify(updatedSettings)));
       } catch (error) {
         console.error('Error fetching settings:', error);
         setLoadError(true);
@@ -104,6 +111,20 @@ const SettingsUI = () => {
 
     fetchSettings();
   }, []);
+
+  // Function to detect if there are unsaved changes
+  const hasUnsavedChanges = () => {
+    // Check if the settings object has the same structure as originalSettings
+    if (Object.keys(originalSettings).length === 0) return false;
+    
+    // Compare original and current settings using deep comparison
+    try {
+      return JSON.stringify(settings) !== JSON.stringify(originalSettings);
+    } catch (e) {
+      // If comparison fails (e.g., circular references), default to true
+      return true;
+    }
+  };
 
   const handleChange = (key, value) => {
     setSettings(prev => ({
@@ -135,6 +156,10 @@ const SettingsUI = () => {
       }
 
       setSaveStatus('saved');
+      
+      // Update the original settings after saving
+      setOriginalSettings(JSON.parse(JSON.stringify(settings)));
+      
       setTimeout(() => setSaveStatus(null), 2000);
     } catch (error) {
       console.error('Error saving settings:', error);
@@ -736,15 +761,15 @@ const SettingsUI = () => {
           )}
           <Button
             onClick={handleSave}
-            className="w-32"
-            disabled={saveStatus === 'saving'}
+            className={`w-32 ${hasUnsavedChanges() ? 'bg-blue-600 hover:bg-blue-700' : 'bg-slate-300 hover:bg-slate-400'}`}
+            disabled={saveStatus === 'saving' || !hasUnsavedChanges()}
           >
             {saveStatus === 'saving' ? (
               'Saving...'
             ) : (
               <>
                 <Save className="h-4 w-4 mr-2" />
-                Save
+                {hasUnsavedChanges() ? 'Save *' : 'Save'}
               </>
             )}
           </Button>
