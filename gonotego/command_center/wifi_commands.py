@@ -100,23 +100,6 @@ def migrate_wifi_networks():
     say('No WiFi networks found to migrate.')
 
 
-@register_command('wifi-nm-migrate')
-def migrate_from_networkmanager():
-  """Migrate existing NetworkManager connections to Go Note Go settings."""
-  networks = wifi.migrate_from_networkmanager()
-  
-  if networks is None:
-    say('Error reading NetworkManager connections.')
-    return
-    
-  # Save the extracted networks to Redis
-  if networks:
-    wifi.save_networks(networks)
-    say(f'Migrated {len(networks)} WiFi networks from NetworkManager to settings.')
-  else:
-    say('No WiFi networks found to migrate.')
-
-
 @register_command('wifi-remove {}')
 def remove_wifi_network(ssid):
   networks = wifi.get_networks()
