@@ -30,8 +30,8 @@ def add_wpa_wifi(ssid, psk):
   # Save updated networks
   wifi.save_networks(networks)
   
-  # Update NetworkManager connections
-  if wifi.update_network_connections():
+  # Configure NetworkManager connections
+  if wifi.configure_network_connections():
     wifi.reconfigure_wifi()
     say(f'WiFi network {ssid} added.')
   else:
@@ -59,8 +59,8 @@ def add_wifi_no_psk(ssid):
   # Save updated networks
   wifi.save_networks(networks)
   
-  # Update NetworkManager connections
-  if wifi.update_network_connections():
+  # Configure NetworkManager connections
+  if wifi.configure_network_connections():
     wifi.reconfigure_wifi()
     say(f'Open WiFi network {ssid} added.')
   else:
@@ -92,8 +92,8 @@ def migrate_wifi_networks():
     wifi.save_networks(networks)
     say(f'Migrated {len(networks)} WiFi networks to settings.')
     
-    # Update NetworkManager connections
-    wifi.update_network_connections()
+    # Configure NetworkManager connections
+    wifi.configure_network_connections()
     wifi.reconfigure_wifi()
   else:
     say('No WiFi networks found to migrate.')
@@ -102,7 +102,7 @@ def migrate_wifi_networks():
 @register_command('wifi-nm-migrate')
 def migrate_from_networkmanager():
   """Migrate existing NetworkManager connections to Go Note Go settings."""
-  networks = wifi.migrate_from_networkmanger()
+  networks = wifi.migrate_from_networkmanager()
   
   if networks is None:
     say('Error reading NetworkManager connections.')
@@ -128,8 +128,8 @@ def remove_wifi_network(ssid):
     # Save updated networks
     wifi.save_networks(networks)
     
-    # Update NetworkManager connections
-    if wifi.update_network_connections():
+    # Configure NetworkManager connections
+    if wifi.configure_network_connections():
       wifi.reconfigure_wifi()
       say(f'WiFi network {ssid} removed.')
     else:

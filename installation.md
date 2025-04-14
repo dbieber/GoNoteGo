@@ -34,7 +34,7 @@ Run `hostname -I` on the Raspberry Pi to determine the IP address to use in the 
   ```bash
 sudo apt update
 sudo apt upgrade
-sudo apt install firefox-esr xvfb portaudio19-dev libatlas-base-dev redis-server espeak rustc python3-dev network-manager
+sudo apt install firefox-esr xvfb portaudio19-dev libatlas-base-dev redis-server espeak rustc python3-dev
 
 cd /home/pi/code/github/dbieber/GoNoteGo
 mkdir out
@@ -64,14 +64,10 @@ sudo mv geckodriver /usr/local/bin
 
 7. Set up Internet
 
-Go Note Go uses NetworkManager for managing WiFi connections. There are several ways to configure your network:
+* Run `sudo nano /etc/wpa_supplicant/wpa_supplicant.conf`
+* Follow the guide at https://www.raspberrypi.org/documentation/computers/configuration.html to set up your wpa_supplicant.conf file.
 
-* **Through the Go Note Go Settings UI**: The recommended way is to use the Go Note Go settings interface.
-* **Through command voice commands**: Use commands like `wifi <network-name> <password>` to add networks.
-* **Through the NetworkManager CLI**: Run `sudo nmcli device wifi connect "<SSID>" password "<PASSWORD>"` to connect to a network.
-* **Through the operating system's UI**: The Raspberry Pi desktop provides a GUI for NetworkManager.
-
-For more details on NetworkManager, see https://networkmanager.dev/ or run `man nmcli`.
+Setting up internet through the operating system's UI may also work.
 
 8. Set up your audio
 

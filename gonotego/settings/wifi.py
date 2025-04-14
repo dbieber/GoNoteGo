@@ -2,6 +2,7 @@
 import json
 import subprocess
 import re
+import os
 from gonotego.settings import settings
 from gonotego.command_center import system_commands
 
@@ -21,8 +22,8 @@ def save_networks(networks):
   settings.set('WIFI_NETWORKS', json.dumps(networks))
 
 
-def update_network_connections():
-  """Update NetworkManager connections for Go Note Go managed WiFi networks."""
+def configure_network_connections():
+  """Configure NetworkManager connections for Go Note Go managed WiFi networks."""
   networks = get_networks()
   result = True
   
@@ -187,7 +188,7 @@ def migrate_networks_from_wpa_supplicant():
   """Scan wpa_supplicant.conf and migrate existing networks to Redis."""
   filepath = '/etc/wpa_supplicant/wpa_supplicant.conf'
   
-  if not subprocess.run(["test", "-f", filepath], capture_output=True).returncode == 0:
+  if not os.path.exists(filepath):
     print('WiFi configuration file not found.')
     return None
   
@@ -219,13 +220,14 @@ def migrate_networks_from_wpa_supplicant():
           psk = psk_match.group(1)
           networks.append({'ssid': ssid, 'psk': psk})
     
+    # Return the extracted networks
     return networks
   except Exception as e:
     print(f"Error migrating WiFi networks: {e}")
     return None
 
 
-def migrate_from_networkmanger():
+def migrate_from_networkmanager():
   """Scan NetworkManager connections and migrate to Redis."""
   try:
     # Get all wifi connections
