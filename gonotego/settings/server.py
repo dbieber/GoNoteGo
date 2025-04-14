@@ -175,26 +175,12 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
           try:
             # Handle WiFi networks specially
             if key == 'WIFI_NETWORKS':
-              # Get current networks before saving the new ones
-              current_networks = wifi.get_networks()
-              
-              # Compare current and new networks
-              if json.dumps(current_networks) != json.dumps(value):
-                # Only save and reconfigure if networks have actually changed
-                wifi.save_networks(value)
-                wifi.update_wpa_supplicant_config()
-                wifi.reconfigure_wifi()
-                print("WiFi networks changed, reconfigured WiFi")
-              else:
-                print("WiFi networks unchanged, skipping reconfiguration")
+              wifi.save_networks(value)
+              wifi.update_wpa_supplicant_config()
+              wifi.reconfigure_wifi()
             else:
-              # For all other settings, only save if changed
-              current_value = settings.get(key)
-              if str(current_value) != str(value):
-                settings.set(key, value)
-                print(f"Setting {key} changed, saved new value")
-              else:
-                print(f"Setting {key} unchanged, skipping save")
+              # For all other settings, just use settings.set
+              settings.set(key, value)
           except Exception as e:
             print(f"Error setting {key}: {e}")
 
