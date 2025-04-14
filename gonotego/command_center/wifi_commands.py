@@ -1,4 +1,5 @@
 """WiFi command handlers for Go Note Go using NetworkManager."""
+import subprocess
 from gonotego.command_center import registry
 from gonotego.command_center import system_commands
 from gonotego.settings import wifi
@@ -150,10 +151,13 @@ def scan_wifi_networks():
   """Scan for available WiFi networks."""
   try:
     # Ensure the WiFi adapter is on
-    shell('sudo nmcli radio wifi on')
+    subprocess.run(['sudo', 'nmcli', 'radio', 'wifi', 'on'], check=True)
     
     # Scan for networks
-    result = shell('nmcli -t -f SSID,SIGNAL,SECURITY device wifi list')
+    result = subprocess.run(
+        ['nmcli', '-t', '-f', 'SSID,SIGNAL,SECURITY', 'device', 'wifi', 'list'],
+        capture_output=True, text=True, check=True
+    )
     
     networks = []
     for line in result.stdout.strip().split('\n'):
