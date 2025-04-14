@@ -163,6 +163,13 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
         post_data = self.rfile.read(content_length).decode("utf-8")
         settings_data = json.loads(post_data)
 
+        # Write all settings being processed to debug file
+        with open('/tmp/wifi_debug.log', 'a') as f:
+            f.write("===== SETTINGS UPDATE =====\n")
+            for k, v in settings_data.items():
+                f.write(f"Key: {k}, Value type: {type(v)}, Value: {v}\n")
+            f.write("========================\n")
+            
         # Update settings
         for key, value in settings_data.items():
           # Skip masked values - we don't want to overwrite with placeholder text
@@ -175,9 +182,21 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
 
           try:
             settings.set(key, value)
-            # If we're updating WiFi networks, update the wpa_supplicant.conf file
+            # If we're updating WiFi networks, save networks and update the wpa_supplicant.conf file
             if key == 'WIFI_NETWORKS':
               try:
+                # Write debug info to a file that can be checked later
+                with open('/tmp/wifi_debug.log', 'a') as f:
+                    f.write(f"WIFI_NETWORKS value type: {type(value)}, value: {value}\n")
+                # Parse the value to ensure it's in the correct format
+                if isinstance(value, str):
+                  networks = json.loads(value)
+                else:
+                  networks = value
+                
+                # Save networks using the wifi module's function
+                wifi.save_networks(networks)
+                
                 # Update wpa_supplicant configuration using the wifi module
                 wifi.update_wpa_supplicant_config()
                 wifi.reconfigure_wifi()
