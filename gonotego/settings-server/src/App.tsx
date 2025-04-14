@@ -21,6 +21,10 @@ const SettingsUI = () => {
     { display: 'Twitter', value: 'twitter' },
     { display: 'Email', value: 'email' }
   ];
+  
+  const BLOB_STORAGE_SYSTEMS = [
+    { display: 'Dropbox', value: 'dropbox' }
+  ];
 
   const [settings, setSettings] = useState({
     HOTKEY: '',
@@ -217,6 +221,11 @@ const SettingsUI = () => {
     const system = NOTE_TAKING_SYSTEMS.find(sys => sys.value === value);
     return system ? system.display : value;
   };
+  
+  const getBlobStorageDisplayName = (value) => {
+    const system = BLOB_STORAGE_SYSTEMS.find(sys => sys.value === value);
+    return system ? system.display : value;
+  };
 
   return (
     <div className="w-full max-w-4xl mx-auto p-6 space-y-6">
@@ -303,10 +312,25 @@ const SettingsUI = () => {
           </div>
           <div className="grid gap-2">
             <label className="text-sm font-medium">Blob Storage System</label>
-            <Input
+            <Select
               value={settings.BLOB_STORAGE_SYSTEM}
-              onChange={(e) => handleChange('BLOB_STORAGE_SYSTEM', e.target.value)}
-            />
+              onValueChange={(value) => handleChange('BLOB_STORAGE_SYSTEM', value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select a blob storage system">
+                  {settings.BLOB_STORAGE_SYSTEM ? getBlobStorageDisplayName(settings.BLOB_STORAGE_SYSTEM) : ""}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {BLOB_STORAGE_SYSTEMS.map(system => (
+                    <SelectItem key={system.value} value={system.value}>
+                      {system.display}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
         </CardContent>
       </Card>
