@@ -12,4 +12,10 @@ if [ -f "$source_file" ]; then
 
     # Rename the original file to a backup file
     mv "$source_file" "$backup_file"
+    
+    # Ensure the copied settings file is owned by pi user
+    chown pi:pi "$target_dir/$(basename "$source_file")"
 fi
+
+# Ensure the entire GoNoteGo repo is owned by pi user
+chown -R pi:pi /home/pi/code/github/dbieber/GoNoteGo
