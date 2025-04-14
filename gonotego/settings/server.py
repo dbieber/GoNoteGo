@@ -157,11 +157,8 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
     parsed_path = urlparse(self.path)
 
     # Early debug log to see if we're getting to this point
-    try:
-      with open('/tmp/wifi_debug_start.log', 'a') as f:
-        f.write(f"POST request received to {parsed_path.path}\n")
-    except Exception as e:
-      print(f"Error writing to start debug log: {e}")
+    with open('/tmp/wifi_debug_start.log', 'a') as f:
+      f.write(f"POST request received to {parsed_path.path}\n")
 
     if parsed_path.path == "/api/settings":
       try:
@@ -171,14 +168,11 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
         settings_data = json.loads(post_data)
 
         # Write all settings being processed to debug file
-        try:
-          with open('/tmp/wifi_debug.log', 'a') as f:
-            f.write("===== SETTINGS UPDATE =====\n")
-            for k, v in settings_data.items():
-              f.write(f"Key: {k}, Value type: {type(v)}, Value: {v}\n")
-            f.write("========================\n")
-        except Exception as e:
-          print(f"Error writing to debug log: {e}")
+        with open('/tmp/wifi_debug.log', 'a') as f:
+          f.write("===== SETTINGS UPDATE =====\n")
+          for k, v in settings_data.items():
+            f.write(f"Key: {k}, Value type: {type(v)}, Value: {v}\n")
+          f.write("========================\n")
             
         # Update settings
         for key, value in settings_data.items():
@@ -196,11 +190,8 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
             if key == 'WIFI_NETWORKS':
               try:
                 # Write debug info to a file that can be checked later
-                try:
-                  with open('/tmp/wifi_debug.log', 'a') as f:
-                    f.write(f"WIFI_NETWORKS value type: {type(value)}, value: {value}\n")
-                except Exception as e:
-                  print(f"Error writing to wifi debug log: {e}")
+                with open('/tmp/wifi_debug.log', 'a') as f:
+                  f.write(f"WIFI_NETWORKS value type: {type(value)}, value: {value}\n")
                 # Parse the value to ensure it's in the correct format
                 if isinstance(value, str):
                   networks = json.loads(value)
