@@ -148,9 +148,6 @@ def check_internet():
   say('yes' if internet.is_internet_available() else 'no')
 
 
-# WiFi functions moved to gonotego.settings.wifi module
-
-
 @register_command('wifi {} {}')
 @register_command('wpa {} {}')
 def add_wpa_wifi(ssid, psk):
