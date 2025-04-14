@@ -3,7 +3,6 @@ import json
 import os
 import re
 from gonotego.settings import settings
-from gonotego.common import interprocess
 from gonotego.command_center import system_commands
 
 shell = system_commands.shell
