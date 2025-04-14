@@ -10,8 +10,8 @@ import mimetypes
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse
 
-from gonotego.settings import settings
 from gonotego.settings import secure_settings
+from gonotego.settings import settings
 from gonotego.settings import wifi
 
 PORT = 8000
@@ -130,7 +130,6 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
                 if key == 'WIFI_NETWORKS':
                   # Get networks directly from the wifi module to ensure proper format
                   networks = wifi.get_networks()
-                  print(f"DEBUG: Including WiFi networks in API response: {networks}")
                   all_settings[key] = networks
                 else:
                   all_settings[key] = value

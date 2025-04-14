@@ -1,7 +1,7 @@
 """WiFi command handlers for Go Note Go."""
 from gonotego.command_center import registry
-from gonotego.settings import wifi
 from gonotego.command_center import system_commands
+from gonotego.settings import wifi
 
 register_command = registry.register_command
 say = system_commands.say
