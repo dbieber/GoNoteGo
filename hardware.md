@@ -10,11 +10,17 @@ Link: https://www.raspberrypi.com/products/raspberry-pi-400-unit/
 
 Details: The Raspberry Pi 400 with US keyboard is recommended. You can purchase from e.g. [PiShop](https://www.pishop.us/product/raspberry-pi-400-complete-kit/).
 
-Cost: ~$70
+It's recommended to order the complete kit which includes:
+- The Raspberry Pi 400 unit ($70)
+- Class 10 microSD Card With Raspbian - 16GB
+- USB-C Power Supply, 5.1V 3.0A, Black, UL Listed
+- Micro-HDMI to HDMI cable for Pi 4, 3ft, Black
+
+Cost: ~$70 (unit only) or ~$91 (complete kit)
 
 #### SD Card
 
-A Class 10 microSD Card - 16GB or larger is recommended.
+A Class 10 microSD Card - 16GB or larger is recommended. (This is included if you purchase the complete Raspberry Pi 400 kit).
 
 Cost: ~$10-15
 
@@ -34,7 +40,7 @@ Cost: $13-30
 
 #### Power Source
 
-A USB-C Power Supply, 5.1V 3.0A for the Raspberry Pi 400.
+A USB-C Power Supply, 5.1V 3.0A for the Raspberry Pi 400. (This is included if you purchase the complete Raspberry Pi 400 kit).
 
 Cost: ~$10
 
