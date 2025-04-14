@@ -176,7 +176,7 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
             # Handle WiFi networks specially
             if key == 'WIFI_NETWORKS':
               wifi.save_networks(value)
-              wifi.update_wpa_supplicant_config()
+              wifi.update_network_connections()
               wifi.reconfigure_wifi()
             else:
               # For all other settings, just use settings.set
