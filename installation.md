@@ -48,7 +48,7 @@ These instructions will guide you through setting up Go Note Go on a Raspberry P
    :i
    ```
    
-   It should respond with 'Yes' indicating it's connected to the internet.
+   It should respond out loud with 'Yes' indicating it's connected to the internet.
 
 8. Turn off the WiFi hotspot (optional).
    
