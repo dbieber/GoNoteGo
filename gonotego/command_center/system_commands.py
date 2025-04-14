@@ -3,8 +3,6 @@ import os
 import platform
 import subprocess
 import sys
-import json
-import re
 
 from gonotego.common import internet
 from gonotego.common import status

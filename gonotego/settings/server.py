@@ -10,17 +10,17 @@ import mimetypes
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse
 
-# Import required modules
-from gonotego.settings import settings, secure_settings, wifi
+from gonotego.settings import settings
+from gonotego.settings import secure_settings
+from gonotego.settings import wifi
 
-# Define server port - use port 8000 (the original settings-server port)
 PORT = 8000
 
 # Path to the static files (React build)
 STATIC_FILES_DIR = os.path.abspath(os.path.join(
     os.path.dirname(__file__), "../settings-server/dist"))
 
-# Define sensitive keys that should be masked
+# Sensitive keys that should be masked
 SENSITIVE_KEYS = [
     'ROAM_PASSWORD',
     'REMNOTE_API_KEY',
@@ -160,7 +160,7 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
         # Update settings
         for key, value in settings_data.items():
           # Skip masked values - we don't want to overwrite with placeholder text
-          if key in SENSITIVE_KEYS and value == "●●●●●●●●":
+          if value == "●●●●●●●●" or not value:
             continue
 
           # Skip non-settings keys
@@ -168,20 +168,15 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
             continue
 
           try:
-            # Special handling for CUSTOM_COMMAND_PATHS and WIFI_NETWORKS which are lists
-            if isinstance(value, list):
-              settings.set(key, value)
-              # If we're updating WiFi networks, update the wpa_supplicant.conf file
-              if key == 'WIFI_NETWORKS':
-                try:
-                  # Update wpa_supplicant configuration using the wifi module
-                  wifi.update_wpa_supplicant_config()
-                  wifi.reconfigure_wifi()
-                except Exception as e:
-                  print(f"Error updating WiFi configuration: {e}")
-            # Handle other values
-            else:
-              settings.set(key, value)
+            settings.set(key, value)
+            # If we're updating WiFi networks, update the wpa_supplicant.conf file
+            if key == 'WIFI_NETWORKS':
+              try:
+                # Update wpa_supplicant configuration using the wifi module
+                wifi.update_wpa_supplicant_config()
+                wifi.reconfigure_wifi()
+              except Exception as e:
+                print(f"Error updating WiFi configuration: {e}")
           except Exception as e:
             print(f"Error setting {key}: {e}")
 

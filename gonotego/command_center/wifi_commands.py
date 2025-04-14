@@ -1,9 +1,11 @@
 """WiFi command handlers for Go Note Go."""
 from gonotego.command_center import registry
 from gonotego.settings import wifi
-from gonotego.command_center.system_commands import say, shell
+from gonotego.command_center import system_commands
 
 register_command = registry.register_command
+say = system_commands.say
+shell = system_commands.shell
 
 
 @register_command('wifi {} {}')
@@ -12,10 +14,10 @@ def add_wpa_wifi(ssid, psk):
   if '"' in ssid or '"' in psk:
     say('WiFi not set.')
     return
-  
+
   # Load existing networks
   networks = wifi.get_networks()
-  
+
   # Check if this network already exists
   for network in networks:
     if network.get('ssid') == ssid:
@@ -24,7 +26,7 @@ def add_wpa_wifi(ssid, psk):
   else:
     # Network doesn't exist, add it
     networks.append({'ssid': ssid, 'psk': psk})
-  
+
   # Save updated networks
   wifi.save_networks(networks)
   
