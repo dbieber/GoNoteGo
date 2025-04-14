@@ -27,23 +27,21 @@ def configure_network_connections():
   networks = get_networks()
   
   try:
-    # Get existing connections managed by Go Note Go
-    existing_connections = get_gonotego_managed_connections()
+    # Get existing NetworkManager connections
+    existing_connections = get_network_manager_connections()
     
-    # Remove connections no longer in our networks list
+    # Get SSIDs we want to manage
     managed_ssids = [network['ssid'] for network in networks]
+    
+    # Remove existing Network Manager connections that match our managed SSIDs
+    # This allows us to recreate them with current settings
     for conn_name in existing_connections:
-      if conn_name not in managed_ssids:
+      if conn_name in managed_ssids:
         remove_connection(conn_name)
     
-    # Add or update each network
+    # Add each network from our managed list
     for network in networks:
       ssid = network['ssid']
-      
-      # Check if connection already exists
-      if ssid in existing_connections:
-        # Remove and recreate with new settings
-        remove_connection(ssid)
       
       # Create new connection
       if network.get('psk'):
@@ -59,24 +57,21 @@ def configure_network_connections():
     return False
 
 
-def get_gonotego_managed_connections():
-  """Get list of WiFi connections currently managed by Go Note Go."""
+def get_network_manager_connections():
+  """Get list of all WiFi connections from NetworkManager."""
   try:
     result = subprocess.run(
         ["nmcli", "-t", "-f", "NAME,TYPE", "connection", "show"],
         capture_output=True, text=True, check=True
     )
     
-    # Filter connections that are wifi and have names matching our managed networks
+    # Get all WiFi connections
     connections = []
-    networks = get_networks()
-    managed_ssids = [network['ssid'] for network in networks]
-    
     for line in result.stdout.splitlines():
       parts = line.split(':', 1)
       if len(parts) == 2:
         name, conn_type = parts
-        if conn_type == 'wifi' and name in managed_ssids:
+        if conn_type == 'wifi':
           connections.append(name)
     
     return connections
