@@ -47,7 +47,6 @@ const SettingsUI = () => {
     EMAIL_SERVER: '',
     DROPBOX_ACCESS_TOKEN: '',
     OPENAI_API_KEY: '',
-    WIFI_COUNTRY: '',
     WIFI_NETWORKS: [],
     CUSTOM_COMMAND_PATHS: [],
   });
@@ -386,27 +385,6 @@ const SettingsUI = () => {
           <CardDescription>Manage wireless network connections</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="grid gap-2">
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-medium">Country Code</label>
-              <HoverCard>
-                <HoverCardTrigger>
-                  <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors cursor-help" />
-                </HoverCardTrigger>
-                <HoverCardContent className="w-80">
-                  <p className="text-sm">
-                    Two-letter country code (e.g., US, GB, DE) to ensure compliance with local regulations.
-                  </p>
-                </HoverCardContent>
-              </HoverCard>
-            </div>
-            <Input
-              value={settings.WIFI_COUNTRY}
-              onChange={(e) => handleChange('WIFI_COUNTRY', e.target.value)}
-              placeholder="US"
-              maxLength={2}
-            />
-          </div>
           
           <div className="space-y-4">
             <div className="flex justify-between items-center">
