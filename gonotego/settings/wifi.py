@@ -27,64 +27,11 @@ def configure_network_connections():
   networks = get_networks()
   
   try:
-    # Get existing NetworkManager connections
-    existing_connections = get_network_manager_connections()
-    
-    # Get network details by SSID for easy lookup
-    network_by_ssid = {network['ssid']: network for network in networks}
-    
-    # First, handle existing connections
-    for conn_name in existing_connections:
-      # Check if this is a connection we should manage
-      if conn_name in network_by_ssid:
-        # It's one of our managed connections
-        network = network_by_ssid[conn_name]
-        
-        # Check if we need to update this connection
-        update_needed = False
-        
-        # Get existing connection details
-        details = get_network_manager_connection_details(conn_name)
-        if not details:
-          # Connection might exist in the list but can't be retrieved - recreate it
-          update_needed = True
-        else:
-          # Check if connection settings differ
-          ssid_matches = details.get('802-11-wireless.ssid') == conn_name
-          
-          # Check security settings
-          if network.get('psk'):
-            # This should be a secured connection
-            has_psk = '802-11-wireless-security.psk' in details
-            psk_matches = details.get('802-11-wireless-security.psk') == network['psk']
-            update_needed = not (ssid_matches and has_psk and psk_matches)
-          else:
-            # This should be an open connection
-            has_psk = '802-11-wireless-security.psk' in details
-            update_needed = not ssid_matches or has_psk  # Update if SSID doesn't match or it has a password
-        
-        if update_needed:
-          # Remove and recreate with correct settings
-          remove_connection(conn_name)
-          
-          # Recreate the connection with current settings
-          if network.get('psk'):
-            add_wifi_connection(conn_name, network['psk'])
-          else:
-            add_wifi_connection(conn_name)
-        
-        # Mark as processed
-        network_by_ssid[conn_name]['processed'] = True
-    
-    # Now add any connections that weren't already in NetworkManager
+    # Simply add or update all connections in our networks list
+    # add_wifi_connection will handle either adding new or modifying existing connections
     for network in networks:
-      # Skip networks we already processed
-      if network.get('processed'):
-        continue
-        
       ssid = network['ssid']
       
-      # Create new connection
       if network.get('psk'):
         # WPA secured network
         add_wifi_connection(ssid, network['psk'])
@@ -121,31 +68,6 @@ def get_network_manager_connections():
     return []
 
 
-def get_network_manager_connection_details(conn_name):
-  """Get details about a specific NetworkManager connection.
-  
-  Returns:
-    A dictionary with connection details or None if connection not found
-  """
-  try:
-    result = subprocess.run(
-        ["sudo", "nmcli", "--show-secrets", "connection", "show", conn_name],
-        capture_output=True, text=True, check=True
-    )
-    
-    # Parse the connection details
-    details = {}
-    for line in result.stdout.splitlines():
-      if ":" in line:
-        key, value = line.split(":", 1)
-        details[key.strip()] = value.strip()
-    
-    return details
-  except subprocess.CalledProcessError as e:
-    print(f"Error getting details for connection {conn_name}: {e}")
-    return None
-
-
 def add_wifi_connection(ssid, password=None):
   """Add a new WiFi connection (secure or open).
   
@@ -156,47 +78,64 @@ def add_wifi_connection(ssid, password=None):
   Returns:
     True on success, False on error
   """
+  conn_name = ssid
+  
+  # Base command for both connection types
+  add_cmd = [
+      "sudo", "nmcli", "connection", "add",
+      "type", "wifi",
+      "con-name", conn_name,
+      "ifname", "wlan0",
+      "ssid", ssid
+  ]
+  
+  # Add security parameters if password is provided
+  if password:
+    add_cmd.extend([
+        "wifi-sec.key-mgmt", "wpa-psk",
+        "wifi-sec.psk", password
+    ])
+  
   try:
-    conn_name = ssid
-    
-    # Base command for both connection types
-    cmd = [
-        "sudo", "nmcli", "connection", "add",
-        "type", "wifi",
-        "con-name", conn_name,
-        "ifname", "wlan0",
-        "ssid", ssid
-    ]
-    
-    # Add security parameters if password is provided
-    if password:
-      cmd.extend([
-          "wifi-sec.key-mgmt", "wpa-psk",
-          "wifi-sec.psk", password
-      ])
-    
-    subprocess.run(cmd, check=True, capture_output=True)
+    # Try to add the connection
+    subprocess.run(add_cmd, check=True, capture_output=True)
     return True
   except subprocess.CalledProcessError as e:
-    conn_type = "WPA" if password else "open"
-    print(f"Error adding {conn_type} connection for {ssid}: {e}")
-    print(f"Error output: {e.stderr}")
-    return False
-
-
-def remove_connection(conn_name):
-  """Remove a NetworkManager connection."""
-  try:
-    subprocess.run(
-        ["sudo", "nmcli", "connection", "delete", conn_name],
-        check=True, capture_output=True
-    )
-    return True
-  except subprocess.CalledProcessError as e:
-    print(f"Error removing connection {conn_name}: {e}")
-    print(f"Error output: {e.stderr}")
-    return False
-
+    # If the error is that the connection already exists, try to modify it
+    if "already exists" in str(e.stderr):
+      try:
+        # Build the modify command
+        modify_cmd = ["sudo", "nmcli", "connection", "modify", conn_name]
+        
+        # Add basic settings
+        modify_cmd.extend(["802-11-wireless.ssid", ssid])
+        
+        # Add security settings
+        if password:
+          modify_cmd.extend([
+              "802-11-wireless-security.key-mgmt", "wpa-psk",
+              "802-11-wireless-security.psk", password
+          ])
+        else:
+          # For open networks, remove security
+          modify_cmd.extend([
+              "802-11-wireless-security.key-mgmt", "",
+              "-802-11-wireless-security.psk"  # Remove PSK
+          ])
+        
+        # Run the modify command
+        subprocess.run(modify_cmd, check=True, capture_output=True)
+        return True
+      except subprocess.CalledProcessError as modify_error:
+        print(f"Error modifying connection {ssid}: {modify_error}")
+        print(f"Error output: {modify_error.stderr}")
+        return False
+    else:
+      # Other error
+      conn_type = "WPA" if password else "open"
+      print(f"Error adding {conn_type} connection for {ssid}: {e}")
+      print(f"Error output: {e.stderr}")
+      return False
 
 def reconfigure_wifi():
   """Reconnect to available WiFi networks."""
