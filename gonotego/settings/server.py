@@ -168,9 +168,30 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
             continue
 
           try:
-            # Special handling for CUSTOM_COMMAND_PATHS which is a list
+            # Special handling for CUSTOM_COMMAND_PATHS and WIFI_NETWORKS which are lists
             if isinstance(value, list):
               settings.set(key, value)
+              # If we're updating WiFi networks, update the wpa_supplicant.conf file
+              if key == 'WIFI_NETWORKS':
+                try:
+                  # Import the function without creating a circular import
+                  import importlib.util
+                  spec = importlib.util.spec_from_file_location(
+                      "system_commands", 
+                      os.path.join(os.path.dirname(os.path.dirname(__file__)), 
+                                  "command_center/system_commands.py"))
+                  system_commands = importlib.util.module_from_spec(spec)
+                  spec.loader.exec_module(system_commands)
+                  
+                  # Update wpa_supplicant configuration
+                  if hasattr(system_commands, 'update_wpa_supplicant_config'):
+                    system_commands.update_wpa_supplicant_config()
+                    
+                    # Reconfigure WiFi
+                    if hasattr(system_commands, 'reconfigure_wifi'):
+                      system_commands.reconfigure_wifi()
+                except Exception as e:
+                  print(f"Error updating WiFi configuration: {e}")
             # Handle other values
             else:
               settings.set(key, value)

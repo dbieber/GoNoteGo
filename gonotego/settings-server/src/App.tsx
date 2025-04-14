@@ -47,7 +47,14 @@ const SettingsUI = () => {
     EMAIL_SERVER: '',
     DROPBOX_ACCESS_TOKEN: '',
     OPENAI_API_KEY: '',
+    WIFI_COUNTRY: '',
+    WIFI_NETWORKS: [],
     CUSTOM_COMMAND_PATHS: [],
+  });
+  
+  const [newWifiNetwork, setNewWifiNetwork] = useState({
+    ssid: '',
+    psk: ''
   });
 
   const [showPasswords, setShowPasswords] = useState({});
@@ -357,6 +364,164 @@ const SettingsUI = () => {
           )
         },
       ])}
+      
+      <Card className="mb-6">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <CardTitle className="text-xl">WiFi Configuration</CardTitle>
+            <HoverCard>
+              <HoverCardTrigger>
+                <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors cursor-help" />
+              </HoverCardTrigger>
+              <HoverCardContent className="w-80">
+                <div className="space-y-3">
+                  <p>Configure WiFi settings for your device.</p>
+                  <p className="text-sm text-muted-foreground">
+                    Changes will apply after saving and restarting the network service.
+                  </p>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
+          </div>
+          <CardDescription>Manage wireless network connections</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid gap-2">
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium">Country Code</label>
+              <HoverCard>
+                <HoverCardTrigger>
+                  <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors cursor-help" />
+                </HoverCardTrigger>
+                <HoverCardContent className="w-80">
+                  <p className="text-sm">
+                    Two-letter country code (e.g., US, GB, DE) to ensure compliance with local regulations.
+                  </p>
+                </HoverCardContent>
+              </HoverCard>
+            </div>
+            <Input
+              value={settings.WIFI_COUNTRY}
+              onChange={(e) => handleChange('WIFI_COUNTRY', e.target.value)}
+              placeholder="US"
+              maxLength={2}
+            />
+          </div>
+          
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-sm font-medium">WiFi Networks</h3>
+              <HoverCard>
+                <HoverCardTrigger>
+                  <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors cursor-help" />
+                </HoverCardTrigger>
+                <HoverCardContent className="w-80">
+                  <p className="text-sm">
+                    Add multiple WiFi networks. Your device will automatically connect to the strongest available network.
+                  </p>
+                </HoverCardContent>
+              </HoverCard>
+            </div>
+            
+            {/* List of saved networks */}
+            <div className="space-y-2">
+              {settings.WIFI_NETWORKS && settings.WIFI_NETWORKS.length > 0 ? (
+                settings.WIFI_NETWORKS.map((network, index) => (
+                  <div key={index} className="flex items-center justify-between bg-secondary/20 p-3 rounded">
+                    <div className="flex-1">
+                      <div className="font-medium">{network.ssid}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {network.psk ? 'Secured (WPA)' : 'Open Network'}
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        setSettings(prev => ({
+                          ...prev,
+                          WIFI_NETWORKS: prev.WIFI_NETWORKS.filter((_, i) => i !== index)
+                        }));
+                      }}
+                      className="h-8 w-8"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center text-muted-foreground py-4">
+                  No WiFi networks configured
+                </div>
+              )}
+            </div>
+            
+            {/* Add new network form */}
+            <div className="space-y-3 border rounded p-3 border-dashed">
+              <h4 className="text-sm font-medium">Add New Network</h4>
+              
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Network Name (SSID)</label>
+                <Input
+                  value={newWifiNetwork.ssid}
+                  onChange={(e) => setNewWifiNetwork(prev => ({ ...prev, ssid: e.target.value }))}
+                  placeholder="WiFi network name"
+                />
+              </div>
+              
+              <div className="grid gap-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium">Password</label>
+                  <span className="text-xs text-muted-foreground">Leave empty for open networks</span>
+                </div>
+                <div className="relative">
+                  <Input
+                    type={showPasswords.newWifiPassword ? 'text' : 'password'}
+                    value={newWifiNetwork.psk}
+                    onChange={(e) => setNewWifiNetwork(prev => ({ ...prev, psk: e.target.value }))}
+                    placeholder="WiFi password"
+                    className="pr-10"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                    onClick={() => togglePasswordVisibility('newWifiPassword')}
+                  >
+                    {showPasswords.newWifiPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
+              </div>
+              
+              <Button
+                onClick={() => {
+                  if (newWifiNetwork.ssid.trim()) {
+                    const newNetwork = {
+                      ssid: newWifiNetwork.ssid.trim(),
+                      ...(newWifiNetwork.psk ? { psk: newWifiNetwork.psk } : {})
+                    };
+                    
+                    // Add to settings
+                    setSettings(prev => ({
+                      ...prev,
+                      WIFI_NETWORKS: [...(prev.WIFI_NETWORKS || []), newNetwork]
+                    }));
+                    
+                    // Reset form
+                    setNewWifiNetwork({ ssid: '', psk: '' });
+                  }
+                }}
+                className="w-full"
+                disabled={!newWifiNetwork.ssid.trim()}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Network
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <Card className="mb-6">
         <CardHeader>
