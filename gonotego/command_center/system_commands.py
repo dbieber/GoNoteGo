@@ -278,7 +278,7 @@ def add_wifi_no_psk(ssid):
     say('Failed to update WiFi configuration.')
 
 
-@register_command('wifi list')
+@register_command('wifi-list')
 def list_wifi_networks():
   networks = get_wifi_networks()
   if not networks:
@@ -289,7 +289,7 @@ def list_wifi_networks():
   say('Configured WiFi networks: ' + ', '.join(network_list))
 
 
-@register_command('wifi migrate')
+@register_command('wifi-migrate')
 def migrate_wifi_networks():
   """Scan wpa_supplicant.conf and migrate existing networks to Redis."""
   filepath = '/etc/wpa_supplicant/wpa_supplicant.conf'
@@ -340,7 +340,7 @@ def migrate_wifi_networks():
     say('Failed to migrate WiFi networks.')
 
 
-@register_command('wifi remove {}')
+@register_command('wifi-remove {}')
 def remove_wifi_network(ssid):
   networks = get_wifi_networks()
   initial_count = len(networks)
@@ -363,8 +363,8 @@ def remove_wifi_network(ssid):
 
 
 @register_command('reconnect')
-@register_command('wifi refresh')
-@register_command('wifi reconfigure')
+@register_command('wifi-refresh')
+@register_command('wifi-reconfigure')
 def reconfigure_wifi():
   shell('wpa_cli -i wlan0 reconfigure')
 
