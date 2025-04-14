@@ -221,52 +221,21 @@ def list_wifi_networks():
 @register_command('wifi-migrate')
 def migrate_wifi_networks():
   """Scan wpa_supplicant.conf and migrate existing networks to Redis."""
-  filepath = '/etc/wpa_supplicant/wpa_supplicant.conf'
+  networks = wifi.migrate_networks_from_wpa_supplicant()
   
-  if not os.path.exists(filepath):
-    say('WiFi configuration file not found.')
+  if networks is None:
+    say('WiFi configuration file not found or error reading it.')
     return
     
-  try:
-    # Read the existing configuration
-    with open(filepath, 'r') as f:
-      config = f.read()
+  # Save the extracted networks to Redis
+  if networks:
+    wifi.save_networks(networks)
+    say(f'Migrated {len(networks)} WiFi networks to settings.')
     
-    # Extract network blocks
-    network_blocks = re.findall(r'network\s*=\s*{(.*?)}', config, re.DOTALL)
-    
-    # Process each network block
-    networks = []
-    for block in network_blocks:
-      # Extract SSID
-      ssid_match = re.search(r'ssid\s*=\s*"(.*?)"', block)
-      if not ssid_match:
-        continue
-      
-      ssid = ssid_match.group(1)
-      
-      # Check if it's an open network
-      if 'key_mgmt=NONE' in block:
-        networks.append({'ssid': ssid})
-      else:
-        # Extract password for WPA networks
-        psk_match = re.search(r'psk\s*=\s*"(.*?)"', block)
-        if psk_match:
-          psk = psk_match.group(1)
-          networks.append({'ssid': ssid, 'psk': psk})
-    
-    # Save the extracted networks to Redis
-    if networks:
-      wifi.save_networks(networks)
-      say(f'Migrated {len(networks)} WiFi networks to settings.')
-      
-      # Update wpa_supplicant.conf
-      wifi.update_wpa_supplicant_config()
-    else:
-      say('No WiFi networks found to migrate.')
-  except Exception as e:
-    print(f"Error migrating WiFi networks: {e}")
-    say('Failed to migrate WiFi networks.')
+    # Update wpa_supplicant.conf
+    wifi.update_wpa_supplicant_config()
+  else:
+    say('No WiFi networks found to migrate.')
 
 
 @register_command('wifi-remove {}')
