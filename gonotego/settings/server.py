@@ -175,22 +175,10 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
           try:
             # Handle WiFi networks specially
             if key == 'WIFI_NETWORKS':
-              try:
-                # Parse the value to ensure it's in the correct format
-                if isinstance(value, str):
-                  networks = json.loads(value)
-                else:
-                  networks = value
-                
-                # Save networks using the wifi module's function
-                # This already calls settings.set() internally
-                wifi.save_networks(networks)
-                
-                # Update wpa_supplicant configuration using the wifi module
-                wifi.update_wpa_supplicant_config()
-                wifi.reconfigure_wifi()
-              except Exception as e:
-                print(f"Error updating WiFi configuration: {e}")
+              networks = json.loads(value)
+              wifi.save_networks(networks)
+              wifi.update_wpa_supplicant_config()
+              wifi.reconfigure_wifi()
             else:
               # For all other settings, just use settings.set
               settings.set(key, value)
