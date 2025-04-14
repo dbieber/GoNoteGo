@@ -68,6 +68,47 @@ def get_network_manager_connections():
     return []
 
 
+def modify_wifi_connection(ssid, password=None):
+  """Modify an existing WiFi connection.
+  
+  Args:
+    ssid: The SSID/name of the connection to modify
+    password: If provided, configures as WPA secured network. If None, configures as open network.
+  
+  Returns:
+    True on success, False on error
+  """
+  conn_name = ssid
+  
+  try:
+    # Build the modify command
+    modify_cmd = ["sudo", "nmcli", "connection", "modify", conn_name]
+    
+    # Add basic settings
+    modify_cmd.extend(["802-11-wireless.ssid", ssid])
+    
+    # Add security settings
+    if password:
+      modify_cmd.extend([
+          "802-11-wireless-security.key-mgmt", "wpa-psk",
+          "802-11-wireless-security.psk", password
+      ])
+    else:
+      # For open networks, remove security
+      modify_cmd.extend([
+          "802-11-wireless-security.key-mgmt", "",
+          "-802-11-wireless-security.psk"  # Remove PSK
+      ])
+    
+    # Run the modify command
+    subprocess.run(modify_cmd, check=True, capture_output=True)
+    return True
+  except subprocess.CalledProcessError as e:
+    print(f"Error modifying connection {ssid}: {e}")
+    print(f"Error output: {e.stderr}")
+    return False
+
+
 def add_wifi_connection(ssid, password=None):
   """Add a new WiFi connection (secure or open).
   
@@ -103,33 +144,7 @@ def add_wifi_connection(ssid, password=None):
   except subprocess.CalledProcessError as e:
     # If the error is that the connection already exists, try to modify it
     if "already exists" in str(e.stderr):
-      try:
-        # Build the modify command
-        modify_cmd = ["sudo", "nmcli", "connection", "modify", conn_name]
-        
-        # Add basic settings
-        modify_cmd.extend(["802-11-wireless.ssid", ssid])
-        
-        # Add security settings
-        if password:
-          modify_cmd.extend([
-              "802-11-wireless-security.key-mgmt", "wpa-psk",
-              "802-11-wireless-security.psk", password
-          ])
-        else:
-          # For open networks, remove security
-          modify_cmd.extend([
-              "802-11-wireless-security.key-mgmt", "",
-              "-802-11-wireless-security.psk"  # Remove PSK
-          ])
-        
-        # Run the modify command
-        subprocess.run(modify_cmd, check=True, capture_output=True)
-        return True
-      except subprocess.CalledProcessError as modify_error:
-        print(f"Error modifying connection {ssid}: {modify_error}")
-        print(f"Error output: {modify_error.stderr}")
-        return False
+      return modify_wifi_connection(ssid, password)
     else:
       # Other error
       conn_type = "WPA" if password else "open"
