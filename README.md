@@ -72,9 +72,9 @@ See the [installation instructions](installation.md) to get started.
 Go Note Go now uses NetworkManager instead of wpa_supplicant for WiFi management. 
 This provides a more robust networking solution with easier configuration options.
 
-If you're updating from a previous version, run the migration script:
+If you're updating from a previous version, use the built-in migration command:
 ```bash
-sudo /path/to/GoNoteGo/scripts/migrate_to_networkmanager.sh
+wifi-migrate
 ```
 
 Benefits of NetworkManager:
