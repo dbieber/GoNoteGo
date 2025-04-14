@@ -165,7 +165,7 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
         # Update settings
         for key, value in settings_data.items():
           # Skip masked values - we don't want to overwrite with placeholder text
-          if value == "●●●●●●●●" or not value:
+          if value == "●●●●●●●●":
             continue
 
           # Skip non-settings keys
