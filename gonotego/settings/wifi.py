@@ -27,8 +27,8 @@ def configure_network_connections():
   networks = get_networks()
   
   try:
-    # Simply add or update all connections in our networks list
-    # add_wifi_connection will handle either adding new or modifying existing connections
+    # Add or update connections - add_wifi_connection handles either adding new 
+    # or modifying existing connections as needed
     for network in networks:
       ssid = network['ssid']
       
@@ -43,29 +43,6 @@ def configure_network_connections():
   except Exception as e:
     print(f"Error updating NetworkManager connections: {e}")
     return False
-
-
-def get_network_manager_connections():
-  """Get list of all WiFi connections from NetworkManager."""
-  try:
-    result = subprocess.run(
-        ["nmcli", "-t", "-f", "NAME,TYPE", "connection", "show"],
-        capture_output=True, text=True, check=True
-    )
-    
-    # Get all WiFi connections
-    connections = []
-    for line in result.stdout.splitlines():
-      parts = line.split(':', 1)
-      if len(parts) == 2:
-        name, conn_type = parts
-        if conn_type == 'wifi':
-          connections.append(name)
-    
-    return connections
-  except subprocess.CalledProcessError as e:
-    print(f"Error getting NetworkManager connections: {e}")
-    return []
 
 
 def modify_wifi_connection(ssid, password=None):
