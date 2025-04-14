@@ -175,8 +175,7 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
           try:
             # Handle WiFi networks specially
             if key == 'WIFI_NETWORKS':
-              networks = json.loads(value)
-              wifi.save_networks(networks)
+              wifi.save_networks(value)
               wifi.update_wpa_supplicant_config()
               wifi.reconfigure_wifi()
             else:
