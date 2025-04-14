@@ -75,8 +75,14 @@ Cost: ~$7
 ### USB Cables
 
 Links:
-* USB to USB-C cable for connecting the Pi to power sources
-* Short cables may be useful for connecting peripherals while minimizing clutter
+* 3 ft USB - USB C cable: https://www.amazon.com/gp/product/B089DM4KDW
+* 6 in USB - USB C cable: https://www.amazon.com/gp/product/B012V56D2A
+
+Notes:
+* USB to USB-C cables for connecting the Pi to power sources
+* Short cables are useful for connecting peripherals while minimizing clutter
+
+Cost: ~$13 ($6.99 for 3 ft and $5.99 for 6 in)
 
 ---
 
