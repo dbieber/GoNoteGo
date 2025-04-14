@@ -79,27 +79,6 @@ def list_wifi_networks():
   say('Configured WiFi networks: ' + ', '.join(network_list))
 
 
-@register_command('wifi-migrate')
-def migrate_wifi_networks():
-  """Migrate existing networks from wpa_supplicant.conf to NetworkManager."""
-  networks = wifi.migrate_networks_from_wpa_supplicant()
-  
-  if networks is None:
-    say('WiFi configuration file not found or error reading it.')
-    return
-    
-  # Save the extracted networks to Redis
-  if networks:
-    wifi.save_networks(networks)
-    say(f'Migrated {len(networks)} WiFi networks to settings.')
-    
-    # Configure NetworkManager connections
-    wifi.configure_network_connections()
-    wifi.reconfigure_wifi()
-  else:
-    say('No WiFi networks found to migrate.')
-
-
 @register_command('wifi-remove {}')
 def remove_wifi_network(ssid):
   networks = wifi.get_networks()

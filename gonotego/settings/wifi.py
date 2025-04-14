@@ -1,8 +1,6 @@
 """WiFi settings module for Go Note Go using NetworkManager."""
 import json
 import subprocess
-import re
-import os
 from gonotego.settings import settings
 from gonotego.command_center import system_commands
 
@@ -168,45 +166,3 @@ def reconfigure_wifi():
     print(f"Error reconfiguring WiFi: {e}")
     return False
 
-
-def migrate_networks_from_wpa_supplicant():
-  """Scan wpa_supplicant.conf and migrate existing networks to Redis."""
-  filepath = '/etc/wpa_supplicant/wpa_supplicant.conf'
-  
-  if not os.path.exists(filepath):
-    print('WiFi configuration file not found.')
-    return None
-  
-  try:
-    # Read the existing configuration
-    with open(filepath, 'r') as f:
-      config = f.read()
-    
-    # Extract network blocks
-    network_blocks = re.findall(r'network\s*=\s*{(.*?)}', config, re.DOTALL)
-    
-    # Process each network block
-    networks = []
-    for block in network_blocks:
-      # Extract SSID
-      ssid_match = re.search(r'ssid\s*=\s*"(.*?)"', block)
-      if not ssid_match:
-        continue
-      
-      ssid = ssid_match.group(1)
-      
-      # Check if it's an open network
-      if 'key_mgmt=NONE' in block:
-        networks.append({'ssid': ssid})
-      else:
-        # Extract password for WPA networks
-        psk_match = re.search(r'psk\s*=\s*"(.*?)"', block)
-        if psk_match:
-          psk = psk_match.group(1)
-          networks.append({'ssid': ssid, 'psk': psk})
-    
-    # Return the extracted networks
-    return networks
-  except Exception as e:
-    print(f"Error migrating WiFi networks: {e}")
-    return None

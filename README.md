@@ -72,10 +72,11 @@ See the [installation instructions](installation.md) to get started.
 Go Note Go now uses NetworkManager instead of wpa_supplicant for WiFi management. 
 This provides a more robust networking solution with easier configuration options.
 
-If you're updating from a previous version, use the built-in migration command:
+If you're updating from a previous version, you'll need to reconfigure your WiFi networks using:
 ```bash
-wifi-migrate
+wifi <network-name> <password>
 ```
+For open networks, omit the password.
 
 Benefits of NetworkManager:
 - Better handling of network connections
