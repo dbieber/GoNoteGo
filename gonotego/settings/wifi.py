@@ -30,17 +30,58 @@ def configure_network_connections():
     # Get existing NetworkManager connections
     existing_connections = get_network_manager_connections()
     
-    # Get SSIDs we want to manage
-    managed_ssids = [network['ssid'] for network in networks]
+    # Get network details by SSID for easy lookup
+    network_by_ssid = {network['ssid']: network for network in networks}
     
-    # Remove existing Network Manager connections that match our managed SSIDs
-    # This allows us to recreate them with current settings
+    # First, handle existing connections
     for conn_name in existing_connections:
-      if conn_name in managed_ssids:
-        remove_connection(conn_name)
+      # Check if this is a connection we should manage
+      if conn_name in network_by_ssid:
+        # It's one of our managed connections
+        network = network_by_ssid[conn_name]
+        
+        # Check if we need to update this connection
+        update_needed = False
+        
+        # Get existing connection details
+        details = get_network_manager_connection_details(conn_name)
+        if not details:
+          # Connection might exist in the list but can't be retrieved - recreate it
+          update_needed = True
+        else:
+          # Check if connection settings differ
+          ssid_matches = details.get('802-11-wireless.ssid') == conn_name
+          
+          # Check security settings
+          if network.get('psk'):
+            # This should be a secured connection
+            has_psk = '802-11-wireless-security.psk' in details
+            psk_matches = details.get('802-11-wireless-security.psk') == network['psk']
+            update_needed = not (ssid_matches and has_psk and psk_matches)
+          else:
+            # This should be an open connection
+            has_psk = '802-11-wireless-security.psk' in details
+            update_needed = not ssid_matches or has_psk  # Update if SSID doesn't match or it has a password
+        
+        if update_needed:
+          # Remove and recreate with correct settings
+          remove_connection(conn_name)
+          
+          # Recreate the connection with current settings
+          if network.get('psk'):
+            add_wifi_connection(conn_name, network['psk'])
+          else:
+            add_wifi_connection(conn_name)
+        
+        # Mark as processed
+        network_by_ssid[conn_name]['processed'] = True
     
-    # Add each network from our managed list
+    # Now add any connections that weren't already in NetworkManager
     for network in networks:
+      # Skip networks we already processed
+      if network.get('processed'):
+        continue
+        
       ssid = network['ssid']
       
       # Create new connection
@@ -78,6 +119,31 @@ def get_network_manager_connections():
   except subprocess.CalledProcessError as e:
     print(f"Error getting NetworkManager connections: {e}")
     return []
+
+
+def get_network_manager_connection_details(conn_name):
+  """Get details about a specific NetworkManager connection.
+  
+  Returns:
+    A dictionary with connection details or None if connection not found
+  """
+  try:
+    result = subprocess.run(
+        ["sudo", "nmcli", "--show-secrets", "connection", "show", conn_name],
+        capture_output=True, text=True, check=True
+    )
+    
+    # Parse the connection details
+    details = {}
+    for line in result.stdout.splitlines():
+      if ":" in line:
+        key, value = line.split(":", 1)
+        details[key.strip()] = value.strip()
+    
+    return details
+  except subprocess.CalledProcessError as e:
+    print(f"Error getting details for connection {conn_name}: {e}")
+    return None
 
 
 def add_wifi_connection(ssid, password=None):
