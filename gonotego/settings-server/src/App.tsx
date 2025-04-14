@@ -13,13 +13,13 @@ import {
 
 const SettingsUI = () => {
   const NOTE_TAKING_SYSTEMS = [
-    'Roam Research',
-    'RemNote',
-    'IdeaFlow',
-    'Mem',
-    'Notion',
-    'Twitter',
-    'Email'
+    { display: 'Roam Research', value: 'roam' },
+    { display: 'RemNote', value: 'remnote' },
+    { display: 'IdeaFlow', value: 'ideaflow' },
+    { display: 'Mem', value: 'mem' },
+    { display: 'Notion', value: 'notion' },
+    { display: 'Twitter', value: 'twitter' },
+    { display: 'Email', value: 'email' }
   ];
 
   const [settings, setSettings] = useState({
@@ -210,22 +210,12 @@ const SettingsUI = () => {
 
   const shouldShowSection = (section) => {
     const system = settings.NOTE_TAKING_SYSTEM;
-    switch (section) {
-      case 'roam':
-        return system === 'Roam Research';
-      case 'remnote':
-        return system === 'RemNote';
-      case 'ideaflow':
-        return system === 'IdeaFlow';
-      case 'mem':
-        return system === 'Mem';
-      case 'notion':
-        return system === 'Notion';
-      case 'twitter':
-        return system === 'Twitter';
-      default:
-        return true;
-    }
+    return system === section;
+  };
+  
+  const getSystemDisplayName = (value) => {
+    const system = NOTE_TAKING_SYSTEMS.find(sys => sys.value === value);
+    return system ? system.display : value;
   };
 
   return (
@@ -270,13 +260,15 @@ const SettingsUI = () => {
               onValueChange={(value) => handleChange('NOTE_TAKING_SYSTEM', value)}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select a note-taking system" />
+                <SelectValue placeholder="Select a note-taking system">
+                  {settings.NOTE_TAKING_SYSTEM ? getSystemDisplayName(settings.NOTE_TAKING_SYSTEM) : ""}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
                   {NOTE_TAKING_SYSTEMS.map(system => (
-                    <SelectItem key={system} value={system}>
-                      {system}
+                    <SelectItem key={system.value} value={system.value}>
+                      {system.display}
                     </SelectItem>
                   ))}
                 </SelectGroup>
