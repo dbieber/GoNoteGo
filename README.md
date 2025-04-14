@@ -66,24 +66,6 @@ See the [hardware guide](hardware.md) to know exactly what to buy.
 
 See the [installation instructions](installation.md) to get started.
 
-## Recent Updates
-
-### NetworkManager Support
-Go Note Go now uses NetworkManager instead of wpa_supplicant for WiFi management. 
-This provides a more robust networking solution with easier configuration options.
-
-If you're updating from a previous version, you'll need to reconfigure your WiFi networks using:
-```bash
-wifi <network-name> <password>
-```
-For open networks, omit the password.
-
-Benefits of NetworkManager:
-- Better handling of network connections
-- Improved stability and reliability
-- More configuration options
-- Better integration with modern Linux distributions
-
 ## History
 
 [Learn about Go Note Go's predecessor "Shh Shell" here.](https://davidbieber.com/projects/shh-shell/)
