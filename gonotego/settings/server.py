@@ -173,8 +173,7 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
             continue
 
           try:
-            settings.set(key, value)
-            # If we're updating WiFi networks, save networks and update the wpa_supplicant.conf file
+            # Handle WiFi networks specially
             if key == 'WIFI_NETWORKS':
               try:
                 # Parse the value to ensure it's in the correct format
@@ -184,6 +183,7 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
                   networks = value
                 
                 # Save networks using the wifi module's function
+                # This already calls settings.set() internally
                 wifi.save_networks(networks)
                 
                 # Update wpa_supplicant configuration using the wifi module
@@ -191,6 +191,9 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
                 wifi.reconfigure_wifi()
               except Exception as e:
                 print(f"Error updating WiFi configuration: {e}")
+            else:
+              # For all other settings, just use settings.set
+              settings.set(key, value)
           except Exception as e:
             print(f"Error setting {key}: {e}")
 
