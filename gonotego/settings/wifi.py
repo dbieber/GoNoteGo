@@ -23,8 +23,6 @@ def save_networks(networks):
 
 def update_wpa_supplicant_config():
   """Update the Go Note Go managed section of wpa_supplicant.conf."""
-  from gonotego.command_center.system_commands import shell  # Import here to avoid circular import
-  
   networks = get_networks()
   filepath = '/etc/wpa_supplicant/wpa_supplicant.conf'
   
