@@ -126,7 +126,14 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
                 all_settings[key] = "●●●●●●●●"
               # For non-sensitive or empty values, return as is
               else:
-                all_settings[key] = value
+                # Special handling for WIFI_NETWORKS
+                if key == 'WIFI_NETWORKS':
+                  # Get networks directly from the wifi module to ensure proper format
+                  networks = wifi.get_networks()
+                  print(f"DEBUG: Including WiFi networks in API response: {networks}")
+                  all_settings[key] = networks
+                else:
+                  all_settings[key] = value
           except Exception as e:
             print(f"Error getting setting {key}: {e}")
 
