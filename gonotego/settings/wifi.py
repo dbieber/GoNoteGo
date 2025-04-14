@@ -1,7 +1,6 @@
-"""WiFi settings module for Go Note Go."""
+"""WiFi settings module for Go Note Go using NetworkManager."""
 import json
-import os
-import re
+import subprocess
 from gonotego.settings import settings
 from gonotego.command_center import system_commands
 
@@ -21,109 +20,149 @@ def save_networks(networks):
   settings.set('WIFI_NETWORKS', json.dumps(networks))
 
 
-def update_wpa_supplicant_config():
-  """Update the Go Note Go managed section of wpa_supplicant.conf."""
+def configure_network_connections():
+  """Configure NetworkManager connections for Go Note Go managed WiFi networks."""
   networks = get_networks()
-  filepath = '/etc/wpa_supplicant/wpa_supplicant.conf'
   
-  # Check if the file exists
-  if not os.path.exists(filepath):
-    print('WiFi configuration file not found.')
-    return False
-  
-  # Create network configurations
-  network_configs = []
-  for network in networks:
-    if network.get('psk'):
-      network_config = f"""network={{
-        ssid="{network['ssid']}"
-        psk="{network['psk']}"
-        key_mgmt=WPA-PSK
-}}"""
-    else:
-      network_config = f"""network={{
-        ssid="{network['ssid']}"
-        key_mgmt=NONE
-}}"""
-    network_configs.append(network_config)
-  
-  managed_config = "# BEGIN Go Note Go managed WiFi networks\n"
-  if networks:
-    managed_config += "\n" + "\n".join(network_configs) + "\n"
-  managed_config += "# END Go Note Go managed WiFi networks"
-  
-  # Read the existing config
   try:
-    with open(filepath, 'r') as f:
-      config = f.read()
-    
-    # Check if the managed section exists
-    pattern = r'# BEGIN Go Note Go managed WiFi networks\n.*?# END Go Note Go managed WiFi networks'
-    if re.search(pattern, config, re.DOTALL):
-      # Replace the existing managed section
-      new_config = re.sub(pattern, managed_config, config, flags=re.DOTALL)
-    else:
-      # Append the managed section to the end of the file
-      new_config = config.rstrip() + "\n\n" + managed_config + "\n"
-    
-    # Write the new config
-    with open('/tmp/wpa_supplicant.conf', 'w') as f:
-      f.write(new_config)
-    
-    # Use sudo to copy the file to the correct location
-    shell('sudo cp /tmp/wpa_supplicant.conf /etc/wpa_supplicant/wpa_supplicant.conf')
-    shell('rm /tmp/wpa_supplicant.conf')
+    # Add or update connections - add_wifi_connection handles either adding new 
+    # or modifying existing connections as needed
+    for network in networks:
+      ssid = network['ssid']
+      
+      if network.get('psk'):
+        # WPA secured network
+        add_wifi_connection(ssid, network['psk'])
+      else:
+        # Open network
+        add_wifi_connection(ssid)
     
     return True
   except Exception as e:
-    print(f"Error updating wpa_supplicant.conf: {e}")
+    print(f"Error updating NetworkManager connections: {e}")
     return False
 
 
-def reconfigure_wifi():
-  """Reconfigure WiFi to apply changes."""
-  shell('wpa_cli -i wlan0 reconfigure')
-
-
-def migrate_networks_from_wpa_supplicant():
-  """Scan wpa_supplicant.conf and migrate existing networks to Redis."""
+def modify_wifi_connection(ssid, password=None):
+  """Modify an existing WiFi connection.
   
-  filepath = '/etc/wpa_supplicant/wpa_supplicant.conf'
+  Args:
+    ssid: The SSID/name of the connection to modify
+    password: If provided, configures as WPA secured network. If None, configures as open network.
   
-  if not os.path.exists(filepath):
-    print('WiFi configuration file not found.')
-    return None
-    
+  Returns:
+    True on success, False on error
+  """
+  conn_name = ssid
+  
   try:
-    # Read the existing configuration
-    with open(filepath, 'r') as f:
-      config = f.read()
+    # Build the modify command
+    modify_cmd = ["sudo", "nmcli", "connection", "modify", conn_name]
     
-    # Extract network blocks
-    network_blocks = re.findall(r'network\s*=\s*{(.*?)}', config, re.DOTALL)
+    # Add basic settings
+    modify_cmd.extend(["802-11-wireless.ssid", ssid])
     
-    # Process each network block
-    networks = []
-    for block in network_blocks:
-      # Extract SSID
-      ssid_match = re.search(r'ssid\s*=\s*"(.*?)"', block)
-      if not ssid_match:
+    # Add security settings
+    if password:
+      modify_cmd.extend([
+          "802-11-wireless-security.key-mgmt", "wpa-psk",
+          "802-11-wireless-security.psk", password
+      ])
+    else:
+      # For open networks, remove security
+      modify_cmd.extend([
+          "802-11-wireless-security.key-mgmt", "",
+          "-802-11-wireless-security.psk"  # Remove PSK
+      ])
+    
+    # Run the modify command
+    subprocess.run(modify_cmd, check=True, capture_output=True)
+    return True
+  except subprocess.CalledProcessError as e:
+    print(f"Error modifying connection {ssid}: {e}")
+    print(f"Error output: {e.stderr}")
+    return False
+
+
+def add_wifi_connection(ssid, password=None):
+  """Add a new WiFi connection (secure or open).
+  
+  Args:
+    ssid: The SSID of the network to add
+    password: If provided, adds a WPA secured network. If None, adds an open network.
+  
+  Returns:
+    True on success, False on error
+  """
+  conn_name = ssid
+  
+  # Base command for both connection types
+  add_cmd = [
+      "sudo", "nmcli", "connection", "add",
+      "type", "wifi",
+      "con-name", conn_name,
+      "ifname", "wlan0",
+      "ssid", ssid
+  ]
+  
+  # Add security parameters if password is provided
+  if password:
+    add_cmd.extend([
+        "wifi-sec.key-mgmt", "wpa-psk",
+        "wifi-sec.psk", password
+    ])
+  
+  try:
+    # Try to add the connection
+    subprocess.run(add_cmd, check=True, capture_output=True)
+    return True
+  except subprocess.CalledProcessError as e:
+    # If the error is that the connection already exists, try to modify it
+    if "already exists" in str(e.stderr):
+      return modify_wifi_connection(ssid, password)
+    else:
+      # Other error
+      conn_type = "WPA" if password else "open"
+      print(f"Error adding {conn_type} connection for {ssid}: {e}")
+      print(f"Error output: {e.stderr}")
+      return False
+
+def reconfigure_wifi():
+  """Reconnect to available WiFi networks."""
+  # Refresh all connections and activate the best available one
+  try:
+    # Restart NetworkManager service to apply changes
+    shell('sudo systemctl restart NetworkManager')
+    
+    # Get list of available configured networks
+    networks = get_networks()
+    
+    # Try to connect to the first available network
+    for network in networks:
+      ssid = network['ssid']
+      try:
+        # Check if we can see this network
+        result = subprocess.run(
+            ["nmcli", "-t", "-f", "SSID", "device", "wifi", "list"],
+            capture_output=True, text=True, check=True
+        )
+        
+        available_networks = [line.strip() for line in result.stdout.splitlines()]
+        
+        if ssid in available_networks:
+          # Try to connect to this network
+          subprocess.run(
+              ["nmcli", "connection", "up", "id", ssid],
+              check=True, capture_output=True
+          )
+          print(f"Connected to {ssid}")
+          break
+      except Exception as e:
+        print(f"Error connecting to {ssid}: {e}")
         continue
-      
-      ssid = ssid_match.group(1)
-      
-      # Check if it's an open network
-      if 'key_mgmt=NONE' in block:
-        networks.append({'ssid': ssid})
-      else:
-        # Extract password for WPA networks
-        psk_match = re.search(r'psk\s*=\s*"(.*?)"', block)
-        if psk_match:
-          psk = psk_match.group(1)
-          networks.append({'ssid': ssid, 'psk': psk})
     
-    # Return the extracted networks
-    return networks
+    return True
   except Exception as e:
-    print(f"Error migrating WiFi networks: {e}")
-    return None
+    print(f"Error reconfiguring WiFi: {e}")
+    return False
+

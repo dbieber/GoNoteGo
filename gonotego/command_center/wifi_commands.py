@@ -1,4 +1,5 @@
-"""WiFi command handlers for Go Note Go."""
+"""WiFi command handlers for Go Note Go using NetworkManager."""
+import subprocess
 from gonotego.command_center import registry
 from gonotego.command_center import system_commands
 from gonotego.settings import wifi
@@ -30,8 +31,8 @@ def add_wpa_wifi(ssid, psk):
   # Save updated networks
   wifi.save_networks(networks)
   
-  # Update wpa_supplicant.conf
-  if wifi.update_wpa_supplicant_config():
+  # Configure NetworkManager connections
+  if wifi.configure_network_connections():
     wifi.reconfigure_wifi()
     say(f'WiFi network {ssid} added.')
   else:
@@ -59,8 +60,8 @@ def add_wifi_no_psk(ssid):
   # Save updated networks
   wifi.save_networks(networks)
   
-  # Update wpa_supplicant.conf
-  if wifi.update_wpa_supplicant_config():
+  # Configure NetworkManager connections
+  if wifi.configure_network_connections():
     wifi.reconfigure_wifi()
     say(f'Open WiFi network {ssid} added.')
   else:
@@ -78,26 +79,6 @@ def list_wifi_networks():
   say('Configured WiFi networks: ' + ', '.join(network_list))
 
 
-@register_command('wifi-migrate')
-def migrate_wifi_networks():
-  """Scan wpa_supplicant.conf and migrate existing networks to Redis."""
-  networks = wifi.migrate_networks_from_wpa_supplicant()
-  
-  if networks is None:
-    say('WiFi configuration file not found or error reading it.')
-    return
-    
-  # Save the extracted networks to Redis
-  if networks:
-    wifi.save_networks(networks)
-    say(f'Migrated {len(networks)} WiFi networks to settings.')
-    
-    # Update wpa_supplicant.conf
-    wifi.update_wpa_supplicant_config()
-  else:
-    say('No WiFi networks found to migrate.')
-
-
 @register_command('wifi-remove {}')
 def remove_wifi_network(ssid):
   networks = wifi.get_networks()
@@ -110,8 +91,8 @@ def remove_wifi_network(ssid):
     # Save updated networks
     wifi.save_networks(networks)
     
-    # Update wpa_supplicant.conf
-    if wifi.update_wpa_supplicant_config():
+    # Configure NetworkManager connections
+    if wifi.configure_network_connections():
       wifi.reconfigure_wifi()
       say(f'WiFi network {ssid} removed.')
     else:
@@ -125,3 +106,40 @@ def remove_wifi_network(ssid):
 @register_command('wifi-reconfigure')
 def reconfigure_wifi():
   wifi.reconfigure_wifi()
+
+
+@register_command('wifi-scan')
+def scan_wifi_networks():
+  """Scan for available WiFi networks."""
+  try:
+    # Ensure the WiFi adapter is on
+    subprocess.run(['sudo', 'nmcli', 'radio', 'wifi', 'on'], check=True)
+    
+    # Scan for networks
+    result = subprocess.run(
+        ['nmcli', '-t', '-f', 'SSID,SIGNAL,SECURITY', 'device', 'wifi', 'list'],
+        capture_output=True, text=True, check=True
+    )
+    
+    networks = []
+    for line in result.stdout.strip().split('\n'):
+      if line:
+        parts = line.split(':', 2)
+        if len(parts) >= 3 and parts[0]:  # Ensure SSID is not empty
+          ssid, signal, security = parts
+          networks.append((ssid, int(signal), security))
+    
+    # Sort by signal strength (descending)
+    networks.sort(key=lambda x: x[1], reverse=True)
+    
+    # Take the top 5 networks
+    top_networks = networks[:5]
+    
+    if top_networks:
+      network_list = [f"{i+1}. {ssid} ({signal}%)" 
+                     for i, (ssid, signal, _) in enumerate(top_networks)]
+      say('Available WiFi networks: ' + ', '.join(network_list))
+    else:
+      say('No WiFi networks found.')
+  except Exception as e:
+    say(f'Error scanning for WiFi networks: {str(e)}')
