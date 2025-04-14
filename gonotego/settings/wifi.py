@@ -25,11 +25,10 @@ def save_networks(networks):
 def configure_network_connections():
   """Configure NetworkManager connections for Go Note Go managed WiFi networks."""
   networks = get_networks()
-  result = True
   
   try:
     # Get existing connections managed by Go Note Go
-    existing_connections = get_gonote_managed_connections()
+    existing_connections = get_gonotego_managed_connections()
     
     # Remove connections no longer in our networks list
     managed_ssids = [network['ssid'] for network in networks]
@@ -54,18 +53,18 @@ def configure_network_connections():
         # Open network
         add_open_connection(ssid)
     
-    return result
+    return True
   except Exception as e:
     print(f"Error updating NetworkManager connections: {e}")
     return False
 
 
-def get_gonote_managed_connections():
+def get_gonotego_managed_connections():
   """Get list of WiFi connections currently managed by Go Note Go."""
   try:
     result = subprocess.run(
-      ["nmcli", "-t", "-f", "NAME,TYPE", "connection", "show"],
-      capture_output=True, text=True, check=True
+        ["nmcli", "-t", "-f", "NAME,TYPE", "connection", "show"],
+        capture_output=True, text=True, check=True
     )
     
     # Filter connections that are wifi and have names matching our managed networks
@@ -92,13 +91,13 @@ def add_wpa_connection(ssid, password):
     conn_name = ssid
     
     cmd = [
-      "sudo", "nmcli", "connection", "add",
-      "type", "wifi",
-      "con-name", conn_name,
-      "ifname", "wlan0",
-      "ssid", ssid,
-      "wifi-sec.key-mgmt", "wpa-psk",
-      "wifi-sec.psk", password
+        "sudo", "nmcli", "connection", "add",
+        "type", "wifi",
+        "con-name", conn_name,
+        "ifname", "wlan0",
+        "ssid", ssid,
+        "wifi-sec.key-mgmt", "wpa-psk",
+        "wifi-sec.psk", password
     ]
     
     subprocess.run(cmd, check=True, capture_output=True)
@@ -115,11 +114,11 @@ def add_open_connection(ssid):
     conn_name = ssid
     
     cmd = [
-      "sudo", "nmcli", "connection", "add",
-      "type", "wifi",
-      "con-name", conn_name,
-      "ifname", "wlan0",
-      "ssid", ssid
+        "sudo", "nmcli", "connection", "add",
+        "type", "wifi",
+        "con-name", conn_name,
+        "ifname", "wlan0",
+        "ssid", ssid
     ]
     
     subprocess.run(cmd, check=True, capture_output=True)
@@ -134,8 +133,8 @@ def remove_connection(conn_name):
   """Remove a NetworkManager connection."""
   try:
     subprocess.run(
-      ["sudo", "nmcli", "connection", "delete", conn_name],
-      check=True, capture_output=True
+        ["sudo", "nmcli", "connection", "delete", conn_name],
+        check=True, capture_output=True
     )
     return True
   except subprocess.CalledProcessError as e:
@@ -160,8 +159,8 @@ def reconfigure_wifi():
       try:
         # Check if we can see this network
         result = subprocess.run(
-          ["nmcli", "-t", "-f", "SSID", "device", "wifi", "list"],
-          capture_output=True, text=True, check=True
+            ["nmcli", "-t", "-f", "SSID", "device", "wifi", "list"],
+            capture_output=True, text=True, check=True
         )
         
         available_networks = [line.strip() for line in result.stdout.splitlines()]
@@ -169,8 +168,8 @@ def reconfigure_wifi():
         if ssid in available_networks:
           # Try to connect to this network
           subprocess.run(
-            ["nmcli", "connection", "up", "id", ssid],
-            check=True, capture_output=True
+              ["nmcli", "connection", "up", "id", ssid],
+              check=True, capture_output=True
           )
           print(f"Connected to {ssid}")
           break
@@ -232,8 +231,8 @@ def migrate_from_networkmanager():
   try:
     # Get all wifi connections
     result = subprocess.run(
-      ["nmcli", "-t", "-f", "NAME,TYPE", "connection", "show"],
-      capture_output=True, text=True, check=True
+        ["nmcli", "-t", "-f", "NAME,TYPE", "connection", "show"],
+        capture_output=True, text=True, check=True
     )
     
     wifi_connections = []
@@ -248,8 +247,8 @@ def migrate_from_networkmanager():
     for conn_name in wifi_connections:
       # Get connection details
       result = subprocess.run(
-        ["sudo", "nmcli", "--show-secrets", "connection", "show", conn_name],
-        capture_output=True, text=True, check=True
+          ["sudo", "nmcli", "--show-secrets", "connection", "show", conn_name],
+          capture_output=True, text=True, check=True
       )
       
       # Parse output to get SSID and PSK
