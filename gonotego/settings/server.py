@@ -155,7 +155,6 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
   def do_POST(self):
     """Handle POST requests."""
     parsed_path = urlparse(self.path)
-
     if parsed_path.path == "/api/settings":
       try:
         # Read the request body
@@ -174,15 +173,14 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
             continue
 
           try:
-            settings.set(key, value)
-            # If we're updating WiFi networks, update the wpa_supplicant.conf file
+            # Handle WiFi networks specially
             if key == 'WIFI_NETWORKS':
-              try:
-                # Update wpa_supplicant configuration using the wifi module
-                wifi.update_wpa_supplicant_config()
-                wifi.reconfigure_wifi()
-              except Exception as e:
-                print(f"Error updating WiFi configuration: {e}")
+              wifi.save_networks(value)
+              wifi.update_wpa_supplicant_config()
+              wifi.reconfigure_wifi()
+            else:
+              # For all other settings, just use settings.set
+              settings.set(key, value)
           except Exception as e:
             print(f"Error setting {key}: {e}")
 
