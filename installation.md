@@ -2,9 +2,9 @@
 
 These instructions will guide you through setting up Go Note Go on a Raspberry Pi 400.
 
-1. Download the latest image from GitHub Actions artifacts
+1. Download the latest image from GitHub Actions artifacts.
 
-2. Flash the image onto an SD card
+2. Flash the image onto an SD card.
    
    Example commands (macOS):
    ```bash
@@ -12,11 +12,11 @@ These instructions will guide you through setting up Go Note Go on a Raspberry P
    sudo dd bs=4M if=/Users/yourusername/Downloads/go-note-go.img of=/dev/rdisk4 conv=fsync status=progress
    ```
 
-3. Insert the SD card into the Raspberry Pi 400 and power it on
+3. Insert the SD card into the Raspberry Pi 400 and power it on.
    
    Give it a minute to boot.
 
-4. Start the settings server
+4. Start the settings server.
    
    Type the following command and press Enter:
    ```
@@ -25,14 +25,14 @@ These instructions will guide you through setting up Go Note Go on a Raspberry P
    
    This will start a WiFi hotspot called GoNoteGo-Wifi.
 
-5. Connect to the GoNoteGo-Wifi hotspot
+5. Connect to the GoNoteGo-Wifi hotspot.
    
    Connect from another device like a phone or computer.
-   The password is: `swingset`
+   The password is: `swingset`.
 
-6. Configure your Go Note Go
+6. Configure your Go Note Go.
    
-   Navigate to: `192.168.4.1:8000`
+   Navigate to: `192.168.4.1:8000`.
    
    Here you can configure:
    - WiFi networks to connect to
@@ -41,7 +41,7 @@ These instructions will guide you through setting up Go Note Go on a Raspberry P
    
    Click Save when finished.
 
-7. Verify internet connection
+7. Verify internet connection.
    
    Run the following command on the Go Note Go:
    ```
@@ -50,7 +50,7 @@ These instructions will guide you through setting up Go Note Go on a Raspberry P
    
    It should respond with 'Yes' indicating it's connected to the internet.
 
-8. Turn off the WiFi hotspot (optional)
+8. Turn off the WiFi hotspot (optional).
    
    Run the following command:
    ```
