@@ -4,6 +4,9 @@ import os
 import re
 from gonotego.settings import settings
 from gonotego.common import interprocess
+from gonotego.command_center import system_commands
+
+shell = system_commands.shell
 
 
 def get_networks():
@@ -82,13 +85,11 @@ def update_wpa_supplicant_config():
 
 def reconfigure_wifi():
   """Reconfigure WiFi to apply changes."""
-  from gonotego.command_center.system_commands import shell  # Import here to avoid circular import
   shell('wpa_cli -i wlan0 reconfigure')
 
 
 def migrate_networks_from_wpa_supplicant():
   """Scan wpa_supplicant.conf and migrate existing networks to Redis."""
-  from gonotego.command_center.system_commands import shell  # Import here to avoid circular import
   
   filepath = '/etc/wpa_supplicant/wpa_supplicant.conf'
   
