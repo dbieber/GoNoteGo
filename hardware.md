@@ -22,6 +22,8 @@ Cost: ~$70 (unit only) or ~$91 (complete kit)
 
 A Class 10 microSD Card - 16GB or larger is recommended. (This is included if you purchase the complete Raspberry Pi 400 kit).
 
+Link: https://www.amazon.com/SanDisk-microSDHC-Memory-Adapter-SDSQUNC-032G-GN6MA/dp/B010Q57T02/
+
 Cost: ~$10-15
 
 #### USB Microphone
