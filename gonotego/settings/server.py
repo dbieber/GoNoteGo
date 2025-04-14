@@ -11,7 +11,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse
 
 # Import required modules
-from gonotego.settings import settings, secure_settings
+from gonotego.settings import settings, secure_settings, wifi
 
 # Define server port - use port 8000 (the original settings-server port)
 PORT = 8000
@@ -174,22 +174,9 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
               # If we're updating WiFi networks, update the wpa_supplicant.conf file
               if key == 'WIFI_NETWORKS':
                 try:
-                  # Import the function without creating a circular import
-                  import importlib.util
-                  spec = importlib.util.spec_from_file_location(
-                      "system_commands", 
-                      os.path.join(os.path.dirname(os.path.dirname(__file__)), 
-                                  "command_center/system_commands.py"))
-                  system_commands = importlib.util.module_from_spec(spec)
-                  spec.loader.exec_module(system_commands)
-                  
-                  # Update wpa_supplicant configuration
-                  if hasattr(system_commands, 'update_wpa_supplicant_config'):
-                    system_commands.update_wpa_supplicant_config()
-                    
-                    # Reconfigure WiFi
-                    if hasattr(system_commands, 'reconfigure_wifi'):
-                      system_commands.reconfigure_wifi()
+                  # Update wpa_supplicant configuration using the wifi module
+                  wifi.update_wpa_supplicant_config()
+                  wifi.reconfigure_wifi()
                 except Exception as e:
                   print(f"Error updating WiFi configuration: {e}")
             # Handle other values

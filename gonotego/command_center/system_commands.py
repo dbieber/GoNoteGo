@@ -11,6 +11,7 @@ from gonotego.common import status
 from gonotego.command_center import note_commands
 from gonotego.command_center import registry
 from gonotego.settings import settings
+from gonotego.settings import wifi
 
 register_command = registry.register_command
 
@@ -147,76 +148,7 @@ def check_internet():
   say('yes' if internet.is_internet_available() else 'no')
 
 
-def get_wifi_networks():
-  """Get the list of WiFi networks from Redis settings."""
-  try:
-    return json.loads(settings.get('WIFI_NETWORKS') or '[]')
-  except (json.JSONDecodeError, TypeError):
-    return []
-
-
-def save_wifi_networks(networks):
-  """Save the list of WiFi networks to Redis settings."""
-  settings.set('WIFI_NETWORKS', json.dumps(networks))
-
-
-def update_wpa_supplicant_config():
-  """Update the Go Note Go managed section of wpa_supplicant.conf."""
-  networks = get_wifi_networks()
-  filepath = '/etc/wpa_supplicant/wpa_supplicant.conf'
-  
-  # Check if the file exists
-  if not os.path.exists(filepath):
-    say('WiFi configuration file not found.')
-    return False
-  
-  # Create network configurations
-  network_configs = []
-  for network in networks:
-    if network.get('psk'):
-      network_config = f"""network={{
-        ssid="{network['ssid']}"
-        psk="{network['psk']}"
-        key_mgmt=WPA-PSK
-}}"""
-    else:
-      network_config = f"""network={{
-        ssid="{network['ssid']}"
-        key_mgmt=NONE
-}}"""
-    network_configs.append(network_config)
-  
-  managed_config = "# BEGIN Go Note Go managed WiFi networks\n"
-  if networks:
-    managed_config += "\n" + "\n".join(network_configs) + "\n"
-  managed_config += "# END Go Note Go managed WiFi networks"
-  
-  # Read the existing config
-  try:
-    with open(filepath, 'r') as f:
-      config = f.read()
-    
-    # Check if the managed section exists
-    pattern = r'# BEGIN Go Note Go managed WiFi networks\n.*?# END Go Note Go managed WiFi networks'
-    if re.search(pattern, config, re.DOTALL):
-      # Replace the existing managed section
-      new_config = re.sub(pattern, managed_config, config, flags=re.DOTALL)
-    else:
-      # Append the managed section to the end of the file
-      new_config = config.rstrip() + "\n\n" + managed_config + "\n"
-    
-    # Write the new config
-    with open('/tmp/wpa_supplicant.conf', 'w') as f:
-      f.write(new_config)
-    
-    # Use sudo to copy the file to the correct location
-    shell('sudo cp /tmp/wpa_supplicant.conf /etc/wpa_supplicant/wpa_supplicant.conf')
-    shell('rm /tmp/wpa_supplicant.conf')
-    
-    return True
-  except Exception as e:
-    print(f"Error updating wpa_supplicant.conf: {e}")
-    return False
+# WiFi functions moved to gonotego.settings.wifi module
 
 
 @register_command('wifi {} {}')
@@ -227,7 +159,7 @@ def add_wpa_wifi(ssid, psk):
     return
   
   # Load existing networks
-  networks = get_wifi_networks()
+  networks = wifi.get_networks()
   
   # Check if this network already exists
   for network in networks:
@@ -239,11 +171,11 @@ def add_wpa_wifi(ssid, psk):
     networks.append({'ssid': ssid, 'psk': psk})
   
   # Save updated networks
-  save_wifi_networks(networks)
+  wifi.save_networks(networks)
   
   # Update wpa_supplicant.conf
-  if update_wpa_supplicant_config():
-    reconfigure_wifi()
+  if wifi.update_wpa_supplicant_config():
+    wifi.reconfigure_wifi()
     say(f'WiFi network {ssid} added.')
   else:
     say('Failed to update WiFi configuration.')
@@ -256,7 +188,7 @@ def add_wifi_no_psk(ssid):
     return
   
   # Load existing networks
-  networks = get_wifi_networks()
+  networks = wifi.get_networks()
   
   # Check if this network already exists
   for network in networks:
@@ -268,11 +200,11 @@ def add_wifi_no_psk(ssid):
     networks.append({'ssid': ssid})
   
   # Save updated networks
-  save_wifi_networks(networks)
+  wifi.save_networks(networks)
   
   # Update wpa_supplicant.conf
-  if update_wpa_supplicant_config():
-    reconfigure_wifi()
+  if wifi.update_wpa_supplicant_config():
+    wifi.reconfigure_wifi()
     say(f'Open WiFi network {ssid} added.')
   else:
     say('Failed to update WiFi configuration.')
@@ -280,7 +212,7 @@ def add_wifi_no_psk(ssid):
 
 @register_command('wifi-list')
 def list_wifi_networks():
-  networks = get_wifi_networks()
+  networks = wifi.get_networks()
   if not networks:
     say('No WiFi networks configured.')
     return
@@ -328,11 +260,11 @@ def migrate_wifi_networks():
     
     # Save the extracted networks to Redis
     if networks:
-      save_wifi_networks(networks)
+      wifi.save_networks(networks)
       say(f'Migrated {len(networks)} WiFi networks to settings.')
       
       # Update wpa_supplicant.conf
-      update_wpa_supplicant_config()
+      wifi.update_wpa_supplicant_config()
     else:
       say('No WiFi networks found to migrate.')
   except Exception as e:
@@ -342,7 +274,7 @@ def migrate_wifi_networks():
 
 @register_command('wifi-remove {}')
 def remove_wifi_network(ssid):
-  networks = get_wifi_networks()
+  networks = wifi.get_networks()
   initial_count = len(networks)
   
   # Remove networks with matching SSID
@@ -350,11 +282,11 @@ def remove_wifi_network(ssid):
   
   if len(networks) < initial_count:
     # Save updated networks
-    save_wifi_networks(networks)
+    wifi.save_networks(networks)
     
     # Update wpa_supplicant.conf
-    if update_wpa_supplicant_config():
-      reconfigure_wifi()
+    if wifi.update_wpa_supplicant_config():
+      wifi.reconfigure_wifi()
       say(f'WiFi network {ssid} removed.')
     else:
       say('Failed to update WiFi configuration.')
@@ -366,7 +298,7 @@ def remove_wifi_network(ssid):
 @register_command('wifi-refresh')
 @register_command('wifi-reconfigure')
 def reconfigure_wifi():
-  shell('wpa_cli -i wlan0 reconfigure')
+  wifi.reconfigure_wifi()
 
 
 @register_command('server')
