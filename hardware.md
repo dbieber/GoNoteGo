@@ -44,6 +44,8 @@ Cost: $13-30
 
 A USB-C Power Supply, 5.1V 3.0A for the Raspberry Pi 400. (This is included if you purchase the complete Raspberry Pi 400 kit).
 
+Link: https://www.raspberrypi.com/products/type-c-power-supply/
+
 Cost: ~$10
 
 Total Cost for Required Hardware: ~$109-131
