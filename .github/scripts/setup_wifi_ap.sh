@@ -1,5 +1,5 @@
 #!/bin/bash
-# Setup WiFi Access Point for GoNoteGo
+# Setup WiFi Access Point for Go Note Go
 
 # Install required packages
 sudo apt install -y rng-tools hostapd dnsmasq 
