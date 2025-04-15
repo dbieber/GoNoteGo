@@ -1,7 +1,7 @@
 #!/bin/bash
-# Configure system to start GoNoteGo on boot
+# Configure system to start Go Note Go on boot
 
-# Modify rc.local to start GoNoteGo on boot
+# Modify rc.local to start Go Note Go on boot
 sudo cat /etc/rc.local
 sudo sed '/^exit 0/i \
 sudo -u pi mkdir -p /home/pi/out \
