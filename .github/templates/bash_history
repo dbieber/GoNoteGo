@@ -18,6 +18,18 @@ cat /etc/dnsmasq.conf
 python -m http.server
 sudo iptables -t nat -A POSTROUTING -o wlan0 -j MASQUERADE
 sudo iptables -t nat -L
+
+# NetworkManager Wi-Fi commands
+nmcli radio wifi on # turn on wifi adapter
+nmcli device wifi list # list available wifi networks
+nmcli -t -f SSID,SIGNAL,SECURITY device wifi list # show networks with signal strength
+nmcli connection show # list all network connections
+nmcli connection up id "SSID" # connect to saved network
+nmcli device wifi connect "SSID" password "PASSWORD" # connect to new network
+nmcli connection modify "SSID" wifi-sec.psk "NEWPASSWORD" # change wifi password
+nmcli connection delete "SSID" # remove connection
+sudo systemctl restart NetworkManager # restart network service
+
 sudo cat /etc/wpa_supplicant/wpa_supplicant.conf
 sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
 nano /home/pi/code/github/dbieber/GoNoteGo/gonotego/settings/secure_settings.py
