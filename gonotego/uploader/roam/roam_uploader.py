@@ -200,7 +200,11 @@ class Uploader:
 
   def upload(self, note_events):
     browser = self.get_browser()
-    browser.go_graph(settings.get('ROAM_GRAPH'))
+    if not browser.go_graph(settings.get('ROAM_GRAPH')):
+      # Failed to go to graph - return False to indicate failure
+      print("Failed to access Roam graph. Will retry notes later.")
+      return False
+      
     time.sleep(0.5)
     browser.screenshot('screenshot-graph-later.png')
     browser.execute_helper_js()
@@ -246,6 +250,8 @@ class Uploader:
             browser.create_child_block(block_uid, embed_text)
 
       flush()
+    
+    return True
 
   def handle_inactivity(self):
     self.end_session()
