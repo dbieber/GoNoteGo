@@ -35,6 +35,7 @@ dependencies = [
   # selenium 4.0 breaks with arm geckodriver.
   'selenium==3.141.0',
   'setuptools-rust<=1.5.2',
+  'slack-sdk<=3.26.0',  # For Slack integration
   'sounddevice<=0.4.5',
   'soundfile',
   'supervisor<=4.2.4',
