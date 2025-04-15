@@ -261,6 +261,8 @@ jobs:
             # Attempt to not run config on first boot
             sudo apt purge piwiz -y
             sudo raspi-config nonint do_wifi_country US
+            # Configure US keyboard layout
+            sudo raspi-config nonint do_configure_keyboard us
             touch /boot/ssh
             echo "pi:$(echo 'raspberry' | openssl passwd -6 -stdin)" | sudo tee /boot/userconf > /dev/null
 
