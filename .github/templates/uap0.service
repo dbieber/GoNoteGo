@@ -1,0 +1,14 @@
+[Unit]
+Description=Create uap0 interface
+After=sys-subsystem-net-devices-wlan0.device
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/sbin/iw phy phy0 interface add uap0 type __ap
+ExecStartPost=/usr/bin/ip link set dev uap0 address d8:3a:dd:06:5e:ca
+ExecStartPost=/sbin/ifconfig uap0 up
+ExecStop=/sbin/iw dev uap0 del
+
+[Install]
+WantedBy=multi-user.target
