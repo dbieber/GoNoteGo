@@ -1,6 +1,6 @@
-# GoNoteGo Configuration Templates
+# Go Note Go Configuration Templates
 
-This directory contains configuration templates used during the build process for GoNoteGo.
+This directory contains configuration templates used during the build process for Go Note Go.
 
 ## Templates
 
