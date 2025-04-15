@@ -68,7 +68,7 @@ class Uploader:
 
     # Create the initial message with the note content
     try:
-      message_text = f"{first_note}\n\nThis is a Go Note Go generated thread. :keyboard:"
+      message_text = f"{first_note}\n\n:keyboard: Go Note Go thread."
       response = self.client.chat_postMessage(
           channel=channel_id,
           text=message_text

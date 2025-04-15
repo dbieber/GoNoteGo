@@ -22,6 +22,7 @@ _Go Note Go is a note-taking system for when you're on the go, with a focus on d
 * [IdeaFlow](https://ideaflow.app/)
 * [Mem](https://mem.ai/)
 * [Notion](https://www.notion.so/)
+* [Slack](https://www.slack.com/)
 * [Twitter](https://www.twitter.com/)
 * [Email](https://en.wikipedia.org/wiki/Email)
 
