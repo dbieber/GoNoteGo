@@ -12,6 +12,7 @@ from gonotego.uploader.remnote import remnote_uploader
 from gonotego.uploader.roam import roam_uploader
 from gonotego.uploader.mem import mem_uploader
 from gonotego.uploader.notion import notion_uploader
+from gonotego.uploader.slack import slack_uploader
 from gonotego.uploader.twitter import twitter_uploader
 
 Status = status.Status
@@ -41,6 +42,8 @@ def make_uploader(note_taking_system):
     return mem_uploader.Uploader()
   elif note_taking_system == 'notion':
     return notion_uploader.Uploader()
+  elif note_taking_system == 'slack':
+    return slack_uploader.Uploader()
   elif note_taking_system == 'twitter':
     return twitter_uploader.Uploader()
   else:

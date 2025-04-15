@@ -18,6 +18,7 @@ const SettingsUI = () => {
     { display: 'IdeaFlow', value: 'ideaflow' },
     { display: 'Mem', value: 'mem' },
     { display: 'Notion', value: 'notion' },
+    { display: 'Slack', value: 'slack' },
     { display: 'Twitter', value: 'twitter' },
     { display: 'Email', value: 'email' }
   ];
@@ -41,6 +42,8 @@ const SettingsUI = () => {
     MEM_API_KEY: '',
     NOTION_INTEGRATION_TOKEN: '',
     NOTION_DATABASE_ID: '',
+    SLACK_API_TOKEN: '',
+    SLACK_CHANNEL: '',
     TWITTER_API_KEY: '',
     TWITTER_API_SECRET: '',
     TWITTER_ACCESS_TOKEN: '',
@@ -720,6 +723,11 @@ const SettingsUI = () => {
         { key: 'NOTION_INTEGRATION_TOKEN', label: 'Integration Token', type: 'password' },
         { key: 'NOTION_DATABASE_ID', label: 'Database ID' },
       ], shouldShowSection('notion'))}
+
+      {renderSettingGroup('Slack', 'Slack integration settings', [
+        { key: 'SLACK_API_TOKEN', label: 'API Token', type: 'password', tip: 'Bot token starting with xoxb-' },
+        { key: 'SLACK_CHANNEL', label: 'Channel Name', tip: 'Channel name without the # symbol' },
+      ], shouldShowSection('slack'))}
 
       {renderSettingGroup('Twitter API', 'Twitter API credentials', [
         { key: 'TWITTER_API_KEY', label: 'API Key', type: 'password' },
