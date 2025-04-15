@@ -126,8 +126,7 @@ jobs:
             mkdir /home/pi/secrets
             echo "Manually transfer secrets to /home/pi/secrets."
             
-            # Change ownership of entire repository to pi user
-            # Do this after all repository modifications are complete
+            # Ensure repository is owned by pi user instead of root
             chown -R pi:pi /home/pi/code/github/dbieber/GoNoteGo
 
             echo "Install geckodriver to known location"
