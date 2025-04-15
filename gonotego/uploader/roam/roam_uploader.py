@@ -200,9 +200,11 @@ class Uploader:
 
   def upload(self, note_events):
     browser = self.get_browser()
-    if not browser.go_graph(settings.get('ROAM_GRAPH')):
-      # Failed to go to graph - return False to indicate failure
-      print("Failed to access Roam graph. Will retry notes later.")
+    in_graph = browser.go_graph(settings.get('ROAM_GRAPH'))
+    if not in_graph
+      print("Failed to access Roam graph. Aborting upload.")
+      browser.screenshot('screenshot-go_graph-failure.png')
+      flush()
       return False
       
     time.sleep(0.5)
@@ -240,6 +242,11 @@ class Uploader:
         else:
           parent_uid = self.session_uid
         block_uid = browser.create_child_block(parent_uid, text)
+        if not block_uid:
+          print('create_child_block did not yield a block_uid. Aborting upload.')
+          browser.screenshot('screenshot-create_child_block-failure.png')
+          flush()
+          return False
         self.last_note_uid = block_uid
         print(f'Inserted: "{text}" at block (({block_uid}))')
         if has_audio:

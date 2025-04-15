@@ -94,25 +94,17 @@ def main():
       status.set(Status.UPLOADER_ACTIVE, True)
       # TODO(dbieber): Allow uploader to yield note events as it finishes them.
       # So that if it fails midway, we can still mark the completed events as done.
-      try:
-        upload_success = uploader.upload(note_events)
-        # For older uploaders that don't return a value, assume success
-        if upload_success is None:
-          upload_success = True
-      except Exception as e:
-        print(f"Error during upload: {e}")
-        upload_success = False
-      
-      if upload_success:
+      upload_successful = uploader.upload(note_events)
+      if upload_successful:
         last_upload = time.time()
         print('Uploaded.')
-        # Only commit note events if upload was successful
+      else:
+        print('Upload unsuccessful.')
+
+      status.set(Status.UPLOADER_ACTIVE, False)
+      if upload_successful:
         for note_event_bytes in note_event_bytes_list:
           note_events_queue.commit(note_event_bytes)
-      else:
-        print('Upload failed. Will retry notes later.')
-        
-      status.set(Status.UPLOADER_ACTIVE, False)
 
     if last_upload and time.time() - last_upload > 600:
       # X minutes have passed since the last upload.
