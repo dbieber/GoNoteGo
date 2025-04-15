@@ -18,10 +18,10 @@ cat /etc/dnsmasq.conf
 python -m http.server
 sudo iptables -t nat -A POSTROUTING -o wlan0 -j MASQUERADE
 sudo iptables -t nat -L
-nmcli radio wifi on  # turn on wifi adapter
-nmcli device wifi list  # list available wifi networks
-nmcli -t -f SSID,SIGNAL,SECURITY device wifi list  # show networks with signal strength
-nmcli connection show  # list all network connections
+nmcli radio wifi on
+nmcli device wifi list
+nmcli -t -f SSID,SIGNAL,SECURITY device wifi list
+nmcli connection show
 nmcli connection up id "SSID"  # connect to saved network
 nmcli device wifi connect "SSID" password "PASSWORD"  # connect to new network
 nmcli connection modify "SSID" wifi-sec.psk "NEWPASSWORD"  # change wifi password
