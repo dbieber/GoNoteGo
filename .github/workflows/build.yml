@@ -46,6 +46,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
       - name: Download web app build
         uses: actions/download-artifact@v4
         with:
@@ -92,6 +95,9 @@ jobs:
             cd GoNoteGo
             # Checkout the specific commit
             git checkout $GITHUB_SHA
+            
+            # Make scripts executable
+            chmod +x /home/pi/code/github/dbieber/GoNoteGo/.github/scripts/*.sh
 
             echo "Including web app"
             echo "Checking web app files at /web-app-dist:"
@@ -106,201 +112,20 @@ jobs:
             echo "Verifying copied web app files:"
             ls -la /home/pi/code/github/dbieber/GoNoteGo/gonotego/settings-server/dist
 
-            echo "Setting up Python environment"
-            python3 -m venv env
-            ./env/bin/pip install -e .  # Install Python dependencies
+            # Run the Python environment setup script
+            bash /home/pi/code/github/dbieber/GoNoteGo/.github/scripts/setup_python_env.sh
 
-            echo "Start on boot"
-            sudo cat /etc/rc.local
-            sudo sed '/^exit 0/i \
-            sudo -u pi mkdir -p /home/pi/out \
-            bash /home/pi/code/github/dbieber/GoNoteGo/scripts/install_settings.sh \
-            /home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisord -c /home/pi/code/github/dbieber/GoNoteGo/gonotego/supervisord.conf \
-                ' /etc/rc.local > ./rc.local.modified && sudo mv ./rc.local.modified /etc/rc.local
-            sudo chmod +x /etc/rc.local
+            # Setup system boot configuration
+            bash /home/pi/code/github/dbieber/GoNoteGo/.github/scripts/setup_boot.sh
 
-            echo "Setting up Go Note Go:"
-            cp gonotego/settings/secure_settings_template.py gonotego/settings/secure_settings.py
-            echo "Manually edit secure_settings.py to configure your settings."
+            # Install geckodriver
+            bash /home/pi/code/github/dbieber/GoNoteGo/.github/scripts/install_geckodriver.sh
 
-            mkdir /home/pi/secrets
-            echo "Manually transfer secrets to /home/pi/secrets."
-            
-            # Ensure repository is owned by pi user instead of root
-            chown -R pi:pi /home/pi/code/github/dbieber/GoNoteGo
+            # Set up a wifi access point
+            bash /home/pi/code/github/dbieber/GoNoteGo/.github/scripts/setup_wifi_ap.sh
 
-            echo "Install geckodriver to known location"
-            cd
-            wget https://github.com/mozilla/geckodriver/releases/download/v0.23.0/geckodriver-v0.23.0-arm7hf.tar.gz
-            tar -xvf geckodriver-v0.23.0-arm7hf.tar.gz
-            rm geckodriver-v0.23.0-arm7hf.tar.gz
-            sudo mv geckodriver /usr/local/bin
-
-            echo "Set up a wifi access point"
-            sudo apt install -y rng-tools hostapd dnsmasq 
-
-            cat <<EOF > /etc/dhcpcd.conf
-            # Allow users of this group to interact with dhcpcd via the control socket.
-            #controlgroup wheel
-
-            # Inform the DHCP server of our hostname for DDNS.
-            hostname
-
-            # Use the hardware address of the interface for the Client ID.
-            clientid
-            # or
-            # Use the same DUID + IAID as set in DHCPv6 for DHCPv4 ClientID as per RFC4361.
-            # Some non-RFC compliant DHCP servers do not reply with this set.
-            # In this case, comment out duid and enable clientid above.
-            #duid
-
-            # Persist interface configuration when dhcpcd exits.
-            persistent
-
-            # Rapid commit support.
-            # Safe to enable by default because it requires the equivalent option set
-            # on the server to actually work.
-            option rapid_commit
-
-            # A list of options to request from the DHCP server.
-            option domain_name_servers, domain_name, domain_search, host_name
-            option classless_static_routes
-            # Respect the network MTU. This is applied to DHCP routes.
-            option interface_mtu
-
-            # Most distributions have NTP support.
-            #option ntp_servers
-
-            # A ServerID is required by RFC2131.
-            require dhcp_server_identifier
-
-            # Generate SLAAC address using the Hardware Address of the interface
-            #slaac hwaddr
-            # OR generate Stable Private IPv6 Addresses based from the DUID
-            slaac private
-
-            # Example static IP configuration:
-            #interface eth0
-            #static ip_address=192.168.0.10/24
-            #static ip6_address=fd51:42f8:caae:d92e::ff/64
-            #static routers=192.168.0.1
-            #static domain_name_servers=192.168.0.1 8.8.8.8 fd51:42f8:caae:d92e::1
-
-            # It is possible to fall back to a static IP if DHCP fails:
-            # define static profile
-            #profile static_eth0
-            #static ip_address=192.168.1.23/24
-            #static routers=192.168.1.1
-            #static domain_name_servers=192.168.1.1
-
-            # fallback to static profile on eth0
-            #interface eth0
-            #fallback static_eth0
-
-            # Interface for Go Note Go Access Point
-            interface uap0
-            static ip_address=192.168.4.1/24
-            nohook wpa_supplicant
-            EOF
-
-            cat <<EOF >> /etc/dnsmasq.conf
-            interface=uap0
-            dhcp-range=192.168.4.2,192.168.4.20,255.255.255.0,24h
-            EOF
-
-            cat <<EOF >> /etc/systemd/system/uap0.service
-            [Unit]
-            Description=Create uap0 interface
-            After=sys-subsystem-net-devices-wlan0.device
-
-            [Service]
-            Type=oneshot
-            RemainAfterExit=true
-            ExecStart=/sbin/iw phy phy0 interface add uap0 type __ap
-            ExecStartPost=/usr/bin/ip link set dev uap0 address d8:3a:dd:06:5e:ca
-            ExecStartPost=/sbin/ifconfig uap0 up
-            ExecStop=/sbin/iw dev uap0 del
-
-            [Install]
-            WantedBy=multi-user.target
-            EOF
-
-            sudo systemctl daemon-reload
-            sudo systemctl start uap0.service
-            sudo systemctl enable uap0.service
-
-            cat <<EOF >> /etc/hostapd/hostapd.conf
-            interface=uap0
-            ssid=GoNoteGo-Wifi
-            hw_mode=g
-            channel=4
-            wmm_enabled=0
-            macaddr_acl=0
-            auth_algs=1
-            ignore_broadcast_ssid=0
-            wpa=2
-            wpa_passphrase=swingset
-            wpa_key_mgmt=WPA-PSK
-            wpa_pairwise=TKIP
-            rsn_pairwise=CCMP
-            EOF
-
-            cat <<EOF >> /etc/default/hostapd
-            DAEMON_CONF="/etc/hostapd/hostapd.conf"
-            EOF
-
-            sudo systemctl start hostapd
-            sudo systemctl start dnsmasq
-            sudo systemctl enable hostapd
-            sudo systemctl enable dnsmasq
-
-            cat <<EOF >> /etc/sysctl.conf
-            net.ipv4.ip_forward=1
-            EOF
-
-            # Attempt to not run config on first boot
-            sudo apt purge piwiz -y
-            sudo raspi-config nonint do_wifi_country US
-            # Configure US keyboard layout
-            sudo raspi-config nonint do_configure_keyboard us
-            touch /boot/ssh
-            echo "pi:$(echo 'raspberry' | openssl passwd -6 -stdin)" | sudo tee /boot/userconf > /dev/null
-
-            # Enable ssh
-            ssh-keygen -A &&
-            update-rc.d ssh enable
-
-            # Add commands to the bash history for debugging purposes
-            cat << EOF >> /home/pi/.bash_history
-            sudo reboot now
-            sudo systemctl daemon-reload
-            sudo systemctl status uap0.service
-            sudo systemctl status dnsmasq.service
-            sudo systemctl status hostapd.service
-            sudo journalctl -u uap0.service
-            sudo journalctl -u dnsmasq.service
-            sudo journalctl -u hostapd.service
-            ip addr show uap0
-            sudo ip addr add 192.168.4.1/24 dev uap0
-            cat /etc/rc.local
-            cat /etc/default/hostapd
-            cat /etc/hostapd/hostapd.conf
-            cat /etc/systemd/system/uap0.service
-            cat /etc/sysctl.conf
-            cat /etc/dhcpcd.conf
-            cat /etc/dnsmasq.conf
-            python -m http.server
-            sudo iptables -t nat -A POSTROUTING -o wlan0 -j MASQUERADE
-            sudo iptables -t nat -L
-            sudo cat /etc/wpa_supplicant/wpa_supplicant.conf
-            sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
-            nano /home/pi/code/github/dbieber/GoNoteGo/gonotego/settings/secure_settings.py
-            /home/pi/code/github/dbieber/GoNoteGo/env/bin/python
-            /home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisord -c /home/pi/code/github/dbieber/GoNoteGo/gonotego/supervisord.conf
-            /home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisorctl -u go -p notego status
-            /home/pi/code/github/dbieber/GoNoteGo/env/bin/supervisorctl -u go -p notego restart all
-            cd /home/pi/code/github/dbieber/GoNoteGo/
-            EOF
+            # Setup bash history
+            bash /home/pi/code/github/dbieber/GoNoteGo/.github/scripts/setup_bash_history.sh
 
       - name: Compress the release image
         run: |
