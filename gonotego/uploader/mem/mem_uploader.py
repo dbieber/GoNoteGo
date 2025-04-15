@@ -34,6 +34,7 @@ class Uploader:
         else:
           is_read = True
         upload_mem(text, is_read=is_read)
+    return True
 
   def handle_inactivity(self):
     pass

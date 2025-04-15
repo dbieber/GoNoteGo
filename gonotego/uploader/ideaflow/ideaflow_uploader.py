@@ -105,6 +105,7 @@ class Uploader:
           audio_url = blob_uploader.upload_blob(note_event.audio_filepath, client)
           text = f'{text} #unverified-transcription ({audio_url})'
         browser.insert_note(text)
+    return True
 
   def handle_inactivity(self):
     self.close_browser()

@@ -42,6 +42,7 @@ class Uploader:
         if note_event.audio_filepath and os.path.exists(note_event.audio_filepath):
           url = blob_uploader.upload_blob(note_event.audio_filepath, client)
           create_rem(url, edit_later=False, parent_id=rem_id)
+    return True
 
   def handle_inactivity(self):
     pass
