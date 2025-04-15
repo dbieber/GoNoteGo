@@ -1,7 +1,5 @@
 """Uploader for Slack workspace channels."""
 
-import os
-import time
 import logging
 from typing import List, Optional
 
@@ -113,51 +111,47 @@ class Uploader:
     """Upload note events to Slack.
 
     Args:
-        note_events: List of NoteEvent objects.
+      note_events: List of NoteEvent objects.
 
     Returns:
-        bool: True if upload successful, False otherwise.
+      bool: True if upload successful, False otherwise.
     """
-    if not note_events:
-      return True
-        
-    try:
-      for note_event in note_events:
-        # Handle indent/unindent events to track indentation level
-        if note_event.action == events.INDENT:
-          self._indent_level += 1
+    for note_event in note_events:
+      # Handle indent/unindent events to track indentation level
+      if note_event.action == events.INDENT:
+        self._indent_level += 1
+        continue
+      elif note_event.action == events.UNINDENT:
+        self._indent_level = max(0, self._indent_level - 1)
+        continue
+      elif note_event.action == events.CLEAR_EMPTY:
+        self._indent_level = 0
+        continue
+      elif note_event.action == events.ENTER_EMPTY:
+        # When you submit from an empty note, that pops from the stack.
+        self._indent_level = max(0, self._indent_level - 1)
+      elif note_event.action == events.SUBMIT:
+        text = note_event.text.strip()
+
+        # Skip empty notes
+        if not text:
           continue
-        elif note_event.action == events.UNINDENT:
-          self._indent_level = max(0, self._indent_level - 1)
-          continue
-        elif note_event.action == events.CLEAR_EMPTY:
-          self._indent_level = 0
-          continue
-        elif note_event.action == events.SUBMIT:
-          text = note_event.text.strip()
 
-          # Skip empty notes
-          if not text:
-            continue
+        # Start a new session for the first note
+        if not self._session_started:
+          success = self._start_session(text)
+        else:
+          # Send as a reply to the thread with proper indentation
+          success = self._send_note_to_thread(text, self._indent_level)
 
-          # Start a new session for the first note
-          if not self._session_started:
-            success = self._start_session(text)
-          else:
-            # Send as a reply to the thread with proper indentation
-            success = self._send_note_to_thread(text, self._indent_level)
+        if not success:
+          logger.error("Failed to upload note to Slack")
+          return False
 
-          if not success:
-            logger.error("Failed to upload note to Slack")
-            return False
+      elif note_event.action == events.END_SESSION:
+        self.end_session()
 
-        elif note_event.action == events.END_SESSION:
-          self.end_session()
-
-      return True
-    except Exception as e:
-      logger.exception(f"Error uploading notes to Slack: {e}")
-      return False
+    return True
 
   def end_session(self) -> None:
     """End the current session."""
