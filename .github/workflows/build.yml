@@ -112,8 +112,20 @@ jobs:
             echo "Verifying copied web app files:"
             ls -la /home/pi/code/github/dbieber/GoNoteGo/gonotego/settings-server/dist
 
-            # Run the Python environment setup script
-            bash /home/pi/code/github/dbieber/GoNoteGo/.github/scripts/setup_python_env.sh
+            # Setup Python environment
+            echo "Setting up Python environment"
+            python3 -m venv env
+            ./env/bin/pip install -e .  # Install Python dependencies
+            
+            echo "Setting up Go Note Go:"
+            cp gonotego/settings/secure_settings_template.py gonotego/settings/secure_settings.py
+            echo "Manually edit secure_settings.py to configure your settings."
+            
+            mkdir -p /home/pi/secrets
+            echo "Manually transfer secrets to /home/pi/secrets."
+            
+            # Ensure repository is owned by pi user instead of root
+            chown -R pi:pi /home/pi/code/github/dbieber/GoNoteGo
 
             # Setup system boot configuration
             bash /home/pi/code/github/dbieber/GoNoteGo/.github/scripts/setup_boot.sh
@@ -125,7 +137,7 @@ jobs:
             bash /home/pi/code/github/dbieber/GoNoteGo/.github/scripts/setup_wifi_ap.sh
 
             # Setup bash history
-            bash /home/pi/code/github/dbieber/GoNoteGo/.github/scripts/setup_bash_history.sh
+            cat /home/pi/code/github/dbieber/GoNoteGo/.github/templates/bash_history >> /home/pi/.bash_history
 
       - name: Compress the release image
         run: |
