@@ -93,9 +93,8 @@ jobs:
             # Checkout the specific commit
             git checkout $GITHUB_SHA
             
-            # Change ownership of repository to pi user
-            # This leaves supervisord.conf unchanged
-            find /home/pi/code/github/dbieber/GoNoteGo -not -path "*/\.git*" -not -path "*/gonotego/supervisord\.conf" -exec chown pi:pi {} \;
+            # Change ownership of entire repository to pi user
+            chown -R pi:pi /home/pi/code/github/dbieber/GoNoteGo
 
             echo "Including web app"
             echo "Checking web app files at /web-app-dist:"
