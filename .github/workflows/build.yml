@@ -92,9 +92,6 @@ jobs:
             cd GoNoteGo
             # Checkout the specific commit
             git checkout $GITHUB_SHA
-            
-            # Change ownership of entire repository to pi user
-            chown -R pi:pi /home/pi/code/github/dbieber/GoNoteGo
 
             echo "Including web app"
             echo "Checking web app files at /web-app-dist:"
@@ -128,6 +125,10 @@ jobs:
 
             mkdir /home/pi/secrets
             echo "Manually transfer secrets to /home/pi/secrets."
+            
+            # Change ownership of entire repository to pi user
+            # Do this after all repository modifications are complete
+            chown -R pi:pi /home/pi/code/github/dbieber/GoNoteGo
 
             echo "Install geckodriver to known location"
             cd
