@@ -34,7 +34,7 @@ dependencies = [
   'redis<=4.3.4',
   # selenium 4.0 breaks with arm geckodriver.
   'selenium==3.141.0',
-  'setuptools-rust<=1.5.2',
+  'setuptools-rust<=1.11.1',
   'slack-sdk<=3.26.0',
   'sounddevice<=0.4.5',
   'soundfile',
