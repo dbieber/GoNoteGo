@@ -125,6 +125,9 @@ jobs:
 
             mkdir /home/pi/secrets
             echo "Manually transfer secrets to /home/pi/secrets."
+            
+            # Ensure repository is owned by pi user instead of root
+            chown -R pi:pi /home/pi/code/github/dbieber/GoNoteGo
 
             echo "Install geckodriver to known location"
             cd
