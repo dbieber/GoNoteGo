@@ -38,7 +38,7 @@ dependencies = [
   'slack-sdk<=3.26.0',
   'sounddevice<=0.4.5',
   'soundfile',
-  'supervisor<=4.2.4',
+  'supervisor<=4.2.5',
   'twython<=3.9.1',
   "urllib3==1.26.19",  # For compatibility with selenium==3.141.0
 ]
