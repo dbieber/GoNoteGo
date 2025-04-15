@@ -37,6 +37,7 @@ class Uploader:
         with open(DRAFT_FILENAME, 'a') as f:
           f.write(line + '\n')
         self.last_indent_level = self.indent_level
+    return True
 
   def handle_inactivity(self):
     self.end_session()

@@ -84,6 +84,7 @@ class Uploader:
           url = blob_uploader.upload_blob(note_event.audio_filepath, client)
           blocks.append(make_audio_block(url))
     append_notes(blocks, page_id=self.current_page_id)
+    return True
 
   def handle_inactivity(self):
     self.current_page_id = None
