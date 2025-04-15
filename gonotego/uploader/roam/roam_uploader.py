@@ -201,7 +201,7 @@ class Uploader:
   def upload(self, note_events):
     browser = self.get_browser()
     in_graph = browser.go_graph(settings.get('ROAM_GRAPH'))
-    if not in_graph
+    if not in_graph:
       print("Failed to access Roam graph. Aborting upload.")
       browser.screenshot('screenshot-go_graph-failure.png')
       flush()
