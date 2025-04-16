@@ -34,6 +34,8 @@ def whoami():
     user = settings.get('MEM_API_KEY')[:6]
   elif note_taking_system == 'notion':
     user = settings.get('NOTION_DATABASE_ID')[:6]
+  elif note_taking_system == 'slack':
+    user = settings.get('SLACK_CHANNEL')
   elif note_taking_system == 'twitter':
     user = settings.get('twitter.screen_name')
   say(f'uploader {note_taking_system} ; user {user}')
