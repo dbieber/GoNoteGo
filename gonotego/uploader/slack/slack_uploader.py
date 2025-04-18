@@ -215,7 +215,7 @@ class Uploader:
   def end_session(self) -> None:
     """End the current session."""
     # Start the summarization thread if we have a valid session with notes
-    if self._session_started and self.thread_ts and self._session_notes:
+    if self._session_started and self._thread_ts and self._session_notes:
       channel_id = self._get_channel_id()
       self._start_session_summary_thread(
           channel_id,
