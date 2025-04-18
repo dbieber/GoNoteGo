@@ -21,7 +21,6 @@ class Uploader:
     self._client: Optional[WebClient] = None
     self._channel_id: Optional[str] = None
     self._thread_ts: Optional[str] = None
-    self._first_message_ts: Optional[str] = None
     self._session_started: bool = False
     self._indent_level: int = 0
     self._session_notes: List[str] = []
@@ -78,7 +77,6 @@ class Uploader:
           text=message_text
       )
       self._thread_ts = response['ts']
-      self._first_message_ts = response['ts']  # Store for later updates
       self._session_started = True
       self._session_notes = [first_note]  # Start collecting notes for the session
       return True
@@ -108,20 +106,20 @@ class Uploader:
           text=formatted_text,
           thread_ts=self._thread_ts
       )
-      
+
       # Start a background thread to clean up typos
       if response and 'ts' in response:
         message_ts = response['ts']
         self._start_typo_correction_thread(text, channel_id, message_ts, indent_level)
-      
+
       # Add to session notes for later summarization
       self._session_notes.append(text)
-      
+
       return True
     except SlackApiError as e:
       logger.error(f"Error sending note to thread: {e}")
       return False
-      
+
   def _start_typo_correction_thread(self, text: str, channel_id: str, message_ts: str, indent_level: int) -> None:
     """Start a background thread to correct typos in the note."""
     thread = threading.Thread(
@@ -130,7 +128,7 @@ class Uploader:
         daemon=True
     )
     thread.start()
-    
+
   def _correct_typos_and_update(self, text: str, channel_id: str, message_ts: str, indent_level: int) -> None:
     """Correct typos in the text and update the Slack message."""
     try:
@@ -143,11 +141,11 @@ class Uploader:
                                        "with no explanations or additional commentary."},
           {"role": "user", "content": f"Correct obvious typos in this text, but preserve the character and style: {text}"}
       ]
-      
+
       # Get the corrected text from the LLM
       response = assistant_commands.chat_completion(messages)
       corrected_text = response.choices[0].message.content.strip()
-      
+
       # Only update if there were changes and the message isn't empty
       if corrected_text and corrected_text != text:
         # Format the text based on indentation
@@ -156,7 +154,7 @@ class Uploader:
           bullet = "•"
           indentation = "  " * (indent_level - 1)
           formatted_text = f"{indentation}{bullet} {corrected_text}"
-          
+
         # Update the message in Slack
         self.client.chat_update(
             channel=channel_id,
@@ -217,21 +215,20 @@ class Uploader:
   def end_session(self) -> None:
     """End the current session."""
     # Start the summarization thread if we have a valid session with notes
-    if self._session_started and self._first_message_ts and self._session_notes:
+    if self._session_started and self.thread_ts and self._session_notes:
       channel_id = self._get_channel_id()
       self._start_session_summary_thread(
-          channel_id, 
-          self._first_message_ts, 
+          channel_id,
+          self._thread_ts,
           self._session_notes.copy()
       )
-    
+
     # Reset session state
     self._thread_ts = None
-    self._first_message_ts = None
     self._session_started = False
     self._indent_level = 0
     self._session_notes = []
-    
+
   def _start_session_summary_thread(self, channel_id: str, message_ts: str, session_notes: List[str]) -> None:
     """Start a background thread to summarize the session and update the top message."""
     thread = threading.Thread(
@@ -240,7 +237,7 @@ class Uploader:
         daemon=True
     )
     thread.start()
-    
+
   def _summarize_session_and_update(self, channel_id: str, message_ts: str, session_notes: List[str]) -> None:
     """Summarize the session and update the top-level message."""
     try:
@@ -253,15 +250,15 @@ class Uploader:
                                       "(Low/Medium/High), estimated reading time, and relevant #tags."},
           {"role": "user", "content": f"Here's a note-taking session. Please summarize it and provide metadata:\n\n{all_notes}"}
       ]
-      
+
       # Get the summary from the LLM
       response = assistant_commands.chat_completion(messages)
       summary = response.choices[0].message.content.strip()
-      
+
       # Update the top-level message in Slack
       first_note = session_notes[0] if session_notes else ""
       updated_message = f"{first_note}\n\n{summary}\n\n:keyboard: Go Note Go thread."
-      
+
       # Update the message in Slack
       self.client.chat_update(
           channel=channel_id,
