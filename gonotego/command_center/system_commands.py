@@ -80,6 +80,12 @@ def say(text):
 @register_command('say_openai {}')
 def say_with_openai(text):
   import openai
+  from gonotego.command_center import llm_provider
+  
+  if not llm_provider.has_openai_key():
+    say("No OpenAI API key available")
+    return
+    
   client = openai.OpenAI(api_key=settings.get('OPENAI_API_KEY'))
   response = client.audio.speech.create(
       model="tts-1",

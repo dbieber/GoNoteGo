@@ -41,8 +41,8 @@ Some ideas for commands include:
 * Calculator
 * Sending messages
 * Setting alarms
-* Programming with Codex
-* Question answering
+* Programming with AI assistants (GPT-4, Claude 3.7 Sonnet)
+* Question answering with AI
 * Hearing the Time
 
 ## Hardware Parts
@@ -66,6 +66,32 @@ See the [hardware guide](hardware.md) to know exactly what to buy.
 ## Installation
 
 See the [installation instructions](installation.md) to get started.
+
+## LLM Configuration
+
+Go Note Go supports multiple LLM providers for AI assistant features:
+
+* **OpenAI**: Configure with your OpenAI API key to use GPT-4
+* **Anthropic**: Configure with your Anthropic API key to use Claude 3.7 Sonnet
+
+### Configuration
+
+In `secure_settings.py`, set the following:
+
+```python
+OPENAI_API_KEY = 'your-openai-api-key'  # Required for OpenAI models
+ANTHROPIC_API_KEY = 'your-anthropic-api-key'  # Required for Claude models
+LLM_PROVIDER = 'openai'  # Options: 'openai', 'anthropic'
+```
+
+### Available Commands
+
+* `:ai` - Use the default AI model based on your configured provider
+* `:gpt4` - Specifically use GPT-4 (requires OpenAI API key)
+* `:sonnet37` - Specifically use Claude 3.7 Sonnet (requires Anthropic API key)
+* `:set_llm openai` - Switch to using OpenAI models
+* `:set_llm anthropic` - Switch to using Anthropic models
+* `:llm_status` - Check current LLM configuration
 
 ## History
 
