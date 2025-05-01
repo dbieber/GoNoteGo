@@ -40,7 +40,7 @@ dependencies = [
   'soundfile',
   'supervisor<=4.2.4',
   'twython<=3.9.1',
-  "urllib3==1.26.19",  # For compatibility with selenium==3.141.0
+  "urllib3==2.4.0",  # For compatibility with selenium==3.141.0
 ]
 
 [project.optional-dependencies]
