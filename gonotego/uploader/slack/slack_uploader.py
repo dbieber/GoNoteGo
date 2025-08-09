@@ -159,7 +159,7 @@ class Uploader:
 Original text: {original_text}"""
 
       message = client.messages.create(
-        model="claude-4-opus",
+        model="claude-opus-4-1-20250805",
         max_tokens=5000,
         temperature=0.7,
         messages=[
@@ -198,9 +198,9 @@ Session notes:
 {thread_text}"""
 
       message = client.messages.create(
-        model="claude-3-5-opus-20241022",
-        max_tokens=1000,
-        temperature=0.3,
+        model="claude-opus-4-1-20250805",
+        max_tokens=5000,
+        temperature=0.7,
         messages=[
           {"role": "user", "content": prompt}
         ]
