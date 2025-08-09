@@ -43,6 +43,11 @@ class Uploader:
     if self._channel_id:
       return self._channel_id
 
+    channel_id = settings.get('SLACK_CHANNEL_ID')
+    if channel_id is not None:
+      self._channel_id = channel_id
+      return self._channel_id
+
     channel_name = settings.get('SLACK_CHANNEL')
     if not channel_name:
       logger.error("Missing Slack channel name in settings")

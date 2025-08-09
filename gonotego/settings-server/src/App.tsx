@@ -43,6 +43,7 @@ const SettingsUI = () => {
     NOTION_INTEGRATION_TOKEN: '',
     NOTION_DATABASE_ID: '',
     SLACK_API_TOKEN: '',
+    SLACK_CHANNEL_ID: '',
     SLACK_CHANNEL: '',
     TWITTER_API_KEY: '',
     TWITTER_API_SECRET: '',
@@ -727,6 +728,7 @@ const SettingsUI = () => {
       {renderSettingGroup('Slack', 'Slack integration settings', [
         { key: 'SLACK_API_TOKEN', label: 'API Token', type: 'password', tip: 'Bot token starting with xoxb-' },
         { key: 'SLACK_CHANNEL', label: 'Channel Name', tip: 'Channel name without the # symbol' },
+        { key: 'SLACK_CHANNEL_ID', label: 'Channel Id', tip: 'Channel ID' },
       ], shouldShowSection('slack'))}
 
       {renderSettingGroup('Twitter API', 'Twitter API credentials', [
