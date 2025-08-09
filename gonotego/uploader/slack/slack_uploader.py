@@ -168,6 +168,7 @@ Original text: {original_text}"""
       )
 
       cleaned_text = message.content[0].text.strip()
+      logger.warning(f"Cleaned text: {cleaned_text}")
 
       # Update the message in Slack
       channel_id = self._get_channel_id()
