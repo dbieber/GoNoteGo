@@ -133,7 +133,7 @@ class Uploader:
       )
 
       # Track the message
-      logger.debug(f"Sent note to thread: {response}")
+      logger.warning(f"Sent note to thread: {response}")
       self._message_timestamps.append(response['ts'])
       self._session_messages.append({'ts': response['ts'], 'text': text})
 
