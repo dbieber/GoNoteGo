@@ -133,6 +133,7 @@ class Uploader:
       )
 
       # Track the message
+      logger.debug(f"Sent note to thread: {response}")
       self._message_timestamps.append(response['ts'])
       self._session_messages.append({'ts': response['ts'], 'text': text})
 
@@ -153,7 +154,7 @@ class Uploader:
         return
 
       # Call Claude to clean up the message
-      prompt = f"""Clean up this voice-transcribed note to be clear and concise. Fix any transcription errors, grammar, and formatting. Keep the core meaning intact but make it more readable. Return only the cleaned text without any explanation or metadata.
+      prompt = f"""Clean up this message. Fix any obvious typographic issues, but keep any stylistic choices that convey emotion, tone, or emphasis. Only clean up typos that were unintentional mistakes. Output the full cleaned text without any explanation or metadata.
 
 Original text: {original_text}"""
 
