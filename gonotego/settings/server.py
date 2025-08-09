@@ -34,6 +34,7 @@ SENSITIVE_KEYS = [
     'EMAIL_PASSWORD',
     'DROPBOX_ACCESS_TOKEN',
     'OPENAI_API_KEY',
+    'ANTHROPIC_API_KEY',
 ]
 
 class SettingsCombinedHandler(BaseHTTPRequestHandler):
