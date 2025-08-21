@@ -151,8 +151,12 @@ class Uploader:
       self._is_waiting_for_summary = False
 
       # Schedule cleanup for the first message
-      self._executor.submit(self._cleanup_message_async, first_note,
-                           header_response['ts'], self._current_session)
+      self._executor.submit(
+          self._cleanup_message_async,
+          first_note,
+          header_response['ts'],
+          self._current_session
+      )
 
       return True
     except SlackApiError as e:
@@ -220,9 +224,9 @@ class Uploader:
     # Update cleaned reply
     try:
       self.client.chat_update(
-        channel=session['channel_id'],
-        ts=session['cleaned_reply_ts'],
-        text=cleaned_content
+          channel=session['channel_id'],
+          ts=session['cleaned_reply_ts'],
+          text=cleaned_content
       )
     except SlackApiError as e:
       logger.error(f"Error updating cleaned reply: {e}")
@@ -230,9 +234,9 @@ class Uploader:
     # Update raw reply
     try:
       self.client.chat_update(
-        channel=session['channel_id'],
-        ts=session['raw_reply_ts'],
-        text=raw_content
+          channel=session['channel_id'],
+          ts=session['raw_reply_ts'],
+          text=raw_content
       )
     except SlackApiError as e:
       logger.error(f"Error updating raw reply: {e}")
@@ -261,8 +265,11 @@ class Uploader:
     if len(self._current_session['session_messages']) == 2:
       try:
         header_text = f":wip: {self._current_session['last_summary']} :thread:"
-        self._update_message(self._current_session['channel_id'],
-                           self._current_session['thread_ts'], header_text)
+        self._update_message(
+            self._current_session['channel_id'],
+            self._current_session['thread_ts'],
+            header_text,
+        )
       except SlackApiError as e:
         logger.error(f"Error updating header with thread indicator: {e}")
 
@@ -270,16 +277,24 @@ class Uploader:
     self._update_replies(self._current_session)
 
     # Schedule cleanup for this message
-    self._executor.submit(self._cleanup_message_async, formatted_text, msg_ts,
-                         self._current_session)
+    self._executor.submit(
+        self._cleanup_message_async,
+        formatted_text,
+        msg_ts,
+        self._current_session,
+    )
 
     # Request summary with smart debouncing
     self._request_summary_smart()
 
     return True
 
-  def _cleanup_message_async(self, original_text: str, message_ts: str,
-                            session: SessionState):
+  def _cleanup_message_async(
+      self,
+      original_text: str,
+      message_ts: str,
+      session: SessionState,
+  ):
     """Clean up a message using Claude in the background."""
     try:
       client = self._get_anthropic_client()
@@ -293,12 +308,12 @@ class Uploader:
 Original text: {original_text}"""
 
       message = client.messages.create(
-        model="claude-opus-4-1-20250805",
-        max_tokens=5000,
-        temperature=0.7,
-        messages=[
-          {"role": "user", "content": prompt}
-        ]
+          model="claude-opus-4-1-20250805",
+          max_tokens=5000,
+          temperature=0.7,
+          messages=[
+              {"role": "user", "content": prompt}
+          ]
       )
 
       cleaned_text = message.content[0].text.strip()
@@ -334,12 +349,12 @@ Session notes:
 {thread_text}"""
 
       message = client.messages.create(
-        model="claude-opus-4-1-20250805",
-        max_tokens=200,
-        temperature=0.7,
-        messages=[
-          {"role": "user", "content": prompt}
-        ]
+          model="claude-opus-4-1-20250805",
+          max_tokens=200,
+          temperature=0.7,
+          messages=[
+              {"role": "user", "content": prompt}
+          ]
       )
 
       summary = message.content[0].text.strip()
