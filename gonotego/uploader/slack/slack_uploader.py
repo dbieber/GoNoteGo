@@ -2,8 +2,10 @@
 
 import anthropic
 import logging
+import time
+import threading
 from concurrent.futures import ThreadPoolExecutor
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, TypedDict
 
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
@@ -14,19 +16,36 @@ from gonotego.settings import settings
 logger = logging.getLogger(__name__)
 
 
+class SessionState(TypedDict):
+  """State for a single Slack session."""
+  thread_ts: str
+  channel_id: str
+  cleaned_reply_ts: str
+  raw_reply_ts: str
+  session_messages: List[Dict[str, str]]
+  cleaned_messages: Dict[str, str]
+  last_summary: str
+
+
 class Uploader:
   """Uploader implementation for Slack."""
 
   def __init__(self):
     self._client: Optional[WebClient] = None
     self._channel_id: Optional[str] = None
-    self._thread_ts: Optional[str] = None
     self._session_started: bool = False
     self._indent_level: int = 0
-    self._message_timestamps: List[str] = []
-    self._session_messages: List[Dict[str, str]] = []
     self._executor = ThreadPoolExecutor(max_workers=5)
     self._anthropic_client = None
+
+    # Current session state
+    self._current_session: Optional[SessionState] = None
+
+    # Summary debouncing and version tracking
+    self._summary_timer: Optional[threading.Timer] = None
+    self._summary_request_version: int = 0
+    self._latest_summary_version: int = 0
+    self._is_waiting_for_summary: bool = False
 
   @property
   def client(self) -> WebClient:
@@ -89,33 +108,140 @@ class Uploader:
     """Start a new session thread in the configured Slack channel."""
     channel_id = self._get_channel_id()
 
-    # Create the initial message with the note content
     try:
-      message_text = f":wip: {first_note}"
-      response = self.client.chat_postMessage(
+      # Create the header message
+      header_text = f":wip: {first_note}"
+      header_response = self.client.chat_postMessage(
           channel=channel_id,
-          text=message_text
+          text=header_text
       )
-      self._thread_ts = response['ts']
-      self._session_started = True
-      self._message_timestamps = [response['ts']]
-      self._session_messages = [{'ts': response['ts'], 'text': first_note}]
+      thread_ts = header_response['ts']
 
-      # Schedule cleanup for first message
-      self._executor.submit(self._cleanup_message_async, first_note, response['ts'])
+      # Create the first reply (cleaned content - initially raw)
+      cleaned_reply_response = self.client.chat_postMessage(
+          channel=channel_id,
+          text=first_note,
+          thread_ts=thread_ts
+      )
+      cleaned_reply_ts = cleaned_reply_response['ts']
+
+      # Create the second reply (raw content)
+      raw_reply_response = self.client.chat_postMessage(
+          channel=channel_id,
+          text=first_note,
+          thread_ts=thread_ts
+      )
+      raw_reply_ts = raw_reply_response['ts']
+
+      # Create session state
+      self._current_session = SessionState(
+          thread_ts=thread_ts,
+          channel_id=channel_id,
+          cleaned_reply_ts=cleaned_reply_ts,
+          raw_reply_ts=raw_reply_ts,
+          session_messages=[{'ts': header_response['ts'], 'text': first_note}],
+          cleaned_messages={},
+          last_summary=first_note
+      )
+
+      # Initialize tracking
+      self._session_started = True
+      self._summary_request_version = 0
+      self._latest_summary_version = 0
+      self._is_waiting_for_summary = False
+
+      # Schedule cleanup for the first message
+      self._executor.submit(self._cleanup_message_async, first_note,
+                           header_response['ts'], self._current_session)
 
       return True
     except SlackApiError as e:
       logger.error(f"Error starting session: {e}")
       return False
 
-  def _send_note_to_thread(self, text: str, indent_level: int = 0) -> bool:
-    """Send a note as a reply in the current thread."""
-    if not self._thread_ts:
-      logger.error("Trying to send to thread but no thread exists")
-      return False
+  def _request_summary_smart(self):
+    """Request a summary with smart debouncing."""
+    if not self._current_session:
+      return
 
-    channel_id = self._get_channel_id()
+    if not self._is_waiting_for_summary:
+      # Not waiting, send request immediately
+      self._is_waiting_for_summary = True
+      self._summary_request_version += 1
+      version = self._summary_request_version
+      self._executor.submit(self._summarize_session_async, version, self._current_session)
+
+      # Set timer to reset waiting flag
+      self._summary_timer = threading.Timer(0.5, self._reset_summary_waiting)
+      self._summary_timer.start()
+    else:
+      # Already waiting, cancel existing timer and set new one
+      if self._summary_timer:
+        self._summary_timer.cancel()
+
+      # Set new timer to send request after 0.5s
+      self._summary_timer = threading.Timer(0.5, self._send_summary_request)
+      self._summary_timer.start()
+
+  def _reset_summary_waiting(self):
+    """Reset the waiting flag after debounce period."""
+    self._is_waiting_for_summary = False
+
+  def _send_summary_request(self):
+    """Send a summary request after debounce period."""
+    self._is_waiting_for_summary = False
+    if not self._current_session:
+      return
+    self._summary_request_version += 1
+    version = self._summary_request_version
+    self._executor.submit(self._summarize_session_async, version, self._current_session)
+
+  def _update_replies(self, session: SessionState):
+    """Update both reply messages with current content."""
+    if not session['thread_ts'] or not session['cleaned_reply_ts'] or not session['raw_reply_ts']:
+      return
+
+    # Compile cleaned content (use cleaned version if available, else raw)
+    cleaned_content_parts = []
+    for msg in session['session_messages']:
+      ts = msg['ts']
+      text = msg['text']
+      # Use cleaned version if available
+      if ts in session['cleaned_messages']:
+        cleaned_content_parts.append(session['cleaned_messages'][ts])
+      else:
+        cleaned_content_parts.append(text)
+
+    cleaned_content = '\n'.join(cleaned_content_parts)
+
+    # Compile raw content
+    raw_content = '\n'.join([msg['text'] for msg in session['session_messages']])
+
+    # Update cleaned reply
+    try:
+      self.client.chat_update(
+        channel=session['channel_id'],
+        ts=session['cleaned_reply_ts'],
+        text=cleaned_content
+      )
+    except SlackApiError as e:
+      logger.error(f"Error updating cleaned reply: {e}")
+
+    # Update raw reply
+    try:
+      self.client.chat_update(
+        channel=session['channel_id'],
+        ts=session['raw_reply_ts'],
+        text=raw_content
+      )
+    except SlackApiError as e:
+      logger.error(f"Error updating raw reply: {e}")
+
+  def _send_note_to_thread(self, text: str, indent_level: int = 0) -> bool:
+    """Add a note to the session and update reply messages."""
+    if not self._current_session:
+      logger.error("Trying to send to thread but no session exists")
+      return False
 
     # Format the text based on indentation
     formatted_text = text
@@ -125,27 +251,35 @@ class Uploader:
       indentation = "  " * (indent_level - 1)
       formatted_text = f"{indentation}{bullet} {text}"
 
-    try:
-      response = self.client.chat_postMessage(
-          channel=channel_id,
-          text=formatted_text,
-          thread_ts=self._thread_ts
-      )
+    # Generate a unique timestamp for this message
+    msg_ts = str(time.time())
 
-      # Track the message
-      logger.warning(f"Sent note to thread: {response}")
-      self._message_timestamps.append(response['ts'])
-      self._session_messages.append({'ts': response['ts'], 'text': text})
+    # Track the message in current session
+    self._current_session['session_messages'].append({'ts': msg_ts, 'text': formatted_text})
 
-      # Schedule cleanup for this message
-      self._executor.submit(self._cleanup_message_async, text, response['ts'])
+    # Update header to add :thread: if this is the second message
+    if len(self._current_session['session_messages']) == 2:
+      try:
+        header_text = f":wip: {self._current_session['last_summary']} :thread:"
+        self._update_message(self._current_session['channel_id'],
+                           self._current_session['thread_ts'], header_text)
+      except SlackApiError as e:
+        logger.error(f"Error updating header with thread indicator: {e}")
 
-      return True
-    except SlackApiError as e:
-      logger.error(f"Error sending note to thread: {e}")
-      return False
+    # Update both reply messages
+    self._update_replies(self._current_session)
 
-  def _cleanup_message_async(self, original_text: str, message_ts: str):
+    # Schedule cleanup for this message
+    self._executor.submit(self._cleanup_message_async, formatted_text, msg_ts,
+                         self._current_session)
+
+    # Request summary with smart debouncing
+    self._request_summary_smart()
+
+    return True
+
+  def _cleanup_message_async(self, original_text: str, message_ts: str,
+                            session: SessionState):
     """Clean up a message using Claude in the background."""
     try:
       client = self._get_anthropic_client()
@@ -154,7 +288,7 @@ class Uploader:
         return
 
       # Call Claude to clean up the message
-      prompt = f"""Clean up this message. Fix any obvious typographic issues, but keep any stylistic choices that convey emotion, tone, or emphasis. Only clean up typos that were unintentional mistakes. Output the full cleaned text without any explanation or metadata.
+      prompt = f"""Clean up this message. Fix any obvious typographic issues, but keep any stylistic choices that convey emotion, tone, or emphasis. Only clean up typos that were unintentional mistakes. Output the full cleaned text without any explanation or metadata. If you cannot clean the text, state it unchanged.
 
 Original text: {original_text}"""
 
@@ -168,16 +302,18 @@ Original text: {original_text}"""
       )
 
       cleaned_text = message.content[0].text.strip()
-      logger.warning(f"Cleaned text: {cleaned_text}")
+      logger.debug(f"Cleaned text: {cleaned_text}")
 
-      # Update the message in Slack
-      channel_id = self._get_channel_id()
-      self._update_message(channel_id, message_ts, cleaned_text)
+      # Store the cleaned message in session
+      session['cleaned_messages'][message_ts] = cleaned_text
+
+      # Update the cleaned reply message
+      self._update_replies(session)
 
     except Exception as e:
       logger.error(f"Error cleaning up message: {e}")
 
-  def _summarize_session_async(self):
+  def _summarize_session_async(self, version: int, session: SessionState):
     """Summarize the entire session using Claude Opus 4."""
     try:
       client = self._get_anthropic_client()
@@ -185,21 +321,21 @@ Original text: {original_text}"""
         logger.debug("Anthropic client not available, skipping summarization")
         return
 
-      if not self._session_messages or not self._thread_ts:
+      if not session['session_messages']:
         logger.debug("No messages to summarize")
         return
 
       # Compile all messages into a thread
-      thread_text = "\n".join([msg['text'] for msg in self._session_messages])
+      thread_text = "\n".join([msg['text'] for msg in session['session_messages']])
 
-      prompt = f"""Please provide a concise summary of this note-taking session. Identify the main topics, key points, and any action items. Format the summary clearly with bullet points where appropriate.
+      prompt = f"""Please provide a concise one-line summary of this note-taking session. Be very brief and focus on the main topic or purpose.
 
 Session notes:
 {thread_text}"""
 
       message = client.messages.create(
         model="claude-opus-4-1-20250805",
-        max_tokens=5000,
+        max_tokens=200,
         temperature=0.7,
         messages=[
           {"role": "user", "content": prompt}
@@ -208,12 +344,18 @@ Session notes:
 
       summary = message.content[0].text.strip()
 
-      # Update the top-level message with the summary
-      channel_id = self._get_channel_id()
-      original_text = self._session_messages[0]['text'] if self._session_messages else ""
-      updated_text = f":memo: **Session Summary**\n\n{summary}\n\n---\n_Original first note: {original_text}_"
+      # Only update if this version is the latest
+      if version >= self._latest_summary_version:
+        self._latest_summary_version = version
+        session['last_summary'] = summary
 
-      self._update_message(channel_id, self._thread_ts, updated_text)
+        # Determine status indicators
+        has_thread = len(session['session_messages']) > 1
+        thread_indicator = " :thread:" if has_thread else ""
+
+        # Update header (keeping :wip: for now, will be removed in end_session)
+        header_text = f":wip: {summary}{thread_indicator}"
+        self._update_message(session['channel_id'], session['thread_ts'], header_text)
 
     except Exception as e:
       logger.error(f"Error summarizing session: {e}")
@@ -278,16 +420,41 @@ Session notes:
 
   def end_session(self) -> None:
     """End the current session."""
-    # Schedule session summarization before clearing
-    if self._session_started and self._session_messages:
-      self._executor.submit(self._summarize_session_async)
+    # Remove :wip: from header and trigger final summary
+    if self._session_started and self._current_session:
+      try:
+        # Cancel any pending summary timer
+        if self._summary_timer:
+          self._summary_timer.cancel()
+
+        # Request final summary
+        if self._current_session['session_messages']:
+          self._summary_request_version += 1
+          self._executor.submit(self._summarize_session_async,
+                              self._summary_request_version,
+                              self._current_session)
+
+        # Update header to remove :wip:
+        has_thread = len(self._current_session['session_messages']) > 1
+        thread_indicator = " :thread:" if has_thread else ""
+        header_text = f"{self._current_session['last_summary']}{thread_indicator}"
+        self._update_message(self._current_session['channel_id'],
+                           self._current_session['thread_ts'],
+                           header_text)
+
+      except Exception as e:
+        logger.error(f"Error finalizing session: {e}")
 
     # Clear session state
-    self._thread_ts = None
+    self._current_session = None
     self._session_started = False
     self._indent_level = 0
-    self._message_timestamps = []
-    self._session_messages = []
+    self._summary_request_version = 0
+    self._latest_summary_version = 0
+    self._is_waiting_for_summary = False
+    if self._summary_timer:
+      self._summary_timer.cancel()
+      self._summary_timer = None
 
   def handle_inactivity(self) -> None:
     """Handle inactivity by ending the session and clearing client."""
@@ -302,6 +469,6 @@ Session notes:
     self._anthropic_client = None
 
   def __del__(self):
-    """Cleanup executor on deletion."""
-    if hasattr(self, '_executor'):
-      self._executor.shutdown(wait=False)
+    """Cleanup executor and timer on deletion."""
+    self._executor.shutdown(wait=False)
+    self._summary_timer.cancel()
