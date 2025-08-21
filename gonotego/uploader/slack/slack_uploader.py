@@ -25,6 +25,7 @@ class SessionState(TypedDict):
   session_messages: List[Dict[str, str]]
   cleaned_messages: Dict[str, str]
   last_summary: str
+  is_active: bool
 
 
 class Uploader:
@@ -33,7 +34,6 @@ class Uploader:
   def __init__(self):
     self._client: Optional[WebClient] = None
     self._channel_id: Optional[str] = None
-    self._session_started: bool = False
     self._indent_level: int = 0
     self._executor = ThreadPoolExecutor(max_workers=5)
     self._anthropic_client = None
@@ -141,11 +141,11 @@ class Uploader:
           raw_reply_ts=raw_reply_ts,
           session_messages=[{'ts': header_response['ts'], 'text': first_note}],
           cleaned_messages={},
-          last_summary=first_note
+          last_summary=first_note,
+          is_active=True
       )
 
       # Initialize tracking
-      self._session_started = True
       self._summary_request_version = 0
       self._latest_summary_version = 0
       self._is_waiting_for_summary = False
@@ -353,8 +353,9 @@ Session notes:
         has_thread = len(session['session_messages']) > 1
         thread_indicator = " :thread:" if has_thread else ""
 
-        # Update header (keeping :wip: for now, will be removed in end_session)
-        header_text = f":wip: {summary}{thread_indicator}"
+        # Only add :wip: if this session is still active
+        wip_indicator = ":wip: " if session['is_active'] else ""
+        header_text = f"{wip_indicator}{summary}{thread_indicator}"
         self._update_message(session['channel_id'], session['thread_ts'], header_text)
 
     except Exception as e:
@@ -403,7 +404,7 @@ Session notes:
           continue
 
         # Start a new session for the first note
-        if not self._session_started:
+        if not self._current_session:
           success = self._start_session(text)
         else:
           # Send as a reply to the thread with proper indentation
@@ -420,21 +421,23 @@ Session notes:
 
   def end_session(self) -> None:
     """End the current session."""
-    # Remove :wip: from header and trigger final summary
-    if self._session_started and self._current_session:
+    if self._current_session:
       try:
+        # Mark session as inactive
+        self._current_session['is_active'] = False
+
         # Cancel any pending summary timer
         if self._summary_timer:
           self._summary_timer.cancel()
 
-        # Request final summary
+        # Request final summary (will see is_active=False and not add :wip:)
         if self._current_session['session_messages']:
           self._summary_request_version += 1
           self._executor.submit(self._summarize_session_async,
                               self._summary_request_version,
                               self._current_session)
 
-        # Update header to remove :wip:
+        # Update header to remove :wip: immediately
         has_thread = len(self._current_session['session_messages']) > 1
         thread_indicator = " :thread:" if has_thread else ""
         header_text = f"{self._current_session['last_summary']}{thread_indicator}"
@@ -447,7 +450,6 @@ Session notes:
 
     # Clear session state
     self._current_session = None
-    self._session_started = False
     self._indent_level = 0
     self._summary_request_version = 0
     self._latest_summary_version = 0
