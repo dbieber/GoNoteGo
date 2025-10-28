@@ -8,30 +8,30 @@ register_command = registry.register_command
 say = system_commands.say
 
 
-# Predefined profile shortcuts
-PROFILE_SHORTCUTS = {
-    '1': 'roam',
-    '2': 'work',
-    '3': 'assistant',
-    '4': 'guest',
-}
-
-
 @register_command('{}')
 def load_profile_shortcut(shortcut):
-  """Load a profile using numeric shortcut (e.g., :1 for roam)."""
-  if shortcut not in PROFILE_SHORTCUTS:
+  """Load a profile using numeric shortcut (e.g., :1, :2, :3)."""
+  # Check if this is a numeric shortcut
+  if not shortcut.isdigit():
     return  # Not a profile shortcut, let other commands handle it
 
-  profile_name = PROFILE_SHORTCUTS[shortcut]
+  profile_name = profiles.get_profile_by_shortcut(shortcut)
+  if profile_name is None:
+    return  # No profile mapped to this shortcut
+
   result = profiles.load_profile(profile_name)
 
   if result is None:
-    say(f'Profile {profile_name} not found. Creating from current settings.')
-    profiles.save_profile(profile_name)
-    say(f'Saved current settings as {profile_name}.')
+    say(f'Profile {profile_name} not found.')
   else:
     say(f'Loaded profile: {profile_name}')
+
+
+@register_command('profile save {} {}')
+def save_profile_with_shortcut(profile_name, shortcut):
+  """Save current settings as a named profile with a shortcut."""
+  profiles.save_profile(profile_name, shortcut=shortcut)
+  say(f'Saved profile: {profile_name} with shortcut :{shortcut}')
 
 
 @register_command('profile save {}')
@@ -53,7 +53,7 @@ def load_profile(profile_name):
 
 @register_command('profile list')
 def list_profiles():
-  """List all saved profiles."""
+  """List all saved profiles with their shortcuts."""
   profile_names = profiles.list_profiles()
   if not profile_names:
     say('No profiles saved.')
@@ -76,14 +76,3 @@ def delete_profile(profile_name):
   """Delete a saved profile."""
   profiles.delete_profile(profile_name)
   say(f'Deleted profile: {profile_name}')
-
-
-@register_command('profile init')
-def init_default_profiles():
-  """Initialize default profiles (roam, work, assistant, guest) from current settings."""
-  current_settings = profiles.get_all_settings()
-
-  for shortcut, profile_name in PROFILE_SHORTCUTS.items():
-    profiles.save_profile(profile_name)
-
-  say('Initialized default profiles: roam, work, assistant, guest')

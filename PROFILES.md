@@ -1,30 +1,27 @@
 # Go Note Go Profiles
 
-Profiles allow you to quickly switch between different Go Note Go configurations. Each profile stores a complete snapshot of all settings.
+Profiles allow you to quickly switch between different Go Note Go configurations. Each profile stores a complete snapshot of all settings, plus a name and optional numeric shortcut.
 
 ## Quick Start
 
-### Initialize Default Profiles
+### Create Your First Profile
 
-First, set up your settings the way you want them, then run:
+Set up your settings the way you want them, then save as a profile with a shortcut:
+
 ```
-:profile init
+:profile save roam 1
 ```
 
-This creates four default profiles:
-- `roam` (shortcut: `:1`)
-- `work` (shortcut: `:2`)
-- `assistant` (shortcut: `:3`)
-- `guest` (shortcut: `:4`)
+This creates a profile named "roam" with shortcut `:1`.
 
 ### Switch Between Profiles
 
-Use the numeric shortcuts:
+Use the numeric shortcuts you've configured:
 ```
-:1    # Switch to roam profile
-:2    # Switch to work profile
-:3    # Switch to assistant profile
-:4    # Switch to guest profile
+:1    # Switch to profile with shortcut 1
+:2    # Switch to profile with shortcut 2
+:3    # Switch to profile with shortcut 3
+:4    # Switch to profile with shortcut 4
 ```
 
 Or use the full command:
@@ -36,21 +33,32 @@ Or use the full command:
 
 ### Save a Profile
 ```
-:profile save <name>
+:profile save <name>              # Save without shortcut
+:profile save <name> <number>     # Save with numeric shortcut
 ```
-Saves your current settings as a named profile.
+
+Examples:
+```
+:profile save roam 1              # Save as "roam" with shortcut :1
+:profile save work 2              # Save as "work" with shortcut :2
+:profile save temp                # Save as "temp" with no shortcut
+```
 
 ### Load a Profile
 ```
-:profile load <name>
+:profile load <name>              # Load by name
+:<number>                         # Load by shortcut (if configured)
 ```
-Loads all settings from the specified profile. Your current settings are automatically backed up to the `backup` profile before loading.
+
+Your current settings are automatically backed up to the `backup` profile before loading.
 
 ### List Profiles
 ```
 :profile list
 ```
-Shows all saved profiles.
+Shows all saved profiles with their shortcuts (if any).
+
+Example output: `Profiles: backup, roam (:1), temp, work (:2)`
 
 ### Current Profile
 ```
@@ -62,30 +70,46 @@ Shows which profile is currently active.
 ```
 :profile delete <name>
 ```
-Deletes a saved profile.
+Deletes a saved profile and removes its shortcut mapping.
 
 ## Example Use Cases
 
 ### Personal vs Work
-- Profile 1 (roam): Personal Roam graph with your personal account
-- Profile 2 (work): Work Roam graph or different note-taking system
+```
+:profile save personal 1          # Personal Roam graph
+:profile save work 2               # Work note-taking system
+```
+
+Then switch with `:1` or `:2`
 
 ### Different Assistants
-- Profile 3 (assistant): Connected to your personal assistant
-- Profile 4 (guest): Safe settings for letting others try your GNG
+```
+:profile save assistant 3          # Connected to personal assistant
+:profile save guest 4               # Safe settings for demos
+```
 
 ### Different Upload Destinations
-Switch between different note-taking systems (Roam, RemNote, Notion, etc.) with a single command.
+Switch between Roam, RemNote, Notion, etc. with a single command.
 
 ## How It Works
 
-- Each profile is stored as a JSON blob in Redis containing all setting values
-- When you load a profile, your current settings are automatically backed up
-- The `backup` profile always contains your most recent settings before the last profile switch
-- Settings include: uploader type, credentials, custom command paths, API keys, etc.
+- Each profile stores all settings from `secure_settings.py` as JSON in Redis
+- Profile metadata (name, shortcut) is stored with the settings
+- Shortcuts are mapped dynamically in Redis (no hardcoded values)
+- When you load a profile, current settings are backed up to `backup`
+- The `backup` profile always contains your most recent settings
 
 ## Safety
 
 - Your current settings are always backed up to `backup` before loading a new profile
 - The secure_settings.py file is never modified - profiles only affect Redis settings
-- You can always revert to your previous settings by running `:profile load backup`
+- You can always revert: `:profile load backup`
+- Deleting a profile also removes its shortcut mapping
+
+## Configuration
+
+Profiles are completely user-configurable:
+- Choose your own profile names
+- Assign any numeric shortcuts you want
+- No hardcoded profile names in the codebase
+- Works for any Go Note Go user
