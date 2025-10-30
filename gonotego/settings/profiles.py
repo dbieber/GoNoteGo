@@ -29,20 +29,32 @@ def get_all_settings():
 
 
 def save_profile(profile_name, shortcut=None):
+  backup_profile(profile_name)
+  return save_profile_raw(profile_name, shortcut=shortcut)
+
+
+def save_profile_raw(profile_name, shortcut=None):
   """Save current settings to a named profile.
 
   Args:
-    profile_name: Name of the profile
-    shortcut: Optional numeric shortcut (e.g., '1', '2', '3')
+      profile_name: Name of the profile
+      shortcut: Optional numeric shortcut (e.g., '1', '2', '3')
   """
   r = interprocess.get_redis_client()
   current_settings = get_all_settings()
 
   # Store profile data
   profile_data = {
-    'name': profile_name,
-    'settings': current_settings,
+      'name': profile_name,
+      'settings': current_settings,
   }
+  return save_profile_data(profile_name, profile_data, shortcut=shortcut)
+
+
+def save_profile_data(profile_name, profile_data, shortcut=None):
+  r = interprocess.get_redis_client()
+  current_settings = get_all_settings()
+
   if shortcut is not None:
     profile_data['shortcut'] = shortcut
 
@@ -58,6 +70,23 @@ def save_profile(profile_name, shortcut=None):
   return current_settings
 
 
+def backup_profile(profile_name):
+  profile_data = get_profile_data(profile_name)
+  if profile_data is not None:
+    save_profile_data(f'{profile_name}.backup', profile_data)
+
+
+def get_profile_data(profile_name):
+  r = interprocess.get_redis_client()
+
+  profile_json = r.get(get_redis_key(profile_name))
+  if profile_json is None:
+    return None
+
+  profile_data = json.loads(profile_json)
+  return profile_data
+
+
 def load_profile(profile_name):
   """Load settings from a named profile.
 
@@ -71,11 +100,9 @@ def load_profile(profile_name):
   save_profile('backup', shortcut=None)
 
   # Load the requested profile
-  profile_json = r.get(get_redis_key(profile_name))
-  if profile_json is None:
+  profile_data = get_profile_data(profile_name)
+  if profile_data is None:
     return None
-
-  profile_data = json.loads(profile_json)
   profile_settings = profile_data.get('settings', profile_data)  # Backward compat
 
   # Clear all current settings and load profile settings
@@ -130,7 +157,7 @@ def list_profiles():
       profile_name = key_str[len(f'{PROFILES_KEY}:'):]
       shortcut = name_to_shortcut.get(profile_name)
       if shortcut:
-        profiles_info.append(f"{profile_name} (:{shortcut})")
+        profiles_info.append(f"{profile_name} ({shortcut})")
       else:
         profiles_info.append(profile_name)
 

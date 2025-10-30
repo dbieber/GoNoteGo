@@ -8,15 +8,16 @@ register_command = registry.register_command
 say = system_commands.say
 
 
-@register_command('{}')
+@register_command(r'p(\d)')
 def load_profile_shortcut(shortcut):
-  """Load a profile using numeric shortcut (e.g., :1, :2, :3)."""
+  """Load a profile using numeric shortcut (e.g., :p1, :p2, :p3)."""
   # Check if this is a numeric shortcut
   if not shortcut.isdigit():
-    return  # Not a profile shortcut, let other commands handle it
+    return  # Not a profile shortcut
 
   profile_name = profiles.get_profile_by_shortcut(shortcut)
   if profile_name is None:
+    say(f'Profile {shortcut} not found')
     return  # No profile mapped to this shortcut
 
   result = profiles.load_profile(profile_name)
