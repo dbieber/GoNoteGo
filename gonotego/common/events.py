@@ -46,6 +46,18 @@ class NoteEvent:
   action: Text
   audio_filepath: Text
   timestamp: datetime
+  # Seconds to add to the raw system-clock timestamp to get the alleged time.
+  # Set via ':xtime' when the system clock is known to be wrong (e.g. no
+  # internet while traveling). Notes carry both the raw timestamp and the
+  # offset, so either time can be recovered later.
+  offset: float = 0.0
+
+  @property
+  def effective_timestamp(self):
+    """The timestamp with the alleged-time offset applied."""
+    if self.timestamp is None:
+      return None
+    return self.timestamp + (self.offset or 0.0)
 
   def __bytes__(self):
     return json.dumps(dataclasses.asdict(self)).encode('utf-8')

@@ -10,6 +10,7 @@ from gonotego.command_center import custom_commands  # noqa: F401
 from gonotego.command_center import note_commands  # noqa: F401
 from gonotego.command_center import settings_commands  # noqa: F401
 from gonotego.command_center import system_commands  # noqa: F401
+from gonotego.command_center import time_commands  # noqa: F401
 from gonotego.command_center import twitter_commands  # noqa: F401
 from gonotego.command_center import wifi_commands  # noqa: F401
 from gonotego.command_center import registry

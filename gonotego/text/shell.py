@@ -10,6 +10,7 @@ from gonotego.common import events
 from gonotego.common import interprocess
 from gonotego.common import note_log
 from gonotego.common import status
+from gonotego.common import time_offsets
 from gonotego.settings import settings
 
 Status = status.Status
@@ -75,6 +76,7 @@ class Shell:
 
   def put_note_event(self, note_event, session=True):
     """Logs a note event locally and enqueues it for the uploader."""
+    note_event.offset = time_offsets.get_offset()
     note_log.log(note_event)
     self.note_events_queue.put(bytes(note_event))
     if session:

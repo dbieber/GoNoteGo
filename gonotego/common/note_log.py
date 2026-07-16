@@ -35,12 +35,16 @@ def log(note_event):
     timestamp = note_event.timestamp
     dt = datetime.fromtimestamp(timestamp) if timestamp else datetime.now()
     filepath = os.path.join(NOTE_LOG_DIR, dt.strftime('%Y-%m-%d') + '.jsonl')
+    offset = getattr(note_event, 'offset', 0.0) or 0.0
+    effective_dt = datetime.fromtimestamp(timestamp + offset) if timestamp else dt
     entry = {
         'text': note_event.text,
         'action': note_event.action,
         'audio_filepath': note_event.audio_filepath,
         'timestamp': timestamp,
         'time': dt.isoformat(),
+        'offset': offset,
+        'effective_time': effective_dt.isoformat(),
     }
     with open(filepath, 'a') as f:
       f.write(json.dumps(entry) + '\n')

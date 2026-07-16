@@ -5,6 +5,7 @@ from gonotego.command_center import system_commands
 from gonotego.common import events
 from gonotego.common import interprocess
 from gonotego.common import note_log
+from gonotego.common import time_offsets
 
 
 register_command = registry.register_command
@@ -16,6 +17,7 @@ def get_timestamp():
 
 def put_note_event(note_event):
   """Logs a note event locally and enqueues it for the uploader."""
+  note_event.offset = time_offsets.get_offset()
   note_log.log(note_event)
   interprocess.get_note_events_queue().put(bytes(note_event))
   interprocess.get_note_events_session_queue().put(bytes(note_event))
