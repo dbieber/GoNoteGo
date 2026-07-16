@@ -4,6 +4,7 @@ import time
 from gonotego.common import events
 from gonotego.common import internet
 from gonotego.common import interprocess
+from gonotego.common import note_log
 from gonotego.common import status
 from gonotego.settings import settings
 from gonotego.uploader.email import email_uploader
@@ -68,7 +69,16 @@ def main():
   status.set(Status.UPLOADER_READY, True)
 
   last_upload = None
+  last_cleanup = None
   while True:
+
+    # Once a day, clean up old local note copies -- and even then, only files
+    # older than ~6 months, and only if the disk is under real pressure.
+    if last_cleanup is None or time.time() - last_cleanup > 24 * 60 * 60:
+      last_cleanup = time.time()
+      deleted = note_log.cleanup()
+      if deleted:
+        print(f'Disk pressure: cleaned up {len(deleted)} old local note files.')
 
     # Don't even try uploading notes if we don't have a connection.
     internet.wait_for_internet(on_disconnect=uploader.handle_disconnect)
@@ -105,6 +115,9 @@ def main():
         print('Upload unsuccessful.')
 
       status.set(Status.UPLOADER_ACTIVE, False)
+      # Only remove note events from the queue when the upload succeeded.
+      # On failure the events stay queued for the next attempt, and either
+      # way every note also remains in the durable local note log.
       if upload_successful:
         for note_event_bytes in note_event_bytes_list:
           note_events_queue.commit(note_event_bytes)

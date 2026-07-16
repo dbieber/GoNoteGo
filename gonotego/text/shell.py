@@ -8,6 +8,7 @@ import time
 
 from gonotego.common import events
 from gonotego.common import interprocess
+from gonotego.common import note_log
 from gonotego.common import status
 from gonotego.settings import settings
 
@@ -72,6 +73,13 @@ class Shell:
   def start(self):
     keyboard.on_press(self.on_press)
 
+  def put_note_event(self, note_event, session=True):
+    """Logs a note event locally and enqueues it for the uploader."""
+    note_log.log(note_event)
+    self.note_events_queue.put(bytes(note_event))
+    if session:
+      self.note_events_session_queue.put(bytes(note_event))
+
   def on_press(self, event):
     self.last_press = time.time()
     status.set(Status.TEXT_LAST_KEYPRESS, self.last_press)
@@ -91,8 +99,7 @@ class Shell:
             action=events.UNINDENT,
             audio_filepath=None,
             timestamp=get_timestamp())
-        self.note_events_queue.put(bytes(note_event))
-        self.note_events_session_queue.put(bytes(note_event))
+        self.put_note_event(note_event)
       else:
         # Tab
         note_event = events.NoteEvent(
@@ -100,8 +107,7 @@ class Shell:
             action=events.INDENT,
             audio_filepath=None,
             timestamp=get_timestamp())
-        self.note_events_queue.put(bytes(note_event))
-        self.note_events_session_queue.put(bytes(note_event))
+        self.put_note_event(note_event)
     elif event.name == 'delete' or event.name == 'backspace':
       if self.text == '':
         note_event = events.NoteEvent(
@@ -109,8 +115,7 @@ class Shell:
             action=events.CLEAR_EMPTY,
             audio_filepath=None,
             timestamp=get_timestamp())
-        self.note_events_queue.put(bytes(note_event))
-        self.note_events_session_queue.put(bytes(note_event))
+        self.put_note_event(note_event)
       self.text = self.text[:-1]
       if is_shift_pressed():
         self.text = ''
@@ -126,7 +131,7 @@ class Shell:
             action=events.END_SESSION,
             audio_filepath=None,
             timestamp=get_timestamp())
-        self.note_events_queue.put(bytes(note_event))
+        self.put_note_event(note_event, session=False)
         self.note_events_session_queue.clear()
       # Write both a text event (for the command center)
       # and a note event (for the uploader).
@@ -136,8 +141,7 @@ class Shell:
             action=events.ENTER_EMPTY,
             audio_filepath=None,
             timestamp=get_timestamp())
-        self.note_events_queue.put(bytes(note_event))
-        self.note_events_session_queue.put(bytes(note_event))
+        self.put_note_event(note_event)
       elif self.text.strip().startswith('::'):
         self.text = self.text.strip()[1:]
         self.submit_note()
@@ -164,8 +168,7 @@ class Shell:
           action=events.SUBMIT,
           audio_filepath=None,
           timestamp=get_timestamp())
-      self.note_events_queue.put(bytes(note_event))
-      self.note_events_session_queue.put(bytes(note_event))
+      self.put_note_event(note_event)
       # Reset the text buffer.
       self.text = ''
 
@@ -177,7 +180,7 @@ class Shell:
         action=events.END_SESSION,
         audio_filepath=None,
         timestamp=get_timestamp())
-    self.note_events_queue.put(bytes(note_event))
+    self.put_note_event(note_event, session=False)
     self.note_events_session_queue.clear()
 
   def wait(self):
