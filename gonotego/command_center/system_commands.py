@@ -117,9 +117,20 @@ def flush():
   sys.stderr.flush()
 
 
+def get_repo_dir():
+  return os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
 @register_command('update')
 def update():
-  shell('git pull')
+  """Pull latest main, install deps, verify, and restart -- with rollback.
+
+  The heavy lifting happens in scripts/update.sh, launched detached so it
+  survives the supervisord restart it triggers. The script speaks its
+  progress and never leaves the device stopped on an unverified version.
+  """
+  script = os.path.join(get_repo_dir(), 'scripts', 'update.sh')
+  shell(f'nohup bash {script} >> /tmp/gonotego-update.log 2>&1 &')
 
 
 @register_command('restart')
