@@ -192,9 +192,13 @@ class Uploader:
     flush()
     return browser
 
-  def new_session(self):
+  def new_session(self, note_event=None):
     browser = self.get_browser()
-    time_str = datetime.now().strftime('%H:%M %p')
+    # Title the session with the note's effective time (clock + alleged-time
+    # offset) rather than the time of upload.
+    timestamp = note_event.effective_timestamp if note_event is not None else None
+    dt = datetime.fromtimestamp(timestamp) if timestamp else datetime.now()
+    time_str = dt.strftime('%H:%M %p')
     block_uid = browser.insert_top_level_note(time_str)
     self.session_uid = block_uid
 
@@ -232,7 +236,7 @@ class Uploader:
         self.end_session()
       elif note_event.action == events.SUBMIT:
         if self.session_uid is None:
-          self.new_session()
+          self.new_session(note_event)
         text = note_event.text.strip()
         has_audio = note_event.audio_filepath and os.path.exists(note_event.audio_filepath)
         if has_audio:

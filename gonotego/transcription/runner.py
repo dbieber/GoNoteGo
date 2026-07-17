@@ -4,7 +4,9 @@ import time
 from gonotego.common import events
 from gonotego.common import internet
 from gonotego.common import interprocess
+from gonotego.common import note_log
 from gonotego.common import status
+from gonotego.common import time_offsets
 from gonotego.transcription import transcriber
 
 Status = status.Status
@@ -45,7 +47,9 @@ def main():
               action=events.SUBMIT,
               audio_filepath=event.filepath,
               timestamp=time.time(),
+              offset=time_offsets.get_offset(),
           )
+          note_log.log(note_event)
           note_events_queue.put(bytes(note_event))
           note_events_session_queue.put(bytes(note_event))
 

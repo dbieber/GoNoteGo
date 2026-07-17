@@ -48,6 +48,21 @@ class InterprocessQueue:
     assert self.index >= 0
     assert value == pop_value
 
+  def update_items(self, update_fn):
+    """Applies update_fn to every queued item, in place.
+
+    update_fn receives the item's bytes and returns replacement bytes, or
+    None to leave the item unchanged. Returns the number of items updated.
+    """
+    updated = 0
+    values = self.r.lrange(self.key, 0, -1)
+    for i, value in enumerate(values):
+      new_value = update_fn(value)
+      if new_value is not None and new_value != value:
+        self.r.lset(self.key, i, new_value)
+        updated += 1
+    return updated
+
   def size(self):
     return self.r.llen(self.key) - self.index
 
