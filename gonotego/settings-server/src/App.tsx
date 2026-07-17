@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Eye, EyeOff, Save, Plus, Trash2, Info } from 'lucide-react';
+import { Eye, EyeOff, Save, Plus, Trash2, Info, Wifi, WifiOff, Power } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
@@ -72,6 +72,27 @@ const SettingsUI = () => {
   const [loadingSettings, setLoadingSettings] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [customPath, setCustomPath] = useState('');
+  const [networkStatus, setNetworkStatus] = useState(null);
+  const [wifiTests, setWifiTests] = useState({});
+  const [hotspotStopState, setHotspotStopState] = useState(null);
+
+  // Poll device network status (internet, hotspot, connected network).
+  useEffect(() => {
+    let cancelled = false;
+    const fetchStatus = async () => {
+      try {
+        const response = await fetch('/api/status');
+        if (!response.ok) return;
+        const data = await response.json();
+        if (!cancelled) setNetworkStatus(data);
+      } catch (e) {
+        // Status is best-effort; keep the last known status.
+      }
+    };
+    fetchStatus();
+    const interval = setInterval(fetchStatus, 8000);
+    return () => { cancelled = true; clearInterval(interval); };
+  }, []);
 
   // Fetch settings when component mounts
   useEffect(() => {
@@ -177,15 +198,63 @@ const SettingsUI = () => {
       }
 
       setSaveStatus('saved');
-      
+
       // Update the original settings after saving
       setOriginalSettings(JSON.parse(JSON.stringify(settings)));
-      
-      setTimeout(() => setSaveStatus(null), 2000);
     } catch (error) {
       console.error('Error saving settings:', error);
       setSaveStatus('error');
-      setTimeout(() => setSaveStatus(null), 2000);
+    }
+  };
+
+  // Save as you edit: autosave shortly after the last change.
+  useEffect(() => {
+    if (loadingSettings || loadError) return;
+    if (!hasUnsavedChanges()) return;
+    const timeout = setTimeout(() => { handleSave(); }, 1000);
+    return () => clearTimeout(timeout);
+  }, [settings, originalSettings, loadingSettings, loadError]);
+
+  const testWifiNetwork = async (ssid) => {
+    setWifiTests(prev => ({ ...prev, [ssid]: { state: 'testing' } }));
+    try {
+      const response = await fetch('/api/wifi/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ssid }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Test failed');
+      setWifiTests(prev => ({
+        ...prev,
+        [ssid]: { state: data.success ? 'success' : 'failure', message: data.message },
+      }));
+    } catch (error) {
+      setWifiTests(prev => ({
+        ...prev,
+        [ssid]: { state: 'failure', message: String(error.message || error) },
+      }));
+    }
+  };
+
+  const stopHotspot = async (force = false) => {
+    setHotspotStopState({ state: 'stopping' });
+    try {
+      const response = await fetch('/api/hotspot/stop', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ force }),
+      });
+      const data = await response.json();
+      if (response.status === 409) {
+        setHotspotStopState({ state: 'blocked', message: data.error });
+        return;
+      }
+      if (!response.ok) throw new Error(data.error || 'Failed to stop hotspot');
+      setHotspotStopState({ state: 'stopped' });
+      setNetworkStatus(prev => (prev ? { ...prev, hotspot: false } : prev));
+    } catch (error) {
+      setHotspotStopState({ state: 'error', message: String(error.message || error) });
     }
   };
 
@@ -438,7 +507,8 @@ const SettingsUI = () => {
                 <div className="space-y-3">
                   <p>Configure WiFi settings for your device.</p>
                   <p className="text-sm text-muted-foreground">
-                    Changes will apply after saving and restarting the network service.
+                    Networks save automatically as you edit. Use "Test connection"
+                    to verify a network works before turning off the hotspot.
                   </p>
                 </div>
               </HoverCardContent>
@@ -447,7 +517,53 @@ const SettingsUI = () => {
           <CardDescription>Manage wireless network connections</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          
+
+          {networkStatus && (
+            <div className="flex items-center justify-between bg-secondary/20 p-3 rounded">
+              <div className="flex items-center gap-2">
+                {networkStatus.internet ? (
+                  <Wifi className="h-4 w-4 text-green-600" />
+                ) : (
+                  <WifiOff className="h-4 w-4 text-red-600" />
+                )}
+                <div className="text-sm">
+                  <div className="font-medium">
+                    {networkStatus.internet ? 'Internet connected' : 'No internet connection'}
+                    {networkStatus.connected_ssid ? ` (${networkStatus.connected_ssid})` : ''}
+                  </div>
+                  {networkStatus.hotspot && (
+                    <div className="text-muted-foreground">Setup hotspot is on</div>
+                  )}
+                </div>
+              </div>
+              {networkStatus.hotspot && (
+                <Button
+                  variant="outline"
+                  onClick={() => stopHotspot(false)}
+                  disabled={hotspotStopState?.state === 'stopping'}
+                >
+                  <Power className="h-4 w-4 mr-2" />
+                  {hotspotStopState?.state === 'stopping' ? 'Turning off…' : 'Turn off hotspot (run :hotspot to reenable)'}
+                </Button>
+              )}
+            </div>
+          )}
+          {hotspotStopState?.state === 'blocked' && (
+            <Alert className="bg-yellow-100 text-yellow-900 border-yellow-200">
+              <AlertDescription className="flex items-center justify-between gap-4">
+                <span>{hotspotStopState.message}</span>
+                <Button variant="outline" onClick={() => stopHotspot(true)}>
+                  Turn off anyway
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
+          {hotspotStopState?.state === 'error' && (
+            <Alert className="bg-red-100 text-red-800 border-red-200">
+              <AlertDescription>{hotspotStopState.message}</AlertDescription>
+            </Alert>
+          )}
+
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-sm font-medium">WiFi Networks</h3>
@@ -467,26 +583,43 @@ const SettingsUI = () => {
             <div className="space-y-2">
               {settings.WIFI_NETWORKS && settings.WIFI_NETWORKS.length > 0 ? (
                 settings.WIFI_NETWORKS.map((network, index) => (
-                  <div key={index} className="flex items-center justify-between bg-secondary/20 p-3 rounded">
-                    <div className="flex-1">
-                      <div className="font-medium">{network.ssid}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {network.psk ? 'Secured (WPA)' : 'Open Network'}
+                  <div key={index} className="bg-secondary/20 p-3 rounded space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="font-medium">{network.ssid}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {network.psk ? 'Secured (WPA)' : 'Open Network'}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => testWifiNetwork(network.ssid)}
+                          disabled={wifiTests[network.ssid]?.state === 'testing' || hasUnsavedChanges()}
+                        >
+                          {wifiTests[network.ssid]?.state === 'testing' ? 'Testing…' : 'Test connection'}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => {
+                            setSettings(prev => ({
+                              ...prev,
+                              WIFI_NETWORKS: prev.WIFI_NETWORKS.filter((_, i) => i !== index)
+                            }));
+                          }}
+                          className="h-8 w-8"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => {
-                        setSettings(prev => ({
-                          ...prev,
-                          WIFI_NETWORKS: prev.WIFI_NETWORKS.filter((_, i) => i !== index)
-                        }));
-                      }}
-                      className="h-8 w-8"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    {wifiTests[network.ssid]?.message && (
+                      <div className={`text-sm ${wifiTests[network.ssid].state === 'success' ? 'text-green-700' : 'text-red-700'}`}>
+                        {wifiTests[network.ssid].message}
+                      </div>
+                    )}
                   </div>
                 ))
               ) : (
@@ -775,31 +908,22 @@ const SettingsUI = () => {
       </Card>
 
       <div className="sticky bottom-6">
-        <div className="flex flex-col items-end gap-4">
-          {saveStatus === 'saved' && (
-            <Alert className="w-72">
-              <AlertDescription>Settings saved successfully!</AlertDescription>
-            </Alert>
-          )}
+        <div className="flex flex-col items-end gap-2">
           {saveStatus === 'error' && (
             <Alert className="w-72 bg-red-100 text-red-800 border-red-200">
-              <AlertDescription>Error saving settings. Please try again.</AlertDescription>
+              <AlertDescription>Error saving settings. Retrying may help.</AlertDescription>
             </Alert>
           )}
-          <Button
-            onClick={handleSave}
-            className={`w-32 ${hasUnsavedChanges() ? 'bg-blue-600 hover:bg-blue-700' : 'bg-slate-300 hover:bg-slate-400'}`}
-            disabled={saveStatus === 'saving' || !hasUnsavedChanges()}
-          >
-            {saveStatus === 'saving' ? (
-              'Saving...'
-            ) : (
-              <>
-                <Save className="h-4 w-4 mr-2" />
-                {hasUnsavedChanges() ? 'Save *' : 'Save'}
-              </>
-            )}
-          </Button>
+          <div className="flex items-center gap-2 bg-white/90 border rounded-full px-4 py-2 shadow">
+            <Save className={`h-4 w-4 ${hasUnsavedChanges() || saveStatus === 'saving' ? 'text-yellow-600' : 'text-green-600'}`} />
+            <span className="text-sm font-medium">
+              {saveStatus === 'saving'
+                ? 'Saving…'
+                : hasUnsavedChanges()
+                  ? 'Unsaved changes…'
+                  : 'All changes saved'}
+            </span>
+          </div>
         </div>
       </div>
       </>

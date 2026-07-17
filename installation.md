@@ -16,14 +16,16 @@ These instructions will guide you through setting up Go Note Go on a Raspberry P
    
    Give it a minute to boot.
 
-4. Start the settings server.
-   
-   Type the following command and press Enter:
+4. Wait for the setup hotspot (or start it yourself).
+
+   If Go Note Go can't find a WiFi network it knows, it automatically starts
+   a hotspot called GoNoteGo-Wifi after about two minutes and speaks the
+   network name, password, and settings address out loud.
+
+   You can also start it any time by typing:
    ```
-   :server
+   :hotspot
    ```
-   
-   This will start a WiFi hotspot called GoNoteGo-Wifi.
 
 5. Connect to the GoNoteGo-Wifi hotspot.
    
@@ -39,22 +41,28 @@ These instructions will guide you through setting up Go Note Go on a Raspberry P
    - Where to upload your notes
    - Other settings
    
-   Click Save when finished.
+   Settings save automatically as you edit (watch the saved/unsaved
+   indicator in the corner).
 
-7. Verify internet connection.
-   
-   Run the following command on the Go Note Go:
+7. Verify the WiFi connection.
+
+   After adding a WiFi network, press its "Test connection" button. Go Note
+   Go connects to the network while the hotspot stays up, verifies real
+   internet access, and reports the result on the page and out loud. You can
+   also ask the device directly:
    ```
    :i
    ```
    
    It should respond out loud with 'Yes' indicating it's connected to the internet.
 
-8. Turn off the WiFi hotspot (optional).
-   
-   Run the following command:
+8. Turn off the WiFi hotspot.
+
+   Once a connection is verified, press "Turn off hotspot" on the settings
+   page (it refuses until a connection has been verified, so you can't lock
+   yourself out), or type:
    ```
-   :server stop
+   :hotspot off
    ```
 
 9. That's it! Your Go Note Go is ready to use. Happy note-taking!

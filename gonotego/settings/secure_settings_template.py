@@ -36,5 +36,9 @@ DROPBOX_ACCESS_TOKEN = '<DROPBOX_ACCESS_TOKEN>'
 
 OPENAI_API_KEY = '<OPENAI_API_KEY>'
 
+# List of {'ssid': ..., 'psk': ...} dicts. Omit 'psk' for open networks.
 WIFI_NETWORKS = []
 CUSTOM_COMMAND_PATHS = []
+
+# Start the configuration hotspot automatically when no WiFi is reachable.
+AUTO_HOTSPOT = True

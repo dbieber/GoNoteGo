@@ -7,9 +7,12 @@ import json
 import os
 import sys
 import mimetypes
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse
 
+from gonotego.common import internet
+from gonotego.command_center import system_commands
+from gonotego.settings import hotspot
 from gonotego.settings import secure_settings
 from gonotego.settings import settings
 from gonotego.settings import wifi
@@ -35,6 +38,55 @@ SENSITIVE_KEYS = [
     'DROPBOX_ACCESS_TOKEN',
     'OPENAI_API_KEY',
 ]
+
+def get_status_payload():
+  """Current network status shown by the settings UI."""
+  return {
+      'internet': internet.is_internet_available(),
+      'hotspot': hotspot.is_active(),
+      'connected_ssid': wifi.get_connected_ssid(),
+  }
+
+
+def handle_wifi_test(payload):
+  """Connects to a configured network and verifies internet access.
+
+  The hotspot (if running) stays up throughout, so the person configuring
+  the device doesn't lose the settings page while the network is tested.
+
+  Returns:
+    A (status_code, response_dict) tuple.
+  """
+  ssid = (payload.get('ssid') or '').strip()
+  if not ssid:
+    return 400, {'error': 'ssid is required'}
+  if ssid not in {network['ssid'] for network in wifi.get_networks()}:
+    return 404, {'error': f'{ssid} is not a configured network. Save it first.'}
+  # Make sure NetworkManager has an up-to-date connection for it.
+  wifi.sync_connections()
+  system_commands.say(f'Trying WiFi network {ssid}.')
+  success, message = wifi.connect_and_verify(ssid)
+  system_commands.say(message)
+  return 200, {'success': success, 'message': message}
+
+
+def handle_hotspot_stop(payload):
+  """Stops the hotspot -- but only once a connection has been verified.
+
+  Pass {'force': true} to stop it regardless (e.g. from the keyboard you
+  could also type ':hotspot off').
+
+  Returns:
+    A (status_code, response_dict) tuple.
+  """
+  force = bool(payload.get('force'))
+  if not force and not internet.is_internet_available():
+    return 409, {
+        'error': ('No verified internet connection yet. Test a WiFi network '
+                  'first, or force the hotspot off.')}
+  hotspot.stop()
+  return 200, {'success': True}
+
 
 class SettingsCombinedHandler(BaseHTTPRequestHandler):
   """HTTP request handler for settings server and API."""
@@ -97,6 +149,14 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
         print(f"Error resetting settings: {e}")
         self._set_response_headers(status_code=500, content_type="application/json")
         self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
+    elif path == "/api/status":
+      try:
+        self._set_response_headers(content_type="application/json")
+        self.wfile.write(json.dumps(get_status_payload()).encode("utf-8"))
+      except Exception as e:
+        print(f"Error handling status request: {e}")
+        self._set_response_headers(status_code=500, content_type="application/json")
+        self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
     elif path == "/api/settings":
       try:
         # Get all available settings from secure_settings and mask sensitive values
@@ -152,10 +212,29 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
 
       self.serve_static_file(file_path)
 
+  def _read_json_body(self):
+    content_length = int(self.headers.get("Content-Length") or 0)
+    if not content_length:
+      return {}
+    return json.loads(self.rfile.read(content_length).decode("utf-8"))
+
   def do_POST(self):
     """Handle POST requests."""
     parsed_path = urlparse(self.path)
-    if parsed_path.path == "/api/settings":
+    if parsed_path.path in ("/api/wifi/test", "/api/hotspot/stop"):
+      try:
+        payload = self._read_json_body()
+        if parsed_path.path == "/api/wifi/test":
+          status_code, response = handle_wifi_test(payload)
+        else:
+          status_code, response = handle_hotspot_stop(payload)
+        self._set_response_headers(status_code=status_code, content_type="application/json")
+        self.wfile.write(json.dumps(response).encode("utf-8"))
+      except Exception as e:
+        print(f"Error handling {parsed_path.path} request: {e}")
+        self._set_response_headers(status_code=500, content_type="application/json")
+        self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
+    elif parsed_path.path == "/api/settings":
       try:
         # Read the request body
         content_length = int(self.headers["Content-Length"])
@@ -173,11 +252,15 @@ class SettingsCombinedHandler(BaseHTTPRequestHandler):
             continue
 
           try:
-            # Handle WiFi networks specially
+            # Handle WiFi networks specially.
+            # Settings are the source of truth; sync them into
+            # NetworkManager without restarting it (the UI saves as you
+            # edit, and a NetworkManager restart would drop the hotspot's
+            # upstream connection). Use /api/wifi/test to actually try a
+            # network.
             if key == 'WIFI_NETWORKS':
               wifi.save_networks(value)
-              wifi.configure_network_connections()
-              wifi.reconfigure_wifi()
+              wifi.sync_connections()
             else:
               # For all other settings, just use settings.set
               settings.set(key, value)
@@ -203,7 +286,9 @@ def run_server():
     sys.exit(1)
 
   server_address = ("", PORT)
-  httpd = HTTPServer(server_address, SettingsCombinedHandler)
+  # Threading so slow requests (e.g. testing a WiFi connection) don't block
+  # the UI's status polling and autosaves.
+  httpd = ThreadingHTTPServer(server_address, SettingsCombinedHandler)
   print(f"Starting combined settings server on port {PORT}")
   print(f"Serving static files from {STATIC_FILES_DIR}")
   httpd.serve_forever()

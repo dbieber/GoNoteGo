@@ -147,21 +147,5 @@ def check_internet():
   say('yes' if internet.is_internet_available() else 'no')
 
 
-@register_command('server')
-@register_command('settings')
-@register_command('configure')
-def start_settings_server():
-  shell('sudo systemctl stop uap0.service')
-  shell('sudo systemctl stop dnsmasq.service')
-  shell('sudo systemctl stop hostapd.service')
-
-  shell('sudo systemctl start uap0.service')
-  shell('sudo ip addr show uap0')
-  shell('sudo ip addr add 192.168.4.1/24 dev uap0')
-  shell('sudo iptables -t nat -A POSTROUTING -o wlan0 -j MASQUERADE')
-  shell('sudo systemctl start dnsmasq.service')
-  shell('sudo systemctl start hostapd.service')
-
-@register_command('server stop')
-def stop_settings_server():
-  shell('sudo systemctl stop hostapd.service')
+# The settings server always runs; ':hotspot' (see wifi_commands.py) starts
+# the hotspot that makes it reachable without a monitor.

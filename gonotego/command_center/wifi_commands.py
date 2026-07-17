@@ -2,6 +2,7 @@
 import subprocess
 from gonotego.command_center import registry
 from gonotego.command_center import system_commands
+from gonotego.settings import hotspot
 from gonotego.settings import wifi
 
 register_command = registry.register_command
@@ -32,7 +33,7 @@ def add_wpa_wifi(ssid, psk):
   wifi.save_networks(networks)
   
   # Configure NetworkManager connections
-  if wifi.configure_network_connections():
+  if wifi.sync_connections():
     wifi.reconfigure_wifi()
     say(f'WiFi network {ssid} added.')
   else:
@@ -61,7 +62,7 @@ def add_wifi_no_psk(ssid):
   wifi.save_networks(networks)
   
   # Configure NetworkManager connections
-  if wifi.configure_network_connections():
+  if wifi.sync_connections():
     wifi.reconfigure_wifi()
     say(f'Open WiFi network {ssid} added.')
   else:
@@ -92,7 +93,7 @@ def remove_wifi_network(ssid):
     wifi.save_networks(networks)
     
     # Configure NetworkManager connections
-    if wifi.configure_network_connections():
+    if wifi.sync_connections():
       wifi.reconfigure_wifi()
       say(f'WiFi network {ssid} removed.')
     else:
@@ -143,3 +144,20 @@ def scan_wifi_networks():
       say('No WiFi networks found.')
   except Exception as e:
     say(f'Error scanning for WiFi networks: {str(e)}')
+
+
+@register_command('hotspot')
+@register_command('hotspot on')
+@register_command('wifi-config')
+@register_command('server')
+@register_command('settings')
+@register_command('configure')
+def hotspot_on():
+  """Start the configuration hotspot and speak how to connect to it."""
+  hotspot.start()
+
+
+@register_command('hotspot off')
+@register_command('server stop')
+def hotspot_off():
+  hotspot.stop()
