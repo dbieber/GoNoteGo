@@ -2,7 +2,14 @@
 
 These instructions will guide you through setting up Go Note Go on a Raspberry Pi 400.
 
-1. Download the latest image from GitHub Actions artifacts.
+1. Download the latest image.
+
+   Images are built automatically on every push to main (grab the
+   "Release image" artifact from the latest [GitHub Actions
+   run](https://github.com/dbieber/GoNoteGo/actions)) and attached to
+   [releases](https://github.com/dbieber/GoNoteGo/releases) for tagged
+   versions. You can also build one on demand for any branch from the
+   Actions tab via "Run workflow".
 
 2. Flash the image onto an SD card.
    
@@ -66,5 +73,25 @@ These instructions will guide you through setting up Go Note Go on a Raspberry P
    ```
 
 9. That's it! Your Go Note Go is ready to use. Happy note-taking!
+
+## Configuring before first boot (great for gifting)
+
+The image is generic; each device can be customized by editing a file on
+the SD card between flashing and first boot -- no monitor, no hotspot
+dance:
+
+1. Flash the image (step 2 above).
+2. Re-insert the SD card and open the small FAT volume that appears
+   (the boot partition -- readable on macOS, Windows, and Linux).
+3. Open `gonotego/secure_settings.py` in a text editor and fill in the
+   recipient's WiFi network(s) and note-taking destination. The
+   `gonotego/README.md` next to it has examples.
+4. Eject, insert into the Raspberry Pi 400, and boot. On boot the settings
+   are installed automatically (the file is renamed to `.bak`; rename it
+   back to apply new settings from the card again).
+
+A device set up this way is ready to take notes on first boot. If it ever
+finds itself without a known WiFi network, it starts the setup hotspot
+described above and speaks instructions.
 
 If you're having any trouble getting set up, open a [new GitHub issue](https://github.com/dbieber/GoNoteGo/issues).

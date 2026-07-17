@@ -11,3 +11,4 @@ This directory contains configuration templates used during the build process fo
 - `hostapd`: Default configuration for hostapd service
 - `sysctl.conf`: System configuration for IP forwarding
 - `bash_history`: Predefined bash history commands for debugging
+- `boot_config_README.md`: README placed next to the settings template on the image's boot partition, explaining per-recipient configuration
