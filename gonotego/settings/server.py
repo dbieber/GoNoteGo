@@ -45,6 +45,7 @@ def get_status_payload():
       'internet': internet.is_internet_available(),
       'hotspot': hotspot.is_active(),
       'connected_ssid': wifi.get_connected_ssid(),
+      'active_profile': settings.get_active_profile(),
   }
 
 

@@ -38,7 +38,11 @@ def whoami():
     user = settings.get('SLACK_CHANNEL')
   elif note_taking_system == 'twitter':
     user = settings.get('twitter.screen_name')
-  say(f'uploader {note_taking_system} ; user {user}')
+  else:
+    user = 'unknown'
+  profile = settings.get_active_profile()
+  profile_part = f' ; profile {profile}' if profile != settings.DEFAULT_PROFILE else ''
+  say(f'uploader {note_taking_system} ; user {user}{profile_part}')
 
 
 @register_command('t')

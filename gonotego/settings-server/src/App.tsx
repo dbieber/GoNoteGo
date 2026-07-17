@@ -344,7 +344,14 @@ const SettingsUI = () => {
 
   return (
     <div className="w-full max-w-4xl mx-auto p-6 space-y-6">
-      <h1 className="text-3xl font-bold mb-8">Go Note Go Settings</h1>
+      <div className="flex items-center gap-3 mb-8">
+        <h1 className="text-3xl font-bold">Go Note Go Settings</h1>
+        {networkStatus?.active_profile && networkStatus.active_profile !== 'default' && (
+          <span className="text-sm font-medium bg-secondary/40 border rounded-full px-3 py-1">
+            profile: {networkStatus.active_profile}
+          </span>
+        )}
+      </div>
 
       {loadingSettings && (
         <div className="text-center py-8">

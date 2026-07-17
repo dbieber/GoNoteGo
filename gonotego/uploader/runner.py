@@ -54,6 +54,7 @@ def make_uploader(note_taking_system):
 def main():
   print('Starting uploader.')
   note_events_queue = interprocess.get_note_events_queue()
+  active_profile = settings.get_active_profile()
   note_taking_system = settings.get('NOTE_TAKING_SYSTEM').lower()
 
   # Check if note taking system is still using the default unconfigured value
@@ -83,9 +84,15 @@ def main():
     # Don't even try uploading notes if we don't have a connection.
     internet.wait_for_internet(on_disconnect=uploader.handle_disconnect)
 
+    # Remake the uploader when the note-taking system changes -- or when the
+    # active profile changes, since a different profile may point at a
+    # different account of the same system.
+    profile_setting = settings.get_active_profile()
     note_taking_system_setting = settings.get('NOTE_TAKING_SYSTEM').lower()
-    if note_taking_system_setting != note_taking_system:
+    if (note_taking_system_setting != note_taking_system
+        or profile_setting != active_profile):
       note_taking_system = note_taking_system_setting
+      active_profile = profile_setting
 
       # Check if note taking system is using the default unconfigured value after a change
       if is_unconfigured(note_taking_system):

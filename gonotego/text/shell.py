@@ -62,6 +62,18 @@ def is_shift_pressed():
   return False
 
 
+def is_cmd_pressed():
+  # 'cmd' is the command key on Mac and the super/windows key elsewhere;
+  # which names the keyboard library accepts varies by platform.
+  for key in ('cmd', 'windows', 'command'):
+    try:
+      if keyboard.is_pressed(key):
+        return True
+    except ValueError:
+      continue
+  return False
+
+
 class Shell:
 
   def __init__(self):
@@ -155,6 +167,9 @@ class Shell:
         self.submit_note()
     elif event.name == 'space':
       self.text += ' '
+    elif event.name.isdigit() and is_shift_pressed() and is_cmd_pressed():
+      # cmd-shift-N switches to the Nth settings profile (':profiles' order).
+      self.switch_profile(int(event.name))
     elif len(event.name) == 1:
       character = event.name
       if character in character_substitutions:
@@ -162,6 +177,11 @@ class Shell:
       if is_shift_pressed():
         character = shift_characters.get(character, character.upper())
       self.text += character
+
+  def switch_profile(self, number):
+    """Enqueues a profile switch by number, as if ':use profile N' were typed."""
+    command_event = events.CommandEvent(command_text=f'use profile {number}')
+    self.command_event_queue.put(bytes(command_event))
 
   def submit_note(self):
     if self.text:
