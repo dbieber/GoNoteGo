@@ -22,6 +22,7 @@ STATIC_FILES_DIR = os.path.abspath(os.path.join(
 
 # Sensitive keys that should be masked
 SENSITIVE_KEYS = [
+    'ROAM_API_TOKEN',
     'ROAM_PASSWORD',
     'REMNOTE_API_KEY',
     'IDEAFLOW_PASSWORD',
