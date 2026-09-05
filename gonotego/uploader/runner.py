@@ -10,6 +10,7 @@ from gonotego.settings import settings
 from gonotego.uploader.email import email_uploader
 from gonotego.uploader.ideaflow import ideaflow_uploader
 from gonotego.uploader.remnote import remnote_uploader
+from gonotego.uploader.roam import roam_api_uploader
 from gonotego.uploader.roam import roam_uploader
 from gonotego.uploader.mem import mem_uploader
 from gonotego.uploader.notion import notion_uploader
@@ -25,6 +26,13 @@ def print_configuration_help():
   print("Example: ':set NOTE_TAKING_SYSTEM roam'")
 
 
+def is_configured(value):
+  """True if a setting has a real value rather than being empty or a '<PLACEHOLDER>'."""
+  if not value:
+    return False
+  return not (value.startswith('<') and value.endswith('>'))
+
+
 def is_unconfigured(note_taking_system):
   """Check if the note taking system is unconfigured."""
   return note_taking_system == '<note_taking_system>' or note_taking_system == ''
@@ -38,6 +46,11 @@ def make_uploader(note_taking_system):
   elif note_taking_system == 'remnote':
     return remnote_uploader.Uploader()
   elif note_taking_system == 'roam':
+    if is_configured(settings.get('ROAM_API_TOKEN', None)):
+      return roam_api_uploader.Uploader()
+    print('ROAM_API_TOKEN is not set; using the browser-based Roam uploader. '
+          'Create a token in Roam (Settings > Graph > API tokens) and run '
+          "':set ROAM_API_TOKEN <token>' to upload without a browser.")
     return roam_uploader.Uploader()
   elif note_taking_system == 'mem':
     return mem_uploader.Uploader()

@@ -17,12 +17,21 @@ def get_redis_key(key):
   return f'{SETTINGS_KEY}:{key}'
 
 
-def get(key):
+_MISSING = object()
+
+
+def get(key, default=_MISSING):
+  """Returns a setting, preferring the value set on the device over secure_settings.
+
+  Raises AttributeError for an unknown key unless a default is given.
+  """
   r = interprocess.get_redis_client()
   value_bytes = r.get(get_redis_key(key))
   if value_bytes is None:
     # If the setting isn't set in redis, fall back to the value from secure_settings.
-    return getattr(secure_settings, key)
+    if default is _MISSING:
+      return getattr(secure_settings, key)
+    return getattr(secure_settings, key, default)
   value_repr = value_bytes.decode('utf-8')
   value = ast.literal_eval(value_repr)
   return value

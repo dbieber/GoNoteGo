@@ -32,6 +32,7 @@ const SettingsUI = () => {
     NOTE_TAKING_SYSTEM: '',
     BLOB_STORAGE_SYSTEM: '',
     ROAM_GRAPH: '',
+    ROAM_API_TOKEN: '',
     ROAM_USER: '',
     ROAM_PASSWORD: '',
     REMNOTE_USER_ID: '',
@@ -701,8 +702,9 @@ const SettingsUI = () => {
       {/* Conditional Settings based on Note Taking System */}
       {renderSettingGroup('Roam Research', 'Roam Research integration settings', [
         { key: 'ROAM_GRAPH', label: 'Graph Name' },
-        { key: 'ROAM_USER', label: 'Username' },
-        { key: 'ROAM_PASSWORD', label: 'Password', type: 'password' },
+        { key: 'ROAM_API_TOKEN', label: 'API Token (recommended; Roam Settings > Graph > API tokens)', type: 'password' },
+        { key: 'ROAM_USER', label: 'Username (browser fallback)' },
+        { key: 'ROAM_PASSWORD', label: 'Password (browser fallback)', type: 'password' },
       ], shouldShowSection('roam'))}
 
       {renderSettingGroup('RemNote', 'RemNote integration settings', [
