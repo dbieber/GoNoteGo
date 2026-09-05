@@ -33,6 +33,11 @@ def is_configured(value):
   return not (value.startswith('<') and value.endswith('>'))
 
 
+def roam_api_configured():
+  """True if a Roam API token is set, so Roam uploads can skip the browser."""
+  return is_configured(settings.get('ROAM_API_TOKEN', None))
+
+
 def is_unconfigured(note_taking_system):
   """Check if the note taking system is unconfigured."""
   return note_taking_system == '<note_taking_system>' or note_taking_system == ''
@@ -46,7 +51,7 @@ def make_uploader(note_taking_system):
   elif note_taking_system == 'remnote':
     return remnote_uploader.Uploader()
   elif note_taking_system == 'roam':
-    if is_configured(settings.get('ROAM_API_TOKEN', None)):
+    if roam_api_configured():
       return roam_api_uploader.Uploader()
     print('ROAM_API_TOKEN is not set; using the browser-based Roam uploader. '
           'Create a token in Roam (Settings > Graph > API tokens) and run '
@@ -105,6 +110,12 @@ def main():
         print_configuration_help()
         continue
 
+      uploader = make_uploader(note_taking_system)
+
+    # Switch between the Roam API and browser uploaders if ROAM_API_TOKEN was
+    # set or cleared while running (e.g. via ':set ROAM_API_TOKEN <token>').
+    if note_taking_system == 'roam' and roam_api_configured() != isinstance(uploader, roam_api_uploader.Uploader):
+      uploader.handle_disconnect()
       uploader = make_uploader(note_taking_system)
 
     note_event_bytes_list = []
