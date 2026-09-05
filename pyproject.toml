@@ -62,8 +62,14 @@ test = [
 
 [tool.ruff]
 line-length = 180
-lint.ignore = ["E722"]
 exclude = ["scratch"]
+
+[tool.ruff.lint]
+# Pin the rule set to the classic ruff default (pyflakes + pycodestyle
+# errors) so `ruff check` stays deterministic as new ruff versions widen
+# their defaults. E722 (bare except) is used intentionally in a few places.
+select = ["E4", "E7", "E9", "F"]
+ignore = ["E722"]
 
 [build-system]
 requires = ["setuptools>=43.0.0", "wheel"]
