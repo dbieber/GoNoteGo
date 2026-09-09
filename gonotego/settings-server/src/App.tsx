@@ -20,7 +20,8 @@ const SettingsUI = () => {
     { display: 'Notion', value: 'notion' },
     { display: 'Slack', value: 'slack' },
     { display: 'Twitter', value: 'twitter' },
-    { display: 'Email', value: 'email' }
+    { display: 'Email', value: 'email' },
+    { display: 'Google Docs', value: 'googledocs' }
   ];
   
   const BLOB_STORAGE_SYSTEMS = [
@@ -54,6 +55,10 @@ const SettingsUI = () => {
     EMAIL_USER: '',
     EMAIL_PASSWORD: '',
     EMAIL_SERVER: '',
+    GOOGLE_DOCS_CREDENTIALS: '',
+    GOOGLE_DOCS_SHARE_EMAIL: '',
+    GOOGLE_DOCS_FOLDER_ID: '',
+    GOOGLE_DOCS_TITLE_FORMAT: '',
     DROPBOX_ACCESS_TOKEN: '',
     OPENAI_API_KEY: '',
     WIFI_NETWORKS: [],
@@ -726,6 +731,13 @@ const SettingsUI = () => {
         { key: 'NOTION_INTEGRATION_TOKEN', label: 'Integration Token', type: 'password' },
         { key: 'NOTION_DATABASE_ID', label: 'Database ID' },
       ], shouldShowSection('notion'))}
+
+      {renderSettingGroup('Google Docs', 'Google Docs integration settings (one doc per month)', [
+        { key: 'GOOGLE_DOCS_CREDENTIALS', label: 'Service Account JSON Path', tip: 'Path on the device to the service-account credentials file' },
+        { key: 'GOOGLE_DOCS_SHARE_EMAIL', label: 'Share With Email', tip: 'Each monthly doc is shared with this address as an editor' },
+        { key: 'GOOGLE_DOCS_FOLDER_ID', label: 'Drive Folder ID', tip: 'Optional: Drive folder to create the monthly docs in' },
+        { key: 'GOOGLE_DOCS_TITLE_FORMAT', label: 'Doc Title Format', tip: "Optional strftime for the monthly doc title, default '%B %Y'" },
+      ], shouldShowSection('googledocs'))}
 
       {renderSettingGroup('Slack', 'Slack integration settings', [
         { key: 'SLACK_API_TOKEN', label: 'API Token', type: 'password', tip: 'Bot token starting with xoxb-' },

@@ -8,6 +8,7 @@ from gonotego.common import note_log
 from gonotego.common import status
 from gonotego.settings import settings
 from gonotego.uploader.email import email_uploader
+from gonotego.uploader.googledocs import googledocs_uploader
 from gonotego.uploader.ideaflow import ideaflow_uploader
 from gonotego.uploader.remnote import remnote_uploader
 from gonotego.uploader.roam import roam_api_uploader
@@ -46,6 +47,8 @@ def is_unconfigured(note_taking_system):
 def make_uploader(note_taking_system):
   if note_taking_system == 'email':
     return email_uploader.Uploader()
+  elif note_taking_system == 'googledocs':
+    return googledocs_uploader.Uploader()
   elif note_taking_system == 'ideaflow':
     return ideaflow_uploader.Uploader()
   elif note_taking_system == 'remnote':
