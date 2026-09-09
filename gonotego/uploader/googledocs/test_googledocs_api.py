@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 from gonotego.uploader.googledocs import googledocs_api as api
@@ -112,6 +114,32 @@ def test_error_raised_on_non_2xx():
   client, _ = make_client([FakeResponse(status_code=403, text='forbidden')])
   with pytest.raises(api.GoogleDocsError, match='403'):
     client.get_document('doc1')
+
+
+def test_load_credentials_routes_service_account(tmp_path, monkeypatch):
+  from google.oauth2 import service_account
+  monkeypatch.setattr(
+      service_account.Credentials, 'from_service_account_info',
+      classmethod(lambda cls, info, scopes: ('service_account', info, scopes)))
+  path = tmp_path / 'sa.json'
+  path.write_text(json.dumps({'type': 'service_account', 'client_email': 'x@y.com'}))
+  kind, info, scopes = api.load_credentials(str(path))
+  assert kind == 'service_account'
+  assert info['client_email'] == 'x@y.com'
+  assert scopes == api.SCOPES
+
+
+def test_load_credentials_routes_authorized_user(tmp_path, monkeypatch):
+  from google.oauth2 import credentials
+  monkeypatch.setattr(
+      credentials.Credentials, 'from_authorized_user_info',
+      classmethod(lambda cls, info, scopes: ('authorized_user', info, scopes)))
+  path = tmp_path / 'token.json'
+  path.write_text(json.dumps({'refresh_token': 'r', 'client_id': 'c', 'client_secret': 's'}))
+  kind, info, scopes = api.load_credentials(str(path))
+  assert kind == 'authorized_user'
+  assert info['refresh_token'] == 'r'
+  assert scopes == api.SCOPES
 
 
 def test_default_credentials_path_prefers_env(monkeypatch):

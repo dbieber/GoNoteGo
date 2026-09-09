@@ -1,17 +1,24 @@
 """Client for the Google Docs and Drive REST APIs used by the Google Docs uploader.
 
-Auth uses a Google service account (no browser, no interactive OAuth). Point
-GOOGLE_DOCS_CREDENTIALS at the service-account JSON (falling back to the
-GOOGLE_APPLICATION_CREDENTIALS env var, then /home/pi/secrets/google_credentials.json).
+Auth can be either of two credential kinds, both pointed to by
+GOOGLE_DOCS_CREDENTIALS (falling back to the GOOGLE_APPLICATION_CREDENTIALS env
+var, then /home/pi/secrets/google_credentials.json):
+
+  - A **service account** key (JSON with "type": "service_account"). Docs are
+    created and owned by the service account, then shared with GOOGLE_DOCS_SHARE_EMAIL.
+  - A **user OAuth token** (an "authorized user" JSON with a refresh_token,
+    produced by scripts/authorize_googledocs.py). Docs are created in and owned
+    by that Google user's own Drive. Use this to write into someone's own Drive,
+    since a service account cannot own files in a consumer Gmail Drive.
 
 The uploader keeps one Google Doc per month. This client finds that doc by name
-or creates it, optionally sharing it with a configured email and placing it in a
-Drive folder, then appends structured content to it.
+or creates it, optionally placing it in a Drive folder, then appends content.
 
 Scopes: documents (edit docs) and drive.file (create/find/share only the files
-this app makes). drive.file is deliberately narrow: the service account can only
-see and manage docs it created, not the rest of anyone's Drive.
+this app makes). drive.file is deliberately narrow: only docs this app created
+are visible to it, not the rest of anyone's Drive.
 """
+import json
 import os
 
 SCOPES = [
@@ -32,6 +39,23 @@ def default_credentials_path():
   return os.environ.get('GOOGLE_APPLICATION_CREDENTIALS') or DEFAULT_CREDENTIALS_PATH
 
 
+def load_credentials(path):
+  """Loads Google credentials from a service-account key or a user OAuth token.
+
+  Detects the kind by the JSON contents: a service-account key has
+  "type": "service_account"; anything else is treated as an authorized-user
+  token (with a refresh_token) that authenticates as a specific Google user so
+  the docs live in that user's own Drive.
+  """
+  with open(path) as f:
+    info = json.load(f)
+  if info.get('type') == 'service_account':
+    from google.oauth2 import service_account
+    return service_account.Credentials.from_service_account_info(info, scopes=SCOPES)
+  from google.oauth2.credentials import Credentials
+  return Credentials.from_authorized_user_info(info, scopes=SCOPES)
+
+
 def _escape_query_value(value):
   """Escapes a value for use inside a Drive query string literal."""
   return value.replace('\\', '\\\\').replace("'", "\\'")
@@ -48,12 +72,9 @@ class GoogleDocsClient:
   def session(self):
     """Returns an authorized requests session, building it from the SA creds once."""
     if self._session is None:
-      from google.oauth2 import service_account
       from google.auth.transport.requests import AuthorizedSession
       path = self._credentials_path or default_credentials_path()
-      credentials = service_account.Credentials.from_service_account_file(
-          path, scopes=SCOPES)
-      self._session = AuthorizedSession(credentials)
+      self._session = AuthorizedSession(load_credentials(path))
     return self._session
 
   def _request(self, method, url, **kwargs):
