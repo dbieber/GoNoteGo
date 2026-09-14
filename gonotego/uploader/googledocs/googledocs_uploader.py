@@ -203,6 +203,17 @@ class Uploader:
     """
     requests = [{'insertText': {
         'location': {'index': insert_index}, 'text': blob}}]
+    # Optionally force a single font across the whole insert (headings + notes).
+    # Without GOOGLE_DOCS_FONT set, Google Docs' default two-font styling is kept
+    # (Trebuchet MS headings, Arial body). Applied before the bullet requests
+    # below, which shift indices by removing tabs; a text-style change has no
+    # length effect, so this range stays valid.
+    font = _setting('GOOGLE_DOCS_FONT')
+    if font:
+      requests.append({'updateTextStyle': {
+          'range': {'startIndex': insert_index, 'endIndex': insert_index + len(blob)},
+          'textStyle': {'weightedFontFamily': {'fontFamily': font}},
+          'fields': 'weightedFontFamily'}})
     styling = []  # (start_index, request)
     i = 0
     n = len(paragraphs)
