@@ -59,6 +59,7 @@ const SettingsUI = () => {
     GOOGLE_DOCS_SHARE_EMAIL: '',
     GOOGLE_DOCS_FOLDER_ID: '',
     GOOGLE_DOCS_TITLE_FORMAT: '',
+    GOOGLE_DOCS_FONT: '',
     DROPBOX_ACCESS_TOKEN: '',
     OPENAI_API_KEY: '',
     WIFI_NETWORKS: [],
@@ -736,7 +737,8 @@ const SettingsUI = () => {
         { key: 'GOOGLE_DOCS_CREDENTIALS', label: 'Service Account JSON Path', tip: 'Path on the device to the service-account credentials file' },
         { key: 'GOOGLE_DOCS_SHARE_EMAIL', label: 'Share With Email', tip: 'Each monthly doc is shared with this address as an editor' },
         { key: 'GOOGLE_DOCS_FOLDER_ID', label: 'Drive Folder ID', tip: 'Optional: Drive folder to create the monthly docs in' },
-        { key: 'GOOGLE_DOCS_TITLE_FORMAT', label: 'Doc Title Format', tip: "Optional strftime for the monthly doc title, default '%B %Y'" },
+        { key: 'GOOGLE_DOCS_TITLE_FORMAT', label: 'Doc Title Format', tip: "Optional strftime for the monthly doc title, default 'Go Note Go Notes - %B %Y'" },
+        { key: 'GOOGLE_DOCS_FONT', label: 'Font', tip: "Optional: one font family for the whole doc (e.g. Trebuchet MS). Blank keeps Google Docs' default two-font styling" },
       ], shouldShowSection('googledocs'))}
 
       {renderSettingGroup('Slack', 'Slack integration settings', [

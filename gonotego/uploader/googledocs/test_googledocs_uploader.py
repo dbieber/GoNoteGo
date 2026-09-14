@@ -88,9 +88,9 @@ def test_single_session_layout():
   ok = up.upload([note(events.SUBMIT, 'first', ts), note(events.SUBMIT, 'second', ts)])
 
   assert ok is True
-  assert client.created == [('September 2026', None, None)]
+  assert client.created == [('Go Note Go Notes - September 2026', None, None)]
   doc_id, requests = client.batches[0]
-  assert doc_id == 'doc:September 2026'
+  assert doc_id == 'doc:Go Note Go Notes - September 2026'
   day = gd.day_title(datetime(2026, 9, 8, 6, 30))
   session = gd.session_title(datetime(2026, 9, 8, 6, 30))
   assert insert_text(requests) == f'{day}\n{session}\nfirst\nsecond\n'
@@ -170,7 +170,7 @@ def test_existing_day_heading_in_doc_is_not_repeated():
   up = gd.Uploader(client=client)
   today = gd.day_title(datetime(2026, 9, 8, 6, 30))
   # Pre-create the month doc and mark today's heading already present.
-  doc_id = client.get_or_create_month_doc('September 2026')
+  doc_id = client.get_or_create_month_doc('Go Note Go Notes - September 2026')
   client.set_existing_day(doc_id, today)
   up.upload([note(events.SUBMIT, 'x')])
   _, requests = client.batches[0]
@@ -192,14 +192,14 @@ def test_folder_and_share_settings_passed(stub_settings):
   stub_settings['GOOGLE_DOCS_SHARE_EMAIL'] = 'andrea@example.com'
   client = FakeClient()
   gd.Uploader(client=client).upload([note(events.SUBMIT, 'x')])
-  assert client.created == [('September 2026', 'folderX', 'andrea@example.com')]
+  assert client.created == [('Go Note Go Notes - September 2026', 'folderX', 'andrea@example.com')]
 
 
 def test_placeholder_settings_treated_as_unset(stub_settings):
   stub_settings['GOOGLE_DOCS_SHARE_EMAIL'] = '<GOOGLE_DOCS_SHARE_EMAIL>'
   client = FakeClient()
   gd.Uploader(client=client).upload([note(events.SUBMIT, 'x')])
-  assert client.created == [('September 2026', None, None)]
+  assert client.created == [('Go Note Go Notes - September 2026', None, None)]
 
 
 def test_custom_title_format(stub_settings):
@@ -207,6 +207,29 @@ def test_custom_title_format(stub_settings):
   client = FakeClient()
   gd.Uploader(client=client).upload([note(events.SUBMIT, 'x')])
   assert client.created[0][0] == 'GNG 2026-09'
+
+
+def test_default_keeps_two_fonts_no_override():
+  client = FakeClient()
+  gd.Uploader(client=client).upload([note(events.SUBMIT, 'x')])
+  _, requests = client.batches[0]
+  assert not any('updateTextStyle' in r for r in requests)
+
+
+def test_google_docs_font_setting_applies_one_font(stub_settings):
+  stub_settings['GOOGLE_DOCS_FONT'] = 'Trebuchet MS'
+  client = FakeClient()
+  gd.Uploader(client=client).upload([note(events.SUBMIT, 'first'), note(events.SUBMIT, 'second')])
+  _, requests = client.batches[0]
+  font_reqs = [r for r in requests if 'updateTextStyle' in r]
+  assert len(font_reqs) == 1
+  style = font_reqs[0]['updateTextStyle']
+  assert style['textStyle']['weightedFontFamily']['fontFamily'] == 'Trebuchet MS'
+  insert = requests[0]['insertText']
+  assert style['range']['startIndex'] == insert['location']['index']
+  assert style['range']['endIndex'] == insert['location']['index'] + len(insert['text'])
+  kinds = [next(iter(r)) for r in requests]
+  assert kinds.index('updateTextStyle') < kinds.index('createParagraphBullets')
 
 
 def test_empty_submits_skipped():
