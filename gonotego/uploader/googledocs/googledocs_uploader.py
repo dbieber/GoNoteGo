@@ -32,7 +32,7 @@ from gonotego.uploader.googledocs import googledocs_api
 DAY_STYLE = 'HEADING_1'
 SESSION_STYLE = 'HEADING_2'
 BULLET_PRESET = 'BULLET_DISC_CIRCLE_SQUARE'
-DEFAULT_TITLE_FORMAT = '%B %Y'
+DEFAULT_TITLE_FORMAT = 'Go Note Go Notes - %B %Y'
 
 
 def clip(x, a, b):
