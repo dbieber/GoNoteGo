@@ -33,7 +33,7 @@ dependencies = [
   'python-dateutil<=2.9.0.post0',
   'google-auth<=2.35.0',
   'redis<=7.0.1',
-  'requests<=2.32.5',
+  'requests<=2.34.2',
   # selenium 4.0 breaks with arm geckodriver.
   'selenium==3.141.0',
   'setuptools-rust<=1.12.0',
